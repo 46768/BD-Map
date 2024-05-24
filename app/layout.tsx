@@ -5,6 +5,11 @@ import MapDisplay from "./components/MapDisplay";
 import Sidebar from "./components/Sidebar/Sidebar";
 import Sidegroup from "./components/Sidebar/Sidegroup";
 import SideLabel from "./components/Sidebar/SideLabel";
+import SideLink from "./components/Sidebar/SideLink";
+import SideBtn from "./components/Sidebar/SideBtn";
+import Navbar from "./components/Navbar/Navbar";
+import { useState } from "react";
+import NavLabel from "./components/Navbar/NavLabel";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,13 +26,16 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="winter" className=" bg-gray-950 overflow-hidden">
       <body className={inter.className}>
-        
-          <Sidebar>
-            <SideLabel>Tools</SideLabel>
-            <SideLabel>Test</SideLabel>
-          </Sidebar>
-        
-        <div className="w-auto inline-block m-4 absolute top-0">
+        <Sidebar>
+          <SideLabel>Placeholder</SideLabel>
+        </Sidebar>
+
+        <Navbar>
+          <NavLabel>BD Navigator  V0.0.0.0</NavLabel>
+          <p className="pl-96 text-sm text-gray-600">theetat kittichai</p>
+        </Navbar>
+
+        <div className="w-auto h-auto inline-block m-4 absolute top-24 left-0 -z-20">
           {children}
         </div>
       </body>

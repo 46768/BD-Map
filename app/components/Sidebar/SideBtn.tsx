@@ -1,8 +1,14 @@
-import React from 'react'
+"use client"
 
-const SideBtn = () => {
+import React, { MouseEventHandler } from 'react'
+
+interface SideBtnProp {
+    children: React.ReactNode
+}
+
+const SideBtn = (props: SideBtnProp) => {
   return (
-    <div>SideBtn</div>
+    <div><button className="btn min-h-min w-max h-max p-2 mb-2 block">{props.children}</button></div>
   )
 }
 

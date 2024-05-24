@@ -1,8 +1,14 @@
+import Link from 'next/link'
 import React from 'react'
 
-const SideLink = () => {
+interface SideLinkProp {
+    href: string
+    children: React.ReactNode
+}
+
+const SideLink = (props: SideLinkProp) => {
   return (
-    <div>SideLink</div>
+    <div><Link href={props.href} className="text-xl text-blue-500">{props.children}</Link></div>
   )
 }
 
