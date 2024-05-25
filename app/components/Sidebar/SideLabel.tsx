@@ -1,8 +1,14 @@
 import React from 'react'
 
-const SideLabel = ({children} : Readonly<{children: React.ReactNode}>) => {
+interface SideLabelProp {
+  hidden?: boolean
+  extraCss?: string
+  children: React.ReactNode
+}
+
+const SideLabel = (props : Readonly<SideLabelProp>) => {
   return (
-    <div className="text-xl">{children}</div>
+    <div className={`text-xl ${props.hidden ? "hidden" : "block"} ${props.extraCss}`}>{props.children}</div>
   )
 }
 

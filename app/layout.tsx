@@ -26,16 +26,11 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="winter" className=" bg-gray-950 overflow-hidden">
       <body className={inter.className}>
-        <Sidebar>
-          <SideLabel>Placeholder</SideLabel>
-        </Sidebar>
-
         <Navbar>
           <NavLabel>BD Navigator  V0.0.0.0</NavLabel>
-          <p className="pl-96 text-sm text-gray-600">theetat kittichai</p>
         </Navbar>
 
-        <div className="w-auto h-auto inline-block m-4 absolute top-24 left-0 -z-20">
+        <div className="m-4 absolute top-24">
           {children}
         </div>
       </body>
