@@ -13,7 +13,7 @@ export default function Home() {
           <SideBtn>Button</SideBtn>
         </Sidebar>
       <div className="absolute top-24 left-0 -z-20 w-screen">
-        <p className="text-xl">Page Under Development, Check Again Later</p>
+        <p className=" text-md sm:text-lg md:text-xl lg:text-3xl">Page Under Development, Check Again Later</p>
       </div>
     </main>
   );

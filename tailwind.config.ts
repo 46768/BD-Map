@@ -13,8 +13,30 @@ const config: Config = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
+      spacing: {
+        '18': '4.5rem',
+        '128': '32rem',
+        '144': '36rem',
+        '160': '40rem',
+        '192': '48rem',
+        '224': '56rem',
+        '256': '64rem',
+      },
       transitionProperty: {
-        'width': 'width'
+        'width': 'width',
+        'height': 'height',
+        'wh': 'width height',
+      },
+      height: {
+        '10vh': '10vh',
+        '20vh': '20vh',
+        '30vh': '30vh',
+        '40vh': '40vh',
+        '50vh': '50vh',
+        '60vh': '60vh',
+        '70vh': '70vh',
+        '80vh': '80vh',
+        '90vh': '90vh',
       },
     },
   },

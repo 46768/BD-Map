@@ -30,7 +30,7 @@ export default function RootLayout({
           <NavLabel>BD Navigator  V0.0.0.0</NavLabel>
         </Navbar>
 
-        <div className="m-4 absolute top-24">
+        <div className="pt-2 pl-4 absolute top-24">
           {children}
         </div>
       </body>
