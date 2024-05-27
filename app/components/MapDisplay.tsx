@@ -86,6 +86,7 @@ const MapDisplay = () => {
       } else {
         SetX(X + Evt.movementX)
         SetY(Y + Evt.movementY)
+        console.log("test")
       }
 
     }
