@@ -12,13 +12,15 @@ const MapDisplay = () => {
 
   const [X, SetX] = useState<number>(0)
   const [Y, SetY] = useState<number>(0)
+  const [XOffset, SetXOffset] = useState<number>(0)
+  const [YOffset, SetYOffset] = useState<number>(0)
   const [Zoom, SetZoom] = useState<number>(0)
   const [Rot, SetRot] = useState<number>(0)
 
   const [IsMouseDown, SetMouseDown] = useState<boolean>(false)
   const [EventListenerAdded, SetEvtListenerState] = useState<boolean>(false)
-  const [PrevTouchX, UpdatePrevTouchX] = useState(0)
-  const [PrevTouchY, UpdatePrevTouchY] = useState(0)
+  const [TouchX, UpdateTouchX] = useState(0)
+  const [TouchY, UpdateTouchY] = useState(0)
 
   const [ViewportW, SetViewportW] = useState<number>(0)
   const [ViewportH, SetViewportH] = useState<number>(0)
@@ -50,45 +52,40 @@ const MapDisplay = () => {
     }
 
     //Test School
-    const SchoolX = 100
-    const SchoolY = 100
+    const SchoolX = 96
+    const SchoolY = 96
 
     CanvasContext.fillStyle = "blue"
     CanvasContext.fillRect(XPos, YPos, SchoolX, SchoolY)
   }
 
-  function HandleUserEventDown(Evt: React.MouseEvent<HTMLCanvasElement, MouseEvent> | TouchEvent) {
-    if (IsTouchEvent(Evt) && !IsMouseDown) {
-      console.log("Tooched-------------------------------------------------")
-      const TouchEvt = Evt.touches[0]
-      console.log("SetX: ", (TouchEvt.clientX))
-      console.log("SetY: ", (TouchEvt.clientY))
-      UpdatePrevTouchX(TouchEvt.clientX)
-      UpdatePrevTouchY(TouchEvt.clientY)
-    }
+  function HandleUserMouseDown() {
     SetMouseDown(true)
   }
 
-  function HandleUserEventUp() {
+  function HandleUserMouseUp() {
     SetMouseDown(false)
   }
 
-  function HandleUserEventMove(Evt: React.MouseEvent<HTMLCanvasElement, MouseEvent> | TouchEvent) {
+  function HandleUserMouseMove(Evt: React.MouseEvent<HTMLCanvasElement, MouseEvent>) {
     if (IsMouseDown) {
-      if (IsTouchEvent(Evt)) {
-        const TouchEvt = Evt.touches[0]
-        console.log("DeltaX: ", (TouchEvt.clientX - PrevTouchX))
-        console.log("DeltaY: ", (TouchEvt.clientY - PrevTouchY))
-        SetX(X + (TouchEvt.clientX - PrevTouchX))
-        SetY(Y + (TouchEvt.clientY - PrevTouchY))
-        UpdatePrevTouchX(TouchEvt.clientX)
-        UpdatePrevTouchY(TouchEvt.clientY)
-      } else {
         SetX(X + Evt.movementX)
         SetY(Y + Evt.movementY)
-        console.log("test")
-      }
+    }
+  }
 
+  function HandleUserTouchDown() {
+    SetMouseDown(true)
+  }
+
+  function HandleUserTouchUp() {
+    SetMouseDown(false)
+  }
+
+  function HandleUserTouchMove(Evt: React.MouseEvent<HTMLCanvasElement, MouseEvent>) {
+    if (IsMouseDown) {
+        SetX(X + Evt.movementX)
+        SetY(Y + Evt.movementY)
     }
   }
 
@@ -106,16 +103,13 @@ const MapDisplay = () => {
     if (Ctx && CanvasContext) {
       Ctx.width = ViewportW
       Ctx.height = ViewportH
-      UpdateMap(CanvasContext, X, Y, Zoom, Rot, ViewportH, ViewportW)
+      UpdateMap(CanvasContext, X + XOffset, Y + YOffset, Zoom, Rot, ViewportH, ViewportW)
     }
 
     //console.log(ViewportH)
     //console.log(ViewportW)
     if (!EventListenerAdded && Ctx) {
       window.addEventListener('resize', UpdateViewportSize)
-      Ctx.addEventListener('touchstart', HandleUserEventDown)
-      Ctx.addEventListener('touchmove', HandleUserEventMove)
-      Ctx.addEventListener('touchend', HandleUserEventUp)
 
       SetEvtListenerState(true)
     }
@@ -123,9 +117,6 @@ const MapDisplay = () => {
     return () => {
       if (EventListenerAdded && Ctx) {
         window.removeEventListener('resize', UpdateViewportSize)
-        Ctx.removeEventListener('touchstart', HandleUserEventDown)
-        Ctx.removeEventListener('touchmove', HandleUserEventMove)
-        Ctx.removeEventListener('touchend', HandleUserEventUp)
         SetEvtListenerState(false)
       }
     }
@@ -133,8 +124,8 @@ const MapDisplay = () => {
 
   return (
     <div className="fixed top-24 left-0 w-full h-full -z-50">
-      <canvas ref={CanvasRef} onMouseDown={HandleUserEventDown} onMouseUp={HandleUserEventUp} onMouseMove={HandleUserEventMove}
-        onTouchStart={(evt) => { evt }} />
+      <canvas ref={CanvasRef} onMouseDown={HandleUserMouseDown} onMouseUp={HandleUserMouseUp} onMouseMove={HandleUserMouseMove}
+        onTouchStart={HandleUserTouchDown} onTouchEnd={HandleUserTouchUp}/>
     </div>
   )
 }
