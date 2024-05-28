@@ -27,7 +27,8 @@ const MapDisplay = () => {
 
   const UpdateMap = (CanvasContext: CanvasRenderingContext2D, XPos: number, YPos: number, ZoomAmount: number, Rotation: number, VH: number, VW: number) => {
     //Constants
-    const LineGap = 32
+    const ScaleFactor: number = 10 ** ZoomAmount
+    const LineGap: number = 32 * ScaleFactor
 
     //Clear Canvas
     CanvasContext.clearRect(0, 0, CanvasContext.canvas.width, CanvasContext.canvas.height)
@@ -52,11 +53,18 @@ const MapDisplay = () => {
     }
 
     //Test School
-    const SchoolX = 96
-    const SchoolY = 96
+    const SchoolX: number = 96 * ScaleFactor
+    const SchoolY: number = 96 * ScaleFactor
 
     CanvasContext.fillStyle = "blue"
     CanvasContext.fillRect(XPos, YPos, SchoolX, SchoolY)
+
+    //Test Building
+    const BuildingX: number = 96 * ScaleFactor
+    const BuildingY: number = 96 * ScaleFactor
+
+    CanvasContext.fillStyle = "red"
+    CanvasContext.fillRect(XPos + 160 * ScaleFactor, YPos + 160 * ScaleFactor, BuildingX, BuildingY)
   }
 
   function HandleUserMouseDown() {
@@ -74,11 +82,18 @@ const MapDisplay = () => {
     }
   }
 
+  function HandleUserMouseScroll(WheelEvt: React.WheelEvent<HTMLCanvasElement>) {
+    SetZoom(Zoom + (WheelEvt.deltaY / 1000))
+    console.log(Zoom)
+  }
+
   function HandleUserTouchDown(TouchEvt: React.TouchEvent<HTMLCanvasElement>) {
     SetMouseDown(true)
     const Touch = TouchEvt.touches[0]
     SetXOffset(Touch.clientX)
     SetYOffset(Touch.clientY)
+    UpdateTouchX(TouchX)
+    UpdateTouchY(TouchY)
   }
 
   function HandleUserTouchUp() {
@@ -96,8 +111,6 @@ const MapDisplay = () => {
         const ChangedTouch = TouchEvt.changedTouches[0]
         UpdateTouchX(ChangedTouch.clientX)
         UpdateTouchY(ChangedTouch.clientY)
-        console.log(TouchX)
-        console.log(TouchY)
     }
   }
 
@@ -136,8 +149,10 @@ const MapDisplay = () => {
 
   return (
     <div className="fixed top-24 left-0 w-full h-full -z-50">
-      <canvas ref={CanvasRef} onMouseDown={HandleUserMouseDown} onMouseUp={HandleUserMouseUp} onMouseMove={HandleUserMouseMove}
-        onTouchStart={HandleUserTouchDown} onTouchEnd={HandleUserTouchUp} onTouchMove={HandleUserTouchMove}/>
+      <canvas ref={CanvasRef} 
+        onMouseDown={HandleUserMouseDown} onMouseUp={HandleUserMouseUp} onMouseMove={HandleUserMouseMove}
+        onTouchStart={HandleUserTouchDown} onTouchEnd={HandleUserTouchUp} onTouchMove={HandleUserTouchMove}
+        onWheel={HandleUserMouseScroll}/>
     </div>
   )
 }
