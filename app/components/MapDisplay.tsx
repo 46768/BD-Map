@@ -37,14 +37,14 @@ const MapDisplay = () => {
     CanvasContext.fillRect(0, 0, CanvasContext.canvas.width, CanvasContext.canvas.height)
 
     //Draw Scale Lines
-    for (let XLine = 0; XLine < VW; XLine += LineGap) {
+    for (let XLine = 0; XLine < VW + LineGap; XLine += LineGap) {
       CanvasContext.beginPath()
       CanvasContext.moveTo(XLine + ((XPos) % LineGap), 0)
       CanvasContext.lineTo(XLine + ((XPos) % LineGap), VH)
       CanvasContext.stroke()
     }
 
-    for (let YLine = 0; YLine < VH; YLine += LineGap) {
+    for (let YLine = 0; YLine < VH + LineGap; YLine += LineGap) {
       CanvasContext.beginPath()
       CanvasContext.moveTo(0, YLine + ((YPos) % LineGap))
       CanvasContext.lineTo(VW, YLine + ((YPos) % LineGap))
