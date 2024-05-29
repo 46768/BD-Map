@@ -20,9 +20,10 @@ const MapDisplay = () => {
   const [ViewportW, SetViewportW] = useState<number>(0)
   const [ViewportH, SetViewportH] = useState<number>(0)
 
-  const [X, SetX] = useState<number>(Math.floor(ViewportW/2))
-  const [Y, SetY] = useState<number>(Math.floor(ViewportH/2))
+  const [X, SetX] = useState<number>(Math.floor(ViewportW / 2))
+  const [Y, SetY] = useState<number>(Math.floor(ViewportH / 2))
   const [Zoom, SetZoom] = useState<number>(0)
+  const [ZoomCompen, SetZoomCompen] = useState<number>(1 / (10 ** Zoom))
   const [Rot, SetRot] = useState<number>(0)
 
   const [IsMouseDown, SetMouseDown] = useState<boolean>(false)
@@ -33,13 +34,10 @@ const MapDisplay = () => {
 
   function UpdateMap(CanvasContext: CanvasRenderingContext2D, XPos: number, YPos: number, MX: number, MY: number, ZoomAmount: number, Rotation: number, VH: number, VW: number) {
     //Constants
-    const ScaleFactor: number = 10 ** Zoom
+    const ScaleFactor: number = 10 ** ZoomAmount
     const LineGap: number = 32 * ScaleFactor
     const UX: number = (XPos * ScaleFactor) + MX
     const UY: number = (YPos * ScaleFactor) + MY
-
-    //Clear Canvas
-    CanvasContext.clearRect(0, 0, CanvasContext.canvas.width, CanvasContext.canvas.height)
 
     //Draw Base
     CanvasContext.fillStyle = "green"
@@ -76,7 +74,7 @@ const MapDisplay = () => {
 
     //Debug Center Point
     CanvasContext.fillStyle = "red"
-    CanvasContext.fillRect(MX-10, MY-10, 20, 20)
+    CanvasContext.fillRect(MX - 10, MY - 10, 20, 20)
   }
 
   function HandleUserEvtDown(Evt: React.MouseEvent<HTMLCanvasElement, MouseEvent> | React.TouchEvent<HTMLCanvasElement>) {
@@ -94,8 +92,8 @@ const MapDisplay = () => {
 
   function HandleUserEvtUp() {
     SetMouseDown(false)
-    SetX(X + (TouchX - XOffset))
-    SetY(Y + (TouchY - YOffset))
+    SetX(X + (TouchX - XOffset) * ZoomCompen)
+    SetY(Y + (TouchY - YOffset) * ZoomCompen)
     UpdateTouchX(0)
     UpdateTouchY(0)
     SetXOffset(0)
@@ -118,7 +116,7 @@ const MapDisplay = () => {
 
   function HandleUserMouseScroll(WheelEvt: React.WheelEvent<HTMLCanvasElement>) {
     SetZoom(Math.max(Math.min(Zoom - (WheelEvt.deltaY / 1000), 0.75), -0.75))
-    console.log(Zoom)
+    SetZoomCompen(1 / (10 ** Zoom))
   }
 
   useEffect(() => {
@@ -135,7 +133,7 @@ const MapDisplay = () => {
     if (Ctx && CanvasContext) {
       Ctx.width = ViewportW
       Ctx.height = ViewportH
-      UpdateMap(CanvasContext, X + (TouchX - XOffset), Y + (TouchY - YOffset), Math.floor(ViewportW/2), Math.floor(ViewportH/2), Zoom, Rot, ViewportH, ViewportW)
+      UpdateMap(CanvasContext, X + (TouchX - XOffset) * ZoomCompen, Y + (TouchY - YOffset) * ZoomCompen, Math.floor(ViewportW / 2), Math.floor(ViewportH / 2), Zoom, Rot, ViewportH, ViewportW)
     }
 
     //console.log(ViewportH)
@@ -153,10 +151,10 @@ const MapDisplay = () => {
 
   return (
     <div className="fixed top-24 left-0 w-full h-full -z-50">
-      <canvas ref={CanvasRef} 
+      <canvas ref={CanvasRef}
         onMouseDown={HandleUserEvtDown} onMouseUp={HandleUserEvtUp} onMouseMove={HandleUserEvtMove}
         onTouchStart={HandleUserEvtDown} onTouchEnd={HandleUserEvtUp} onTouchMove={HandleUserEvtMove}
-        onWheel={HandleUserMouseScroll}/>
+        onWheel={HandleUserMouseScroll} />
     </div>
   )
 }
