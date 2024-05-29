@@ -73,6 +73,10 @@ const MapDisplay = () => {
 
     CanvasContext.fillStyle = "red"
     CanvasContext.fillRect(UX + 160 * ScaleFactor, UY + 160 * ScaleFactor, BuildingX, BuildingY)
+
+    //Debug Center Point
+    CanvasContext.fillStyle = "red"
+    CanvasContext.fillRect(MX-10, MY-10, 20, 20)
   }
 
   function HandleUserEvtDown(Evt: React.MouseEvent<HTMLCanvasElement, MouseEvent> | React.TouchEvent<HTMLCanvasElement>) {
