@@ -2,36 +2,42 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 
+interface MapLocaData {
+  X: number
+  Y: number
+  Zoom: number
+  Rot: number
+}
+
 const MapDisplay = () => {
   //TypeChecking
-  function IsTouchEvent(Evt: React.MouseEvent<HTMLCanvasElement, MouseEvent> | TouchEvent): Evt is TouchEvent {
+  function IsTouchEvent(Evt: React.MouseEvent<HTMLCanvasElement, MouseEvent> | React.TouchEvent<HTMLCanvasElement>): Evt is React.TouchEvent<HTMLCanvasElement> {
     return 'touches' in Evt
   }
 
   const CanvasRef = useRef<HTMLCanvasElement>(null)
 
-  const [X, SetX] = useState<number>(0)
-  const [Y, SetY] = useState<number>(0)
-  const [XOffset, SetXOffset] = useState<number>(0)
-  const [YOffset, SetYOffset] = useState<number>(0)
-  const [Zoom, SetZoom] = useState<number>(0)
-  const [Rot, SetRot] = useState<number>(0)
-
-  const [IsMouseDown, SetMouseDown] = useState<boolean>(false)
-  const [EventListenerAdded, SetEvtListenerState] = useState<boolean>(false)
-  const [TouchX, UpdateTouchX] = useState(0)
-  const [TouchY, UpdateTouchY] = useState(0)
-
   const [ViewportW, SetViewportW] = useState<number>(0)
   const [ViewportH, SetViewportH] = useState<number>(0)
 
-  const UpdateMap = (CanvasContext: CanvasRenderingContext2D, XPos: number, YPos: number, ZoomAmount: number, Rotation: number, VH: number, VW: number) => {
+  const [X, SetX] = useState<number>(Math.floor(ViewportW / 2))
+  const [Y, SetY] = useState<number>(Math.floor(ViewportH / 2))
+  const [Zoom, SetZoom] = useState<number>(0)
+  const [ZoomCompen, SetZoomCompen] = useState<number>(1 / (10 ** Zoom))
+  const [Rot, SetRot] = useState<number>(0)
+
+  const [IsMouseDown, SetMouseDown] = useState<boolean>(false)
+  const [XOffset, SetXOffset] = useState<number>(0)
+  const [YOffset, SetYOffset] = useState<number>(0)
+  const [TouchX, UpdateTouchX] = useState(0)
+  const [TouchY, UpdateTouchY] = useState(0)
+
+  function UpdateMap(CanvasContext: CanvasRenderingContext2D, XPos: number, YPos: number, MX: number, MY: number, ZoomAmount: number, Rotation: number, VH: number, VW: number) {
     //Constants
     const ScaleFactor: number = 10 ** ZoomAmount
     const LineGap: number = 32 * ScaleFactor
-
-    //Clear Canvas
-    CanvasContext.clearRect(0, 0, CanvasContext.canvas.width, CanvasContext.canvas.height)
+    const UX: number = (XPos * ScaleFactor) + MX
+    const UY: number = (YPos * ScaleFactor) + MY
 
     //Draw Base
     CanvasContext.fillStyle = "green"
@@ -40,15 +46,15 @@ const MapDisplay = () => {
     //Draw Scale Lines
     for (let XLine = 0; XLine < VW + LineGap; XLine += LineGap) {
       CanvasContext.beginPath()
-      CanvasContext.moveTo(XLine + ((XPos) % LineGap), 0)
-      CanvasContext.lineTo(XLine + ((XPos) % LineGap), VH)
+      CanvasContext.moveTo(XLine + ((UX) % LineGap), 0)
+      CanvasContext.lineTo(XLine + ((UX) % LineGap), VH)
       CanvasContext.stroke()
     }
 
     for (let YLine = 0; YLine < VH + LineGap; YLine += LineGap) {
       CanvasContext.beginPath()
-      CanvasContext.moveTo(0, YLine + ((YPos) % LineGap))
-      CanvasContext.lineTo(VW, YLine + ((YPos) % LineGap))
+      CanvasContext.moveTo(0, YLine + ((UY) % LineGap))
+      CanvasContext.lineTo(VW, YLine + ((UY) % LineGap))
       CanvasContext.stroke()
     }
 
@@ -57,61 +63,60 @@ const MapDisplay = () => {
     const SchoolY: number = 96 * ScaleFactor
 
     CanvasContext.fillStyle = "blue"
-    CanvasContext.fillRect(XPos, YPos, SchoolX, SchoolY)
+    CanvasContext.fillRect(UX, UY, SchoolX, SchoolY)
 
     //Test Building
     const BuildingX: number = 96 * ScaleFactor
     const BuildingY: number = 96 * ScaleFactor
 
     CanvasContext.fillStyle = "red"
-    CanvasContext.fillRect(XPos + 160 * ScaleFactor, YPos + 160 * ScaleFactor, BuildingX, BuildingY)
+    CanvasContext.fillRect(UX + 160 * ScaleFactor, UY + 160 * ScaleFactor, BuildingX, BuildingY)
+
+    //Debug Center Point
+    CanvasContext.fillStyle = "red"
+    CanvasContext.fillRect(MX - 10, MY - 10, 20, 20)
   }
 
-  function HandleUserMouseDown() {
-    SetMouseDown(true)
-  }
-
-  function HandleUserMouseUp() {
-    SetMouseDown(false)
-  }
-
-  function HandleUserMouseMove(Evt: React.MouseEvent<HTMLCanvasElement, MouseEvent>) {
-    if (IsMouseDown) {
-        SetX(X + Evt.movementX)
-        SetY(Y + Evt.movementY)
+  function HandleUserEvtDown(Evt: React.MouseEvent<HTMLCanvasElement, MouseEvent> | React.TouchEvent<HTMLCanvasElement>) {
+    if (IsTouchEvent(Evt)) {
+      if (Evt.touches.length >= 2) return
+      const Touch = Evt.touches[0]
+      SetXOffset(Touch.clientX)
+      SetYOffset(Touch.clientY)
+    } else {
+      SetXOffset(Evt.clientX)
+      SetYOffset(Evt.clientY)
     }
-  }
-
-  function HandleUserMouseScroll(WheelEvt: React.WheelEvent<HTMLCanvasElement>) {
-    SetZoom(Zoom + (WheelEvt.deltaY / 1000))
-    console.log(Zoom)
-  }
-
-  function HandleUserTouchDown(TouchEvt: React.TouchEvent<HTMLCanvasElement>) {
     SetMouseDown(true)
-    const Touch = TouchEvt.touches[0]
-    SetXOffset(Touch.clientX)
-    SetYOffset(Touch.clientY)
-    UpdateTouchX(TouchX)
-    UpdateTouchY(TouchY)
   }
 
-  function HandleUserTouchUp() {
+  function HandleUserEvtUp() {
     SetMouseDown(false)
-    SetX(X + (TouchX - XOffset))
-    SetY(Y + (TouchY - YOffset))
+    SetX(X + (TouchX - XOffset) * ZoomCompen)
+    SetY(Y + (TouchY - YOffset) * ZoomCompen)
     UpdateTouchX(0)
     UpdateTouchY(0)
     SetXOffset(0)
     SetYOffset(0)
   }
 
-  function HandleUserTouchMove(TouchEvt: React.TouchEvent<HTMLCanvasElement>) {
-    if (true) {
-        const ChangedTouch = TouchEvt.changedTouches[0]
+  function HandleUserEvtMove(Evt: React.MouseEvent<HTMLCanvasElement, MouseEvent> | React.TouchEvent<HTMLCanvasElement>) {
+    if (IsMouseDown) {
+      if (IsTouchEvent(Evt)) {
+        if (Evt.touches.length >= 2) return
+        const ChangedTouch = Evt.changedTouches[0]
         UpdateTouchX(ChangedTouch.clientX)
         UpdateTouchY(ChangedTouch.clientY)
+      } else {
+        UpdateTouchX(Evt.clientX)
+        UpdateTouchY(Evt.clientY)
+      }
     }
+  }
+
+  function HandleUserMouseScroll(WheelEvt: React.WheelEvent<HTMLCanvasElement>) {
+    SetZoom(Math.max(Math.min(Zoom - (WheelEvt.deltaY / 1000), 0.75), -0.75))
+    SetZoomCompen(1 / (10 ** Zoom))
   }
 
   useEffect(() => {
@@ -128,31 +133,28 @@ const MapDisplay = () => {
     if (Ctx && CanvasContext) {
       Ctx.width = ViewportW
       Ctx.height = ViewportH
-      UpdateMap(CanvasContext, X + (TouchX - XOffset), Y + (TouchY - YOffset), Zoom, Rot, ViewportH, ViewportW)
+      UpdateMap(CanvasContext, X + (TouchX - XOffset) * ZoomCompen, Y + (TouchY - YOffset) * ZoomCompen, Math.floor(ViewportW / 2), Math.floor(ViewportH / 2), Zoom, Rot, ViewportH, ViewportW)
     }
 
     //console.log(ViewportH)
     //console.log(ViewportW)
-    if (!EventListenerAdded && Ctx) {
+    if (Ctx) {
       window.addEventListener('resize', UpdateViewportSize)
-
-      SetEvtListenerState(true)
     }
 
     return () => {
-      if (EventListenerAdded && Ctx) {
+      if (Ctx) {
         window.removeEventListener('resize', UpdateViewportSize)
-        SetEvtListenerState(false)
       }
     }
   }, [X, Y, Zoom, Rot, ViewportH, ViewportW, TouchX, TouchY])
 
   return (
     <div className="fixed top-24 left-0 w-full h-full -z-50">
-      <canvas ref={CanvasRef} 
-        onMouseDown={HandleUserMouseDown} onMouseUp={HandleUserMouseUp} onMouseMove={HandleUserMouseMove}
-        onTouchStart={HandleUserTouchDown} onTouchEnd={HandleUserTouchUp} onTouchMove={HandleUserTouchMove}
-        onWheel={HandleUserMouseScroll}/>
+      <canvas ref={CanvasRef}
+        onMouseDown={HandleUserEvtDown} onMouseUp={HandleUserEvtUp} onMouseMove={HandleUserEvtMove}
+        onTouchStart={HandleUserEvtDown} onTouchEnd={HandleUserEvtUp} onTouchMove={HandleUserEvtMove}
+        onWheel={HandleUserMouseScroll} />
     </div>
   )
 }
