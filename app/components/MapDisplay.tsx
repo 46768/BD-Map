@@ -31,10 +31,12 @@ const MapDisplay = () => {
   const [TouchX, UpdateTouchX] = useState(0)
   const [TouchY, UpdateTouchY] = useState(0)
 
-  function UpdateMap(CanvasContext: CanvasRenderingContext2D, XPos: number, YPos: number, MX: number, YX: number, ZoomAmount: number, Rotation: number, VH: number, VW: number) {
+  function UpdateMap(CanvasContext: CanvasRenderingContext2D, XPos: number, YPos: number, MX: number, MY: number, ZoomAmount: number, Rotation: number, VH: number, VW: number) {
     //Constants
     const ScaleFactor: number = 10 ** Zoom
     const LineGap: number = 32 * ScaleFactor
+    const UX: number = (XPos * ScaleFactor) + MX
+    const UY: number = (YPos * ScaleFactor) + MY
 
     //Clear Canvas
     CanvasContext.clearRect(0, 0, CanvasContext.canvas.width, CanvasContext.canvas.height)
@@ -46,15 +48,15 @@ const MapDisplay = () => {
     //Draw Scale Lines
     for (let XLine = 0; XLine < VW + LineGap; XLine += LineGap) {
       CanvasContext.beginPath()
-      CanvasContext.moveTo(XLine + ((XPos) % LineGap), 0)
-      CanvasContext.lineTo(XLine + ((XPos) % LineGap), VH)
+      CanvasContext.moveTo(XLine + ((UX) % LineGap), 0)
+      CanvasContext.lineTo(XLine + ((UX) % LineGap), VH)
       CanvasContext.stroke()
     }
 
     for (let YLine = 0; YLine < VH + LineGap; YLine += LineGap) {
       CanvasContext.beginPath()
-      CanvasContext.moveTo(0, YLine + ((YPos) % LineGap))
-      CanvasContext.lineTo(VW, YLine + ((YPos) % LineGap))
+      CanvasContext.moveTo(0, YLine + ((UY) % LineGap))
+      CanvasContext.lineTo(VW, YLine + ((UY) % LineGap))
       CanvasContext.stroke()
     }
 
@@ -63,18 +65,19 @@ const MapDisplay = () => {
     const SchoolY: number = 96 * ScaleFactor
 
     CanvasContext.fillStyle = "blue"
-    CanvasContext.fillRect(XPos, YPos, SchoolX, SchoolY)
+    CanvasContext.fillRect(UX, UY, SchoolX, SchoolY)
 
     //Test Building
     const BuildingX: number = 96 * ScaleFactor
     const BuildingY: number = 96 * ScaleFactor
 
     CanvasContext.fillStyle = "red"
-    CanvasContext.fillRect(XPos + 160 * ScaleFactor, YPos + 160 * ScaleFactor, BuildingX, BuildingY)
+    CanvasContext.fillRect(UX + 160 * ScaleFactor, UY + 160 * ScaleFactor, BuildingX, BuildingY)
   }
 
   function HandleUserEvtDown(Evt: React.MouseEvent<HTMLCanvasElement, MouseEvent> | React.TouchEvent<HTMLCanvasElement>) {
     if (IsTouchEvent(Evt)) {
+      if (Evt.touches.length >= 2) return
       const Touch = Evt.touches[0]
       SetXOffset(Touch.clientX)
       SetYOffset(Touch.clientY)
@@ -98,6 +101,7 @@ const MapDisplay = () => {
   function HandleUserEvtMove(Evt: React.MouseEvent<HTMLCanvasElement, MouseEvent> | React.TouchEvent<HTMLCanvasElement>) {
     if (IsMouseDown) {
       if (IsTouchEvent(Evt)) {
+        if (Evt.touches.length >= 2) return
         const ChangedTouch = Evt.changedTouches[0]
         UpdateTouchX(ChangedTouch.clientX)
         UpdateTouchY(ChangedTouch.clientY)
