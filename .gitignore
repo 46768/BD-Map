@@ -8,9 +8,7 @@ lerna-debug.log*
 .pnpm-debug.log*
 
 #Data Files
-roomdat.json
-temp.js
-app/data/map.tsx
+DataGen
 Testing
 
 #VSCode
