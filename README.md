@@ -4,8 +4,8 @@ Repository Containing The Source Code To The IS/PBL Project Of Bodin Interactive
 Webpage Under Development
 
 # Tasks
-- [ ] Webpage Navigation
-- [ ] Map System
+- [x] Webpage Navigation
+- [x] Map System
 - [ ] Single Floor A* Algorithm
 - [ ] Multi Floor A* Algorithm
 - [ ] Waypoint And Landmark
