@@ -1,4 +1,49 @@
 # BD-Navigator
 Repository Containing The Source Code To The IS/PBL Project Of Bodin Interactive Map
 
-Webpage Under Construction, Check Back Later
+Webpage Under Development
+
+# Tasks
+- [ ] Webpage Navigation
+- [ ] Map System
+- [ ] Single Floor A* Algorithm
+- [ ] Multi Floor A* Algorithm
+- [ ] Waypoint And Landmark
+- [ ] Danger Warning
+
+# Mapping Progress
+- [ ] Building 1 
+  - [ ] Floor 1: 0%
+  - [ ] Floor 2: 0%
+  - [ ] Floor 3: 0%
+  - [ ] Floor 4: 0%
+- [ ] Building 2
+  - [ ] Floor 1: 0%
+  - [ ] Floor 2: 0%
+  - [ ] Floor 3: 0%
+  - [ ] Floor 4: 0%
+- [ ] Building 3
+  - [ ] Floor 1: 0%
+  - [ ] Floor 2: 0%
+  - [ ] Floor 3: 0%
+  - [ ] Floor 4: 0%
+- [ ] Building 4
+  - [ ] Floor 1: 0%
+  - [ ] Floor 2: 0%
+  - [ ] Floor 3: 0%
+  - [ ] Floor 4: 0%
+- [ ] Building 5
+  - [ ] Floor 1: 0%
+  - [ ] Floor 2: 0%
+  - [ ] Floor 3: 0%
+  - [ ] Floor 4: 0%
+- [ ] Building 6
+  - [ ] Floor 1: 0%
+  - [ ] Floor 2: 0%
+  - [ ] Floor 3: 0%
+  - [ ] Floor 4: 0%
+- [ ] Building 7
+  - [ ] Floor 1: 0%
+  - [ ] Floor 2: 0%
+  - [ ] Floor 3: 0%
+  - [ ] Floor 4: 0%
