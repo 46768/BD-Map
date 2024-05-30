@@ -11,6 +11,7 @@ lerna-debug.log*
 roomdat.json
 temp.js
 app/data/map.tsx
+Testing
 
 #VSCode
 .vscode
