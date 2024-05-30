@@ -8,7 +8,6 @@ lerna-debug.log*
 .pnpm-debug.log*
 
 #Data Files
-app/data/map.tsx
 DataGen
 
 #VSCode
