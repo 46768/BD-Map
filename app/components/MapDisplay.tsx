@@ -1,12 +1,19 @@
 "use client"
 
 import React, { useEffect, useRef, useState } from 'react'
+import { AStarCoordinate } from '../Lib/AStar'
 
 interface MapLocaData {
   X: number
   Y: number
   Zoom: number
   Rot: number
+}
+
+interface DisplayProps {
+  AStarStart: AStarCoordinate
+  AStarTarget: AStarCoordinate
+  TranslationMap: any
 }
 
 const MapDisplay = () => {
