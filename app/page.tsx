@@ -2,6 +2,7 @@ import MapDisplay from "./components/MapDisplay";
 import Sidebar from "./components/Sidebar/Sidebar";
 import SideBtn from "./components/Sidebar/SideBtn";
 import SideLabel from "./components/Sidebar/SideLabel";
+import { AStarCoordinate } from "./Lib/AStar";
 
 export default function Home() {
   return (
@@ -14,7 +15,7 @@ export default function Home() {
           <SideBtn>Button</SideBtn>
         </Sidebar>
       <div className="absolute top-24 left-0 -z-20 w-screen">
-        <MapDisplay/>
+        <MapDisplay TranslationMap={0} Data={0} DrawData={0} DisplayFloor={0}/>
       </div>
     </main>
   );

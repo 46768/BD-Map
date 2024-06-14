@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 import { AStarCoordinate } from '../Lib/AStar'
+import AStar from '../Lib/AStar'
 
 interface MapLocaData {
   X: number
@@ -11,12 +12,15 @@ interface MapLocaData {
 }
 
 interface DisplayProps {
-  AStarStart: AStarCoordinate
-  AStarTarget: AStarCoordinate
+  AStarStart?: AStarCoordinate
+  AStarTarget?: AStarCoordinate
   TranslationMap: any
+  Data: any
+  DrawData: any
+  DisplayFloor: number
 }
 
-const MapDisplay = () => {
+const MapDisplay = (props: DisplayProps) => {
   //TypeChecking
   function IsTouchEvent(Evt: React.MouseEvent<HTMLCanvasElement, MouseEvent> | React.TouchEvent<HTMLCanvasElement>): Evt is React.TouchEvent<HTMLCanvasElement> {
     return 'touches' in Evt
@@ -80,8 +84,8 @@ const MapDisplay = () => {
     CanvasContext.fillRect(UX + 160 * ScaleFactor, UY + 160 * ScaleFactor, BuildingX, BuildingY)
 
     //Debug Center Point
-    CanvasContext.fillStyle = "red"
-    CanvasContext.fillRect(MX - 10, MY - 10, 20, 20)
+    //CanvasContext.fillStyle = "red"
+    //CanvasContext.fillRect(MX - 10, MY - 10, 20, 20)
   }
 
   function HandleUserEvtDown(Evt: React.MouseEvent<HTMLCanvasElement, MouseEvent> | React.TouchEvent<HTMLCanvasElement>) {
