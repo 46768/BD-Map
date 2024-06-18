@@ -2,7 +2,7 @@
 const nextConfig = {
     output: "export",
     distDir: "build",
-    assetPrefix: "./"
+    assetPrefix: "/"
 };
 
 export default nextConfig;
