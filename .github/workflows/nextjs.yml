@@ -43,8 +43,6 @@ jobs:
           #
           # You may remove this line if you want to manage the configuration yourself.
           static_site_generator: next
-      - name: CD Into Frontend Directory
-        run: cd ./frontend
       - name: Install Dependencies
         run: |
           cd ./frontend
