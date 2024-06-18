@@ -52,7 +52,7 @@ jobs:
         run: |
           cd ./frontend
           pwd
-          npm run build
+          npx next build
           mv ./build ../
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
