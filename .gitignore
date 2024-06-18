@@ -7,10 +7,6 @@ yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
 
-#Data Files
-DataGen
-Testing
-
 #VSCode
 .vscode
 
@@ -102,6 +98,7 @@ web_modules/
 # Next.js build output
 .next
 out
+build
 
 # Nuxt.js build / generate output
 .nuxt
