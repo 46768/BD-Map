@@ -7,9 +7,8 @@ yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
 
-#Data Files
-DataGen
-Testing
+#Rust
+target/
 
 #VSCode
 .vscode
