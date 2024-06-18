@@ -47,11 +47,14 @@ jobs:
         run: cd ./frontend
       - name: Install Dependencies
         run: |
-          pwd
           cd ./frontend
+          pwd
           npm i
       - name: Build Page
-        run: npm run build
+        run: |
+          cd ./frontend
+          pwd
+          npm run build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
