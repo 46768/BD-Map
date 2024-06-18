@@ -46,7 +46,7 @@ jobs:
       - name: CD Into Frontend Directory
         run: cd ./frontend
       - name: Install Dependencies
-        run: npm ci
+        run: npm i
       - name: Build Page
         run: npm run build
       - name: Upload artifact
