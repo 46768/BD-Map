@@ -35,6 +35,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22.1.0"
+          cache: npm
       - name: Setup Pages
         uses: actions/configure-pages@v5
         with:
@@ -52,7 +53,7 @@ jobs:
         run: |
           cd ./frontend
           pwd
-          npx next build
+          npx --no-install next build
           mv ./build ../
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
