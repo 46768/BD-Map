@@ -14,6 +14,15 @@ Testing
 #VSCode
 .vscode
 
+#wasm-pack files
+lib-rust/target
+**/*.rs.bk
+Cargo.lock
+bin/
+pkg/
+wasm-pack.log
+
+
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
