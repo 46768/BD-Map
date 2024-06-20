@@ -1,8 +1,8 @@
 "use client"
 
 import React, { useEffect, useRef, useState } from 'react'
-import { AStarCoordinate } from '../Lib/AStar'
-import AStar from '../Lib/AStar'
+import { AStarCoordinate } from '../lib/astar'
+import AStar from '../lib/astar'
 
 interface MapLocaData {
   X: number
