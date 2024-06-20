@@ -7,12 +7,17 @@ yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
 
-#Data Files
-DataGen
-Testing
-
 #VSCode
 .vscode
+
+#wasm-pack files
+lib-rust/target
+**/*.rs.bk
+Cargo.lock
+bin/
+pkg/
+wasm-pack.log
+
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
@@ -93,6 +98,7 @@ web_modules/
 # Next.js build output
 .next
 out
+build
 
 # Nuxt.js build / generate output
 .nuxt
