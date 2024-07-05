@@ -1,7 +1,7 @@
 pub mod binary_heap;
 mod utils;
 
-use binary_heap::MinBinaryHeap;
+use binary_heap::BinaryHeap;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use wasm_bindgen::prelude::*;
@@ -85,7 +85,7 @@ pub fn a_star(
     let mut closed_node: HashSet<AStarCoordinate> = HashSet::new();
     let mut g_cost: HashMap<AStarCoordinate, i32> = HashMap::new();
     g_cost.insert(start_node, 0);
-    let mut f_cost: MinBinaryHeap<(AStarCoordinate, i32)> = MinBinaryHeap::new();
+    let mut f_cost: BinaryHeap<(AStarCoordinate, i32)> = BinaryHeap::new();
     f_cost.insert((start_node, dist(start_node, target_node)), &bubble_up_fn);
     let origin: HashMap<AStarCoordinate, AStarCoordinate> = HashMap::new();
 
@@ -120,13 +120,19 @@ pub fn a_star(
                         -1
                     });
             let neighbor_coord = AStarCoordinate(n_x, n_y);
-            let graph_idx = graph[(2+n_x+(n_y*sx)) as usize];
-            if closed_node.contains(&neighbor_coord) || n_x >= sx || n_y >= sy || n_x < 0 || n_y < 0 || graph_idx == 0 {
+            let graph_idx = graph[(2 + n_x + (n_y * sx)) as usize];
+            if closed_node.contains(&neighbor_coord)
+                || n_x >= sx
+                || n_y >= sy
+                || n_x < 0
+                || n_y < 0
+                || graph_idx == 0
+            {
                 continue 'neighbor_search;
             }
             let neighbor_g_cost = match g_cost.get(&neighbor_coord) {
-                Some(&current_g_cost) => current_g_cost+dist(neighbor_coord, target_node),
-                None => dist(start_node, neighbor_coord)+dist(neighbor_coord, target_node),
+                Some(&current_g_cost) => current_g_cost + dist(neighbor_coord, target_node),
+                None => dist(start_node, neighbor_coord) + dist(neighbor_coord, target_node),
             };
         }
 
