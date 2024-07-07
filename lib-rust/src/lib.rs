@@ -9,8 +9,11 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 pub struct AStarCoordinate(pub i32, pub i32);
-
-#[inline]
+impl std::fmt::Display for AStarCoordinate {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{},{}", self.0, self.1)
+    }
+}
 
 fn dist(p0: AStarCoordinate, p1: AStarCoordinate) -> i32 {
     p0.0.abs_diff(p1.0) as i32 + p0.1.abs_diff(p1.1) as i32
@@ -101,6 +104,7 @@ pub fn a_star(
 
         let extracted_val: (AStarCoordinate, i32) = handle_option(f_cost.extract(&bubble_down_fn));
         let current_node: AStarCoordinate = extracted_val.0;
+        println!("Best Node: {}", current_node);
         closed_node.insert(current_node);
 
         if target_node == current_node {
@@ -109,23 +113,22 @@ pub fn a_star(
 
         'neighbor_search: for &neighbor in ITERATOR.iter() {
             let n_x: i32 = current_node.0
-                + ((neighbor & 0b0100) >> 2 * NORMAL[((neighbor & 0b1000) >> 3) as usize]);
+                + (((neighbor & 0b0100) >> 2) * NORMAL[((neighbor & 0b1000) >> 3) as usize]);
             let n_y: i32 = current_node.1
                 + ((neighbor & 0b0001) * NORMAL[((neighbor & 0b0010) >> 1) as usize]);
             let neighbor_coord: AStarCoordinate = AStarCoordinate(n_x, n_y);
-            let graph_idx: i32 = graph[(2 + n_x + (n_y * sx)) as usize];
-            if closed_node.contains(&neighbor_coord)
-                || n_x >= sx
-                || n_y >= sy
-                || n_x < 0
-                || n_y < 0
-                || graph_idx == 0
+            if closed_node.contains(&neighbor_coord) || n_x >= sx || n_y >= sy || n_x < 0 || n_y < 0
             {
                 continue 'neighbor_search;
             }
-            let neighbor_g_cost: i32 = match g_cost.get(&neighbor_coord) {
-                Some(&current_g_cost) => current_g_cost + dist(neighbor_coord, target_node),
-                None => dist(start_node, neighbor_coord) + dist(neighbor_coord, target_node),
+            let graph_idx: i32 = graph[(2 + n_x + (n_y * sx)) as usize];
+            println!("{}, {}, {}", n_x, n_y, graph_idx);
+            if graph_idx == 0 {
+                continue 'neighbor_search;
+            }
+            let neighbor_g_cost: i32 = match g_cost.get(&current_node) {
+                Some(&current_g_cost) => current_g_cost + dist(current_node, neighbor_coord),
+                None => dist(start_node, neighbor_coord) + dist(current_node, neighbor_coord),
             };
 
             let neighbor_g_cost_in_array = match g_cost.get(&neighbor_coord) {
@@ -136,7 +139,7 @@ pub fn a_star(
             if neighbor_g_cost < neighbor_g_cost_in_array {
                 origin.insert(neighbor_coord, current_node);
                 g_cost.insert(neighbor_coord, neighbor_g_cost);
-                f_cost.insert((neighbor_coord, neighbor_g_cost), &bubble_up_fn);
+                f_cost.insert((neighbor_coord, neighbor_g_cost + dist(neighbor_coord, target_node)), &bubble_up_fn);
             };
         }
 

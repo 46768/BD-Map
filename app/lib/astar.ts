@@ -79,6 +79,7 @@ export default function AStar(
 
   while (OpenArray.length !== 0 && Limit <= 100000) {
     const CurrentNode = GetLowestValueIdx(FCost, OpenArray);
+    console.log("Best Node: ");
     console.log(CurrentNode);
 
     OpenArray = OpenArray.slice(0, OpenArray.indexOf(CurrentNode)).concat(
@@ -112,11 +113,11 @@ export default function AStar(
         NeighborCoord.y < 0
       )
         return;
-      console.log(
-        `Pos: ${NeighborCoord.x},${NeighborCoord.y} Is ${
-          Graph[2 + (NeighborCoord.x + NeighborCoord.y * SX)]
-        }`
-      );
+      //console.log(
+      //  `Pos: ${NeighborCoord.x},${NeighborCoord.y} Is ${
+      //    Graph[2 + (NeighborCoord.x + NeighborCoord.y * SX)]
+      //  }`
+      //);
       if (Graph[2 + (NeighborCoord.x + NeighborCoord.y * SX)] === 0) return;
       const NeighborGCost: number =
         GCost[CurrentNode] + Dist(CurrentCoord, NeighborCoord);
@@ -151,17 +152,17 @@ TestBuffer.write(
     1,
     0,
     0,
-    1,
-    1,
-    1,
-    1,
     0,
     1,
     1,
     1,
+    0,
+    0,
+    0,
     1,
     1,
-    1,
+    0,
+    0,
     1,
     1,
     1,
@@ -171,4 +172,4 @@ TestBuffer.write(
   )
 );
 
-console.log(AStar(TestBuffer, { x: 0, y: 2 }, { x: 4, y: 2 }));
+console.log(AStar(TestBuffer, { x: 0, y: 4 }, { x: 4, y: 0 }));

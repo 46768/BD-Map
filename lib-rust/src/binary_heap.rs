@@ -34,6 +34,7 @@ impl<T: Copy> BinaryHeap<T> {
     ) -> Option<T> {
         let array: &mut Vec<T> = &mut self.0;
         let array_last: usize = array.len() - 1;
+        if array_last == 0 {return  array.pop();}
         array.swap(0, array_last);
         let ret: Option<T> = array.pop();
         let mut root: usize = 0;

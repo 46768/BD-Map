@@ -9,7 +9,6 @@ Webpage Under Development
 - [ ] Single Floor A* Algorithm
 - [ ] Multi Floor A* Algorithm
 - [ ] Waypoint And Landmark
-- [ ] Danger Warning
 
 # Mapping Progress
 - [ ] Building 1 
