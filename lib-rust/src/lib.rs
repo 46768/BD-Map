@@ -130,6 +130,17 @@ pub fn a_star(
                 Some(&current_g_cost) => current_g_cost + dist(neighbor_coord, target_node),
                 None => dist(start_node, neighbor_coord) + dist(neighbor_coord, target_node),
             };
+
+            let neighbor_g_cost_in_array = match g_cost.get(&neighbor_coord) {
+                Some(&g_cost) => g_cost,
+                None => 2147483647,
+            }
+
+            if neighbor_g_cost < neighbor_g_cost_in_array {
+                origin.insert(neighbor_coord, current_node);
+                g_cost.insert(neighbor_coord, neighbor_g_cost);
+                f_cost.insert((neighbor_coord, neighbor_g_cost), &bubble_up_fn);
+            }
         }
 
         loop_limit += 1;
