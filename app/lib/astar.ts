@@ -1,4 +1,4 @@
-import init, { a_star, AStarCoordinate } from "../../public/pkg/lib_rust";
+import init, { a_star, AStarCoordinate } from "@/public/pkg/lib_rust";
 
 let initialized: boolean = false;
 export async function initializeWasm() {
