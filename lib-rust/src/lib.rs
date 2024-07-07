@@ -10,6 +10,11 @@ use wasm_bindgen::prelude::*;
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 pub struct AStarCoordinate(pub i32, pub i32);
 
+#[inline]
+fn derive_normal(i: i32, deriver: i32) -> i32 {
+    (i & deriver) >> 2 * if ((i & deriver) >> 3) == 0 { 1 } else { -1 }
+}
+
 fn dist(p0: AStarCoordinate, p1: AStarCoordinate) -> i32 {
     p0.0.abs_diff(p1.0) as i32 + p0.1.abs_diff(p1.1) as i32
 }
@@ -46,6 +51,7 @@ pub fn a_star(
     const ITERATOR: [i32; 8] = [
         0b0100, 0b1100, 0b0001, 0b0011, 0b0101, 0b1111, 0b0111, 0b1101,
     ];
+    const NORMAL: [i32; 2] = [1, -1];
     const UNDEFINED: (AStarCoordinate, i32) = (AStarCoordinate(0, 0), 2147483647);
 
     fn bubble_up_fn(l_idx: (AStarCoordinate, i32), p_idx: (AStarCoordinate, i32)) -> bool {
@@ -105,22 +111,12 @@ pub fn a_star(
         }
 
         'neighbor_search: for &neighbor in ITERATOR.iter() {
-            let n_x = current_node.0
-                + ((neighbor & 0b0100)
-                    >> 2 * if ((neighbor & 0b1000) >> 3) == 0 {
-                        1
-                    } else {
-                        -1
-                    });
-            let n_y = current_node.0
-                + ((neighbor & 0b0001)
-                    * if ((neighbor & 0b0010) >> 1) == 0 {
-                        1
-                    } else {
-                        -1
-                    });
-            let neighbor_coord = AStarCoordinate(n_x, n_y);
-            let graph_idx = graph[(2 + n_x + (n_y * sx)) as usize];
+            let n_x: i32 = current_node.0
+                + ((neighbor & 0b0100) >> 2 * NORMAL[((neighbor & 0b1000) >> 3) as usize]);
+            let n_y: i32 = current_node.1
+                + ((neighbor & 0b0001) * NORMAL[((neighbor & 0b0010) >> 1) as usize]);
+            let neighbor_coord: AStarCoordinate = AStarCoordinate(n_x, n_y);
+            let graph_idx: i32 = graph[(2 + n_x + (n_y * sx)) as usize];
             if closed_node.contains(&neighbor_coord)
                 || n_x >= sx
                 || n_y >= sy
@@ -130,7 +126,7 @@ pub fn a_star(
             {
                 continue 'neighbor_search;
             }
-            let neighbor_g_cost = match g_cost.get(&neighbor_coord) {
+            let neighbor_g_cost: i32 = match g_cost.get(&neighbor_coord) {
                 Some(&current_g_cost) => current_g_cost + dist(neighbor_coord, target_node),
                 None => dist(start_node, neighbor_coord) + dist(neighbor_coord, target_node),
             };
