@@ -11,9 +11,6 @@ use wasm_bindgen::prelude::*;
 pub struct AStarCoordinate(pub i32, pub i32);
 
 #[inline]
-fn derive_normal(i: i32, deriver: i32) -> i32 {
-    (i & deriver) >> 2 * if ((i & deriver) >> 3) == 0 { 1 } else { -1 }
-}
 
 fn dist(p0: AStarCoordinate, p1: AStarCoordinate) -> i32 {
     p0.0.abs_diff(p1.0) as i32 + p0.1.abs_diff(p1.1) as i32
@@ -93,7 +90,7 @@ pub fn a_star(
     g_cost.insert(start_node, 0);
     let mut f_cost: BinaryHeap<(AStarCoordinate, i32)> = BinaryHeap::new();
     f_cost.insert((start_node, dist(start_node, target_node)), &bubble_up_fn);
-    let origin: HashMap<AStarCoordinate, AStarCoordinate> = HashMap::new();
+    let mut origin: HashMap<AStarCoordinate, AStarCoordinate> = HashMap::new();
 
     let mut loop_limit: i32 = 0;
 
@@ -134,13 +131,13 @@ pub fn a_star(
             let neighbor_g_cost_in_array = match g_cost.get(&neighbor_coord) {
                 Some(&g_cost) => g_cost,
                 None => 2147483647,
-            }
+            };
 
             if neighbor_g_cost < neighbor_g_cost_in_array {
                 origin.insert(neighbor_coord, current_node);
                 g_cost.insert(neighbor_coord, neighbor_g_cost);
                 f_cost.insert((neighbor_coord, neighbor_g_cost), &bubble_up_fn);
-            }
+            };
         }
 
         loop_limit += 1;
