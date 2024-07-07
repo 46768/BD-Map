@@ -1,7 +1,7 @@
 pub mod binary_heap;
 mod utils;
 
-use binary_heap::MinBinaryHeap;
+use binary_heap::BinaryHeap;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use wasm_bindgen::prelude::*;
@@ -85,7 +85,7 @@ pub fn a_star(
     let mut closed_node: HashSet<AStarCoordinate> = HashSet::new();
     let mut g_cost: HashMap<AStarCoordinate, i32> = HashMap::new();
     g_cost.insert(start_node, 0);
-    let mut f_cost: MinBinaryHeap<(AStarCoordinate, i32)> = MinBinaryHeap::new();
+    let mut f_cost: BinaryHeap<(AStarCoordinate, i32)> = BinaryHeap::new();
     f_cost.insert((start_node, dist(start_node, target_node)), &bubble_up_fn);
     let origin: HashMap<AStarCoordinate, AStarCoordinate> = HashMap::new();
 

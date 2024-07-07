@@ -1,10 +1,10 @@
 #[cfg(test)]
 mod tests {
-    use lib_rust::binary_heap::MinBinaryHeap;
+    use lib_rust::binary_heap::BinaryHeap;
 
     #[test]
     fn insert_heap() {
-        let mut heap: MinBinaryHeap<i32> = MinBinaryHeap::new();
+        let mut heap: BinaryHeap<i32> = BinaryHeap::new();
         fn bubble_up_fn(l_idx: i32, p_idx: i32) -> bool {
             l_idx < p_idx
         }
@@ -18,7 +18,7 @@ mod tests {
 
     #[test]
     fn extract_heap() {
-        let mut heap: MinBinaryHeap<i32> = MinBinaryHeap::new();
+        let mut heap: BinaryHeap<i32> = BinaryHeap::new();
         fn bubble_up_fn(l_idx: i32, p_idx: i32) -> bool {
             l_idx < p_idx
         }
