@@ -15,6 +15,14 @@ impl std::fmt::Display for AStarCoordinate {
     }
 }
 
+#[wasm_bindgen]
+impl AStarCoordinate {
+    #[wasm_bindgen(constructor)]
+    pub fn new(f0: i32, f1: i32) -> AStarCoordinate {
+        AStarCoordinate(f0, f1)
+    }
+}
+
 fn dist(p0: AStarCoordinate, p1: AStarCoordinate) -> i32 {
     p0.0.abs_diff(p1.0) as i32 + p0.1.abs_diff(p1.1) as i32
 }
