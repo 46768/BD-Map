@@ -96,7 +96,7 @@ pub fn a_star(
             break 'main;
         }
 
-        let extracted_val = handle_option(f_cost.extract(&bubble_down_fn));
+        let extracted_val: (AStarCoordinate, i32) = handle_option(f_cost.extract(&bubble_down_fn));
         let current_node: AStarCoordinate = extracted_val.0;
         closed_node.insert(current_node);
 
@@ -120,13 +120,19 @@ pub fn a_star(
                         -1
                     });
             let neighbor_coord = AStarCoordinate(n_x, n_y);
-            let graph_idx = graph[(2+n_x+(n_y*sx)) as usize];
-            if closed_node.contains(&neighbor_coord) || n_x >= sx || n_y >= sy || n_x < 0 || n_y < 0 || graph_idx == 0 {
+            let graph_idx = graph[(2 + n_x + (n_y * sx)) as usize];
+            if closed_node.contains(&neighbor_coord)
+                || n_x >= sx
+                || n_y >= sy
+                || n_x < 0
+                || n_y < 0
+                || graph_idx == 0
+            {
                 continue 'neighbor_search;
             }
             let neighbor_g_cost = match g_cost.get(&neighbor_coord) {
-                Some(&current_g_cost) => current_g_cost+dist(neighbor_coord, target_node),
-                None => dist(start_node, neighbor_coord)+dist(neighbor_coord, target_node),
+                Some(&current_g_cost) => current_g_cost + dist(neighbor_coord, target_node),
+                None => dist(start_node, neighbor_coord) + dist(neighbor_coord, target_node),
             };
         }
 
