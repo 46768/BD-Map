@@ -2,7 +2,6 @@ import MapDisplay from "./components/MapDisplay";
 import Sidebar from "./components/Sidebar/Sidebar";
 import SideBtn from "./components/Sidebar/SideBtn";
 import SideLabel from "./components/Sidebar/SideLabel";
-import { AStarCoordinate } from "./lib/astar";
 
 export default function Home() {
   return (

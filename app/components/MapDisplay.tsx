@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { AStarCoordinate } from "../../public/pkg/lib_rust";
-import AStar, { initializeWasm } from "../lib/astar";
+import AStar, {JSAStarCoordinate} from "../lib/aStar/astar";
 
 interface MapLocaData {
   X: number;
@@ -12,8 +11,8 @@ interface MapLocaData {
 }
 
 interface DisplayProps {
-  AStarStart?: AStarCoordinate;
-  AStarTarget?: AStarCoordinate;
+  AStarStart?: JSAStarCoordinate;
+  AStarTarget?: JSAStarCoordinate;
   TranslationMap: any;
   Data: any;
   DrawData: any;
@@ -168,7 +167,6 @@ const MapDisplay = (props: DisplayProps) => {
 
   useEffect(() => {
     const init = async () => {
-      await initializeWasm();
       setWasmInit(true);
     };
     if (!wasmInit) {
