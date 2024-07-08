@@ -1,0 +1,17 @@
+{
+  "name": "lib-rust",
+  "collaborators": [
+    "theetat kittichai <46768@bodin.ac.th>"
+  ],
+  "version": "0.0.1",
+  "files": [
+    "lib_rust_bg.wasm",
+    "lib_rust.js",
+    "lib_rust.d.ts"
+  ],
+  "module": "lib_rust.js",
+  "types": "lib_rust.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
