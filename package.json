@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "jimp": "^0.22.12",
-    "lib-rust": "file:public/a_star",
+    "lib-rust.a-star": "file:public/a_star",
     "next": "14.2.3",
     "pngjs": "^7.0.0",
     "react": "^18",
