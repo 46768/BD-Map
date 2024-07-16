@@ -134,6 +134,9 @@ pub fn a_star(
             if graph_idx == 0 {
                 continue 'neighbor_search;
             }
+            if graph[(2 + n_x + ((n_y-(n_y-current_node.1)) * sx)) as usize] == 0 && graph[(2 + (n_x-(n_x-current_node.0)) + (n_y * sx)) as usize] == 0 {
+                continue 'neighbor_search;
+            }
             let neighbor_g_cost: i32 = match g_cost.get(&current_node) {
                 Some(&current_g_cost) => current_g_cost + dist(current_node, neighbor_coord),
                 None => dist(start_node, neighbor_coord) + dist(current_node, neighbor_coord),
