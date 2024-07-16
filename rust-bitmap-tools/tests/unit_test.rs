@@ -3,7 +3,7 @@ mod tests {
     use bitmap_tools::{bitmap_fill, bitmap_line};
     use image::{ImageBuffer, Luma};
 
-    const RES: i32 = 3;
+    const RES: i32 = 50;
     const SX: usize = 10 * (RES as usize);
     const SY: usize = 10 * (RES as usize);
 
