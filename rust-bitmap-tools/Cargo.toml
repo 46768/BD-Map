@@ -1,5 +1,5 @@
 [package]
-name = "bitmap-tools"
+name = "rust_bitmap_tools"
 version = "0.1.0"
 authors = ["theetat kittichai <46768@bodin.ac.th>"]
 edition = "2018"
