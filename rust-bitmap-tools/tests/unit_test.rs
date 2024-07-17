@@ -18,11 +18,11 @@ mod tests {
 
     #[test]
     fn bitmap_line_test() {
-        let mut buffer: [bool; SX * SY] = [false; SX * SY];
+        let mut buffer: [bool; SX * SY] = [true; SX * SY];
 
-        bitmap_line(&mut buffer, X0, Y0, X1, Y1, SX, true);
-        bitmap_line(&mut buffer, X1, Y1, X2, Y2, SX, true);
-        bitmap_line(&mut buffer, X2, Y2, X0, Y0, SX, true);
+        bitmap_line(&mut buffer, X0, Y0, X1, Y1, SX, false);
+        bitmap_line(&mut buffer, X1, Y1, X2, Y2, SX, false);
+        bitmap_line(&mut buffer, X2, Y2, X0, Y0, SX, false);
         let mut pixel = vec![0u8; SX * SY];
         for idx in 0..SX * SY {
             if buffer[idx] {
@@ -32,7 +32,7 @@ mod tests {
         let img: ImageBuffer<Luma<u8>, _> =
             ImageBuffer::<Luma<u8>, _>::from_raw(SX as u32, SY as u32, pixel)
                 .expect("Failed to create image buffer");
-        img.save("monochrome_line.png")
+        img.save("./png/monochrome_line.png")
             .expect("Failed to save image");
         // for y in 0..SY {
         // for x in 0..SX {
@@ -60,7 +60,7 @@ mod tests {
         let img: ImageBuffer<Luma<u8>, _> =
             ImageBuffer::<Luma<u8>, _>::from_raw(SX as u32, SY as u32, pixel)
                 .expect("Failed to create image buffer");
-        img.save("monochrome_fill.png")
+        img.save("./png/monochrome_fill.png")
             .expect("Failed to save image");
         // for y in 0..SY {
         // for x in 0..SX {
