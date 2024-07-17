@@ -32,7 +32,7 @@ mod tests {
         let img: ImageBuffer<Luma<u8>, _> =
             ImageBuffer::<Luma<u8>, _>::from_raw(SX as u32, SY as u32, pixel)
                 .expect("Failed to create image buffer");
-        img.save("monochrome_line.png")
+        img.save("./png/monochrome_line.png")
             .expect("Failed to save image");
         // for y in 0..SY {
         // for x in 0..SX {
