@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use bitmap_tools::bitmap_line;
+    use rust_bitmap_tools::bitmap_line;
     use image::{ImageBuffer, Luma};
 
     const RES: i32 = 50;
@@ -18,14 +18,14 @@ mod tests {
 
     #[test]
     fn bitmap_line_test() {
-        let mut buffer: [bool; SX * SY] = [true; SX * SY];
+        let mut buffer: [i32; SX * SY] = [1; SX * SY];
 
-        bitmap_line(&mut buffer, X0, Y0, X1, Y1, SX, false);
-        bitmap_line(&mut buffer, X1, Y1, X2, Y2, SX, false);
-        bitmap_line(&mut buffer, X2, Y2, X0, Y0, SX, false);
+        bitmap_line(&mut buffer, X0, Y0, X1, Y1, SX, 0);
+        bitmap_line(&mut buffer, X1, Y1, X2, Y2, SX, 0);
+        bitmap_line(&mut buffer, X2, Y2, X0, Y0, SX, 0);
         let mut pixel = vec![0u8; SX * SY];
         for idx in 0..SX * SY {
-            if buffer[idx] {
+            if buffer[idx] == 1 {
                 pixel[idx] = 255u8;
             }
         }

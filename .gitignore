@@ -12,6 +12,7 @@ target/
 
 #Output
 rust-bitmap-tools/png
+rust-integration-test/png
 
 #VSCode
 .vscode

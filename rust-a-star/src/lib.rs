@@ -52,9 +52,10 @@ extern "C" {}
 
 #[wasm_bindgen]
 pub fn a_star(
-    graph: Vec<i32>,
+    graph: &mut [i32],
     start_node: AStarCoordinate,
     target_node: AStarCoordinate,
+    get_waste: bool
 ) -> Vec<AStarCoordinate> {
     const ITERATOR: [i32; 8] = [
         0b0100, 0b1100, 0b0001, 0b0011, 0b0101, 0b1111, 0b0111, 0b1101,
@@ -112,7 +113,7 @@ pub fn a_star(
 
         let extracted_val: (AStarCoordinate, i32) = handle_option(f_cost.extract(&bubble_down_fn));
         let current_node: AStarCoordinate = extracted_val.0;
-        println!("Best Node: {}", current_node);
+        println!("Best Node: {} f_cost: {}", current_node, extracted_val.1);
         closed_node.insert(current_node);
 
         if target_node == current_node {
@@ -130,21 +131,20 @@ pub fn a_star(
                 continue 'neighbor_search;
             }
             let graph_idx: i32 = graph[(2 + n_x + (n_y * sx)) as usize];
-            println!("{}, {}, {}", n_x, n_y, graph_idx);
             if graph_idx == 0 {
                 continue 'neighbor_search;
             }
-            if graph[(2 + n_x + ((n_y-(n_y-current_node.1)) * sx)) as usize] == 0 && graph[(2 + (n_x-(n_x-current_node.0)) + (n_y * sx)) as usize] == 0 {
-                continue 'neighbor_search;
-            }
+            //if graph[(2 + n_x + ((n_y-(n_y-current_node.1)) * sx)) as usize] == 0 && graph[(2 + (n_x-(n_x-current_node.0)) + (n_y * sx)) as usize] == 0 {
+            //    continue 'neighbor_search;
+            //}
             let neighbor_g_cost: i32 = match g_cost.get(&current_node) {
                 Some(&current_g_cost) => current_g_cost + dist(current_node, neighbor_coord),
-                None => dist(start_node, neighbor_coord) + dist(current_node, neighbor_coord),
+                None => panic!("Current Node Not Exist While Being Checked For Neighbor (Impossible)"),
             };
 
             let neighbor_g_cost_in_array = match g_cost.get(&neighbor_coord) {
                 Some(&g_cost) => g_cost,
-                None => 2147483647,
+                None => i32::MAX,
             };
 
             if neighbor_g_cost < neighbor_g_cost_in_array {
@@ -155,6 +155,16 @@ pub fn a_star(
         }
 
         loop_limit += 1;
+    }
+
+    if get_waste {
+        let mut return_vec: Vec<AStarCoordinate> = Vec::new();
+
+        for coord in closed_node.iter() {
+            return_vec.push(*coord);
+        }
+
+        return return_vec;
     }
 
     reconstruct_path(origin, target_node)

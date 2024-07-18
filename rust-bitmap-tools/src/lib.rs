@@ -6,13 +6,13 @@ use wasm_bindgen::prelude::*;
 extern "C" {}
 
 pub fn bitmap_line(
-    buffer: &mut [bool],
+    buffer: &mut [i32],
     x0: i32,
     y0: i32,
     x1: i32,
     y1: i32,
     sx: usize,
-    bit_set: bool,
+    bit_set: i32,
 ) {
     let dx = x0.abs_diff(x1) as i32;
     let dy = 0-((y0.abs_diff(y1)) as i32);
