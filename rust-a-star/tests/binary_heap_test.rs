@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use lib_rust::binary_heap::BinaryHeap;
+    use rust_a_star::binary_heap::BinaryHeap;
 
     #[test]
     fn insert_heap() {

@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use bitmap_tools::bitmap_line;
+    use rust_bitmap_tools::bitmap_line;
     use image::{ImageBuffer, Luma};
 
     const RES: i32 = 50;
