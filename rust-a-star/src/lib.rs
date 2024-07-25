@@ -23,8 +23,22 @@ impl AStarCoordinate {
     }
 }
 
-fn dist(p0: AStarCoordinate, p1: AStarCoordinate) -> i32 {
-    ((p0.0-p1.0).abs()+(p0.1-p1.1).abs()) as i32 
+#[inline(always)]
+pub fn dist(p0: AStarCoordinate, p1: AStarCoordinate) -> i32 {
+    let dx: f32 = (p0.0 - p1.0) as f32;
+    let dy: f32 = (p0.1 - p1.1) as f32;
+
+    //println!("dx: {}", dx);
+    //println!("dy: {}", dy);
+    let pythagorean_interm: f32 = (dx*dx) + (dy*dy);
+    //println!("pythag interm: {}", pythagorean_interm);
+    let pytha_half: f32 = pythagorean_interm * 0.5;
+    let pythag_bit = pythagorean_interm.to_bits();
+    let mut aprox: f32 = f32::from_bits(0x5f3759df - (pythagorean_interm.to_bits() >> 1)); //logarithm black magic
+    //println!("aprox 1: {}", aprox);
+    aprox *= 1.5 - (pytha_half * aprox * aprox);
+    //println!("aprox 2: {}", aprox);
+    (10.0 * (aprox * pythagorean_interm)).floor() as i32
 }
 
 fn reconstruct_path(
@@ -63,10 +77,12 @@ pub fn a_star(
     const NORMAL: [i32; 2] = [1, -1];
     const UNDEFINED: (AStarCoordinate, i32) = (AStarCoordinate(0, 0), 2147483647);
 
+    #[inline(always)]
     fn bubble_up_fn(l_idx: (AStarCoordinate, i32), p_idx: (AStarCoordinate, i32)) -> bool {
-        l_idx.1 > p_idx.1
+        l_idx.1 < p_idx.1
     }
 
+    #[inline(always)]
     fn bubble_down_fn(
         c_idx: (AStarCoordinate, i32),
         c1_idx: Option<&(AStarCoordinate, i32)>,

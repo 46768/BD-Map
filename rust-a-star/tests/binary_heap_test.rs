@@ -32,7 +32,10 @@ mod tests {
                 None => 2147483647,
             };
 
-            (c_idx > c1_val || c_idx > c2_val, if c1_val > c2_val {true} else {false})
+        (
+            c_idx > c1_val || c_idx > c2_val,
+            c1_val < c2_val,
+        )
         }
         heap.insert(16, &bubble_up_fn);
         heap.insert(17, &bubble_up_fn);
