@@ -24,7 +24,7 @@ impl AStarCoordinate {
 }
 
 fn dist(p0: AStarCoordinate, p1: AStarCoordinate) -> i32 {
-    p0.0.abs_diff(p1.0) as i32 + p0.1.abs_diff(p1.1) as i32
+    ((p0.0-p1.0).abs()+(p0.1-p1.1).abs()) as i32 
 }
 
 fn reconstruct_path(
@@ -64,7 +64,7 @@ pub fn a_star(
     const UNDEFINED: (AStarCoordinate, i32) = (AStarCoordinate(0, 0), 2147483647);
 
     fn bubble_up_fn(l_idx: (AStarCoordinate, i32), p_idx: (AStarCoordinate, i32)) -> bool {
-        l_idx.1 < p_idx.1
+        l_idx.1 > p_idx.1
     }
 
     fn bubble_down_fn(
@@ -83,7 +83,7 @@ pub fn a_star(
 
         (
             c_idx.1 > c1_val.1 || c_idx.1 > c2_val.1,
-            if c1_val.1 > c2_val.1 { true } else { false },
+            c1_val.1 > c2_val.1,
         )
     }
 
@@ -108,6 +108,7 @@ pub fn a_star(
 
     'main: loop {
         if f_cost.get_size() == 0 && loop_limit >= 10000 {
+            println!("Loop Limit Reached Or No Avaiable Node");
             break 'main;
         }
 
@@ -149,7 +150,8 @@ pub fn a_star(
 
             if neighbor_g_cost < neighbor_g_cost_in_array {
                 origin.insert(neighbor_coord, current_node);
-                g_cost.insert(neighbor_coord, neighbor_g_cost);
+                let g_entry = g_cost.entry(neighbor_coord).or_insert(neighbor_g_cost);
+                *g_entry = neighbor_g_cost;
                 f_cost.insert((neighbor_coord, neighbor_g_cost + dist(neighbor_coord, target_node)), &bubble_up_fn);
             };
         }

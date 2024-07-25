@@ -7,8 +7,10 @@ mod tests {
 
     use image::{ImageBuffer, Rgb};
 
-    const SX: usize = 100;
-    const SY: usize = 100;
+    const SX: usize = 1000;
+    const SY: usize = 1000;
+    const TX: i32 = 999;
+    const TY: i32 = 999;
 
     #[test]
     fn main() {
@@ -25,7 +27,7 @@ mod tests {
         }
 
         let a_star_start: AStarCoordinate = AStarCoordinate(0, 0);
-        let a_star_end: AStarCoordinate = AStarCoordinate(99, 99);
+        let a_star_end: AStarCoordinate = AStarCoordinate(TX, TY);
         let a_star_result: Vec<AStarCoordinate> =
             a_star(&mut a_star_buffer, a_star_start, a_star_end, false);
         let a_star_waste = a_star(&mut a_star_buffer, a_star_start, a_star_end, true);

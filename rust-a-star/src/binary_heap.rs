@@ -33,6 +33,9 @@ impl<T: Copy> BinaryHeap<T> {
         bubble_down_fn: &dyn Fn(T, Option<&T>, Option<&T>) -> (bool, bool),
     ) -> Option<T> {
         let array: &mut Vec<T> = &mut self.0;
+        if array.len() == 0 {
+            return None;
+        }
         let array_last: usize = array.len() - 1;
         if array_last == 0 {return  array.pop();}
         array.swap(0, array_last);
@@ -47,6 +50,10 @@ impl<T: Copy> BinaryHeap<T> {
             let (swap_bool, direction_bool) =
                 bubble_down_fn(array[root], array.get(child1), array.get(child2));
             if swap_bool {
+                if array.len() == 2 {
+                    array.swap(root, child1);
+                    continue;
+                }
                 if direction_bool {
                     array.swap(root, child2);
                     root = child2;
