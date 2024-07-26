@@ -17,10 +17,10 @@ mod tests {
         let mut buffer: Box<[i32]> = vec![1; SX * SY].into_boxed_slice();
         let mut a_star_buffer: Vec<i32> = vec![SX as i32, SY as i32];
 
-        //bitmap_line(&mut buffer, 30, 30, 45, 45, SX, 0);
-        //bitmap_line(&mut buffer, 45, 45, 62, 23, SX, 0);
-        //bitmap_line(&mut buffer, 62, 23, 67, 89, SX, 0);
-        //bitmap_line(&mut buffer, 80, 20, 20, 80, SX, 0);
+        bitmap_line(&mut buffer, 30, 30, 45, 45, SX, 0);
+        bitmap_line(&mut buffer, 45, 45, 62, 23, SX, 0);
+        bitmap_line(&mut buffer, 62, 23, 67, 89, SX, 0);
+        bitmap_line(&mut buffer, 80, 20, 20, 80, SX, 0);
 
         for val in buffer.iter() {
             a_star_buffer.push(*val);
