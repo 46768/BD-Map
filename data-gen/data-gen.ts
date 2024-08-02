@@ -1,28 +1,41 @@
 import { JSAStarCoordinate } from "@/app/lib/aStar/astar";
 
-export type SurfaceData = number[];
+type GPSImport = [string, ...number[]];
 
-export function parseDrawData(InptGPS: number[]): SurfaceData[] {
-  let returnData: SurfaceData[] = [];
-  let currentSection: number = 0;
-  let markerCount: number = InptGPS[currentSection];
-  let nextSection: number = currentSection + 1 + markerCount * 2;
+export function parseDrawData(InptGPS: GPSImport[]): (number | string)[][] {
+    let returnData: (number | string)[][] = [];
+    InptGPS.forEach(surface => {
+        if ((surface.length-1) % 2 == 1) return;
+        returnData.push([...surface.slice(1), surface.length-1 == 4 ? "s" : "f"])
+    })
 
-  const slicedSection: number[] = InptGPS.slice(currentSection+1, nextSection);
-  while (nextSection < InptGPS.length) {
-     returnData.push(slicedSection)
-  }
-  return returnData;
+    return returnData;
 }
 
-export function parseMainBus(MainBusPoint: number[][]): {
-  graph: number[]
-  translation: number[][]
-} {
-   let graph: number[] = [15, Math.ceil(MainBusPoint.length / 4), ...Array(15*Math.ceil(MainBusPoint.length / 4)).fill(0)]
-   let translation: number[][] = []
+export function parseAStarSubGrid(InptGPS: GPSImport[]): number[] {
+    let wholeGraph: number[] = []
+    let xCoordArray: number[] = []
+    let yCoordArray: number[] = []
 
-   MainBusPoint.forEach((point, idx) => {
-    graph[] 
-   });
+    //Size Preparation
+    InptGPS.forEach((val, idx) => {
+        if (idx == 0) return;
+        if (idx % 2 == 0 && idx != 0) {
+            yCoordArray.push(val as unknown as number);
+        } else {
+            xCoordArray.push(val as unknown as number);
+        }
+    })
+
+    let xSize: number = Math.max(...xCoordArray) - Math.min(...xCoordArray);
+    let ySize: number = Math.max(...yCoordArray) - Math.min(...yCoordArray);
+    const floatMult: number = Math.max(
+        xSize.toString().split(".").length == 1 ? 1 : xSize.toString().split(".")[1].length,
+        ySize.toString().split(".").length == 1 ? 1 : ySize.toString().split(".")[1].length
+    )
+    xSize = xSize.toString().split(".").length == 1 ? xSize : xSize * (Math.pow(10, floatMult))
+    ySize = ySize.toString().split(".").length == 1 ? ySize : ySize * (Math.pow(10, floatMult))
+    wholeGraph.push(xSize, ySize, ...Array(xSize*ySize).fill(1));
+
+    return wholeGraph
 }
