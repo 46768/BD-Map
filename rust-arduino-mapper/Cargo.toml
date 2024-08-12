@@ -1,7 +1,0 @@
-[package]
-name = "rust-arduino-mapper"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
-"avrd" = "1.0.0"
