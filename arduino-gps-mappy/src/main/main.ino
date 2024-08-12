@@ -58,8 +58,8 @@ enum ProgState {
   EMPTY_SLOT3,  //11
   EMPTY_SLOT4,  //12
 
-  CLEAR_LOG,    //13
-  PROG_LOG,     //14
+  PROG_LOG,    //13
+  EMPTY_SLOT7,     //14
   EMPTY_SLOT5,  //15
   EMPTY_SLOT6,  //16
 
@@ -90,7 +90,7 @@ ProgState progStateStrToEnum(const char* str) {
   if (strcmp(str, "EMPTY_SLOT3") == 0) return EMPTY_SLOT3;
   if (strcmp(str, "EMPTY_SLOT4") == 0) return EMPTY_SLOT4;
 
-  if (strcmp(str, "CLEAR_LOG") == 0) return CLEAR_LOG;
+  if (strcmp(str, "EMPTY_SLOT7") == 0) return EMPTY_SLOT7;
   if (strcmp(str, "PROG_LOG") == 0) return PROG_LOG;
   if (strcmp(str, "EMPTY_SLOT5") == 0) return EMPTY_SLOT5;
   if (strcmp(str, "EMPTY_SLOT6") == 0) return EMPTY_SLOT6;
@@ -121,38 +121,40 @@ int microCodeStrToEnum(const char* str) {
 enum SubMicroCode {
   APL,
   GET_GPS,
+  SOUND_TOGGLE,
   UNKNOWNSUBCODE,
 };
 int subCodeStrToEnum(const char* str) {
   if (strcmp(str, "APL") == 0) return APL;
   if (strcmp(str, "GET_GPS") == 0) return GET_GPS;
+  if (strcmp(str, "SOUND_TOGGLE") == 0) return SOUND_TOGGLE;
   return UNKNOWNSUBCODE;
 }
 
 ProgState programState = MAIN_MENU;
 //Quadary Tree Containing Microcode
 const char* microCodeSetTree[23][9] = {
-  { "GO_TO__ GPS_MENU;", "GO_TO__ IO_MENU;", "GO_TO__ UTILS_MENU;", "GO_TO__ SECRET_MENU;", "Mappy", "GPS", "IO", "UTILS", "?" },  //Main Menu 0
+  { "GO_TO__ GPS_MENU;", "GO_TO__ IO_MENU;", "GO_TO__ UTILS_MENU;", "GO_TO__ SECRET_MENU;", "Mappy", "GPS", "IO", "UTILS", "_" },  //Main Menu 0
 
-  { "GO_TO__ GPS_START;", "GO_TO__ GPS_LOG;", "NOTHING;", "GO_TO__ MAIN_MENU;", "GPS", "Map", "Log", "_", "<" },                                                 //GPS Menu 1
-  { "GO_TO__ IO_CONNECT/IO_SEND CNCTMSG;", "GO_TO__ IO_LOG/IO_SEND RQST_IO_LOG;", "NOTHING;", "GO_TO__ MAIN_MENU;", "IO", "Conct", "Log", "_", "<" },            //IO Menu 2
-  { "GO_TO__ CLEAR_LOG/IO_SEND CLEAR_LOG;", "GO_TO__ PROG_LOG/IO_SEND RQST_PROG_LOG;", "NOTHING;", "GO_TO__ MAIN_MENU;", "UTILS", "ClrLog", "PLog", "_", "<" },  //UTILS Menu 3
-  { "GO_TO__ BAD_APPLE;", "NOTHING;", "NOTHING;", "GO_TO__ MAIN_MENU;", "Secrets", "badapl", "_", "_", "<" },                                                    //Secret Menu 4
+  { "GO_TO__ GPS_START;", "GO_TO__ GPS_LOG/IO_SEND RQST_GPS_LOG;", "NOTHING;", "GO_TO__ MAIN_MENU;", "GPS", "Map", "Log", "_", "<" },                                       //GPS Menu 1
+  { "GO_TO__ IO_CONNECT/IO_SEND CNCTMSG;", "GO_TO__ IO_LOG/IO_SEND RQST_IO_LOG;", "NOTHING;", "GO_TO__ MAIN_MENU;", "IO", "Conct", "Log", "_", "<" },  //IO Menu 2
+  { "GO_TO__ PROG_LOG/IO_SEND RQST_PROG_LOG;", "EXEC___ SOUND_TOGGLE;", "NOTHING;", "GO_TO__ MAIN_MENU;", "UTILS", "PLog", "Sound", "_", "<" },        //UTILS Menu 3
+  { "GO_TO__ BAD_APPLE;", "NOTHING;", "NOTHING;", "GO_TO__ MAIN_MENU;", "Secrets", "badapl", "_", "_", "<" },                                          //Secret Menu 4
 
   { "GO_TO__ GPS_NEW/IO_SEND GPS_NEW;", "NOTHING;", "NOTHING;", "GO_TO__ GPS_MENU;", "Mapping", "New", "_", "_", "<" },  //GPS Start 5
-  { "NOTHING;", "NOTHING;", "NOTHING;", "GO_TO__ GPS_MENU;", "Log", "_", "_", "_", "<" },                //GPS Log 6
-  { "NOTHING;", "NOTHING;", "NOTHING;", "NOTHING;", "_", "_", "_", "_", "_" },                           //Nothing 7
-  { "NOTHING;", "NOTHING;", "NOTHING;", "NOTHING;", "_", "_", "_", "_", "_" },                           //Nothing 8
+  { "NOTHING;", "NOTHING;", "NOTHING;", "GO_TO__ GPS_MENU;", "Log", "_", "_", "_", "<" },                                //GPS Log 6
+  { "NOTHING;", "NOTHING;", "NOTHING;", "NOTHING;", "_", "_", "_", "_", "_" },                                           //Nothing 7
+  { "NOTHING;", "NOTHING;", "NOTHING;", "NOTHING;", "_", "_", "_", "_", "_" },                                           //Nothing 8
 
   { "NOTHING;", "NOTHING;", "NOTHING;", "GO_TO__ IO_MENU;", "STATUS: IDK", "_", "_", "_", "<" },  //IO Connect 9
   { "NOTHING;", "NOTHING;", "NOTHING;", "GO_TO__ IO_MENU;", "Log", "_", "_", "_", "<" },          //IO Log 10
   { "NOTHING;", "NOTHING;", "NOTHING;", "NOTHING;", "_", "_", "_", "_", "_" },                    //Nothing 11
   { "NOTHING;", "NOTHING;", "NOTHING;", "NOTHING;", "_", "_", "_", "_", "_" },                    //Nothing 12
 
-  { "NOTHING;", "NOTHING;", "NOTHING;", "GO_TO__ UTILS_MENU;", "Log Cleared", "_", "_", "_", "<" },  //CLEAR Log 13
-  { "NOTHING;", "NOTHING;", "NOTHING;", "GO_TO__ UTILS_MENU;", "Prog Log", "_", "_", "_", "<" },     //PROG Log 14
-  { "NOTHING;", "NOTHING;", "NOTHING;", "NOTHING;", "_", "_", "_", "_", "_" },                       //Nothing 15
-  { "NOTHING;", "NOTHING;", "NOTHING;", "NOTHING;", "_", "_", "_", "_", "_" },                       //Nothing 16
+  { "NOTHING;", "NOTHING;", "NOTHING;", "GO_TO__ UTILS_MENU;", "Prog Log", "_", "_", "_", "<" },  //PROG Log 13
+  { "NOTHING;", "NOTHING;", "NOTHING;", "NOTHING;", "_", "_", "_", "_", "<" },                    //Nothing 14
+  { "NOTHING;", "NOTHING;", "NOTHING;", "NOTHING;", "_", "_", "_", "_", "_" },                    //Nothing 15
+  { "NOTHING;", "NOTHING;", "NOTHING;", "NOTHING;", "_", "_", "_", "_", "_" },                    //Nothing 16
 
   { "EXEC___ APL;", "NOTHING;", "NOTHING;", "GO_TO__ SECRET_MENU;", "Bad Apple", ">", "H", "_", "<" },  //Nothing 17
   { "NOTHING;", "NOTHING;", "NOTHING;", "NOTHING;", "_", "_", "_", "_", "_" },                          //Nothing 18
@@ -191,18 +193,22 @@ inline void debounceBtn(int btnPin, void (*parseCallback)(int)) {
 //Tones
 inline void toneOK() {
   //Serial.println("toneOK");
+  if (!soundEnable) return;
   tone(soundPin, OKFreq, 100);
 }
 inline void tonePROCESS() {
   //Serial.println("tonePROCESS");
+  if (!soundEnable) return;
   tone(soundPin, PROCESSFreq, 100);
 }
 inline void toneERROR() {
   //Serial.println("toneERROR");
+  if (!soundEnable) return;
   tone(soundPin, ERRORFreq, 100);
 }
 inline void toneDEBUG() {
   //Serial.println("toneDEBUG");
+  if (!soundEnable) return;
   tone(soundPin, PROCESSFreq, 100);
   delay(100);
   tone(soundPin, PROCESSFreq, 100);
@@ -220,13 +226,21 @@ void setDisplay(LiquidCrystal_I2C lcd, ProgState state) {
   }
 }
 void parseMicro(const char* code, const char* args) {
+  //Serial.println(code);
+  //Serial.println(args);
+  if (strcmp(code, "EXEC___") == 0 && strcmp(args, "SOUND_TOGGLE") == 0) {
+    soundEnable = !soundEnable;
+    toneOK();
+    return;
+  }
   switch (microCodeStrToEnum(code)) {
     case GO_TO__:
       programState = progStateStrToEnum(args);
       setDisplay(lcd, programState);
-      //toneOK();
+      toneOK();
       break;
     case EXEC___:
+      //Serial.println(subCodeStrToEnum(args));
       switch (subCodeStrToEnum(args)) {
         case APL:
           for (int i = 1000; i > 0; i--) {
@@ -285,17 +299,26 @@ void parseMicro(const char* code, const char* args) {
           avgLon /= gpsAvg;
           Serial.print(microHeader);
           Serial.print(microSent);
-          Serial.print("gps_lat");
+          Serial.print("GPS_LAT");
           Serial.print(avgLat, 12);
           Serial.print(microHeader);
           Serial.print(microEndMesg);
           Serial.print(microHeader);
           Serial.print(microSent);
-          Serial.print("gps_lon");
+          Serial.print("GPS_LON");
           Serial.print(avgLon, 12);
           Serial.print(microHeader);
           Serial.print(microEndMesg);
           setDisplay(lcd, programState);
+          toneOK();
+          break;
+        case SOUND_TOGGLE:
+          //Serial.println("Sound Toggled");
+          if (soundEnable) {
+            soundEnable = false;
+          } else {
+            soundEnable = true;
+          }
           toneOK();
           break;
         case UNKNOWNSUBCODE:
