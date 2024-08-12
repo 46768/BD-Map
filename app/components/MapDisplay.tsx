@@ -59,7 +59,7 @@ const MapDisplay = (props: DisplayProps) => {
   ) {
     //Constants
     const ScaleFactor: number = 10 ** ZoomAmount;
-    const LineGap: number = 32 * ScaleFactor;
+    const LineGap: number = (32 * ScaleFactor) / Math.min((2**(ZoomAmount*8)), 1);
     const UX: number = XPos * ScaleFactor + MX;
     const UY: number = YPos * ScaleFactor + MY;
 

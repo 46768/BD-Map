@@ -32,21 +32,35 @@ impl<T: Copy> BinaryHeap<T> {
         &mut self,
         bubble_down_fn: &dyn Fn(T, Option<&T>, Option<&T>) -> (bool, bool),
     ) -> Option<T> {
+        println!("--------------------------extract start");
         let array: &mut Vec<T> = &mut self.0;
+        if array.len() == 0 {
+            return None;
+        }
+        if array.len() == 1 {
+            println!("array have 1 element");
+        }
         let array_last: usize = array.len() - 1;
-        if array_last == 0 {return  array.pop();}
         array.swap(0, array_last);
         let ret: Option<T> = array.pop();
+        println!("--------------------------array_len: {}", array.len());
+        println!("--------------------------array_last: {}", array_last);
+        if array_last == 0 {return ret;}
         let mut root: usize = 0;
         loop {
             let child1: usize = (2 * root) + 1;
             let child2: usize = (2 * root) + 2;
-            if child1 >= array_last + 1 {
+            if child1 >= array_last {
                 break;
             };
+            println!("--------------------------array_len_conf: {}", array.len());
             let (swap_bool, direction_bool) =
                 bubble_down_fn(array[root], array.get(child1), array.get(child2));
             if swap_bool {
+                if array.len() == 2 {
+                    array.swap(root, child1);
+                    break;
+                }
                 if direction_bool {
                     array.swap(root, child2);
                     root = child2;

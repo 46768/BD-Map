@@ -23,8 +23,22 @@ impl AStarCoordinate {
     }
 }
 
-fn dist(p0: AStarCoordinate, p1: AStarCoordinate) -> i32 {
-    p0.0.abs_diff(p1.0) as i32 + p0.1.abs_diff(p1.1) as i32
+#[inline(always)]
+pub fn dist(p0: AStarCoordinate, p1: AStarCoordinate) -> i32 {
+    let dx: f32 = (p0.0 - p1.0) as f32;
+    let dy: f32 = (p0.1 - p1.1) as f32;
+
+    //println!("dx: {}", dx);
+    //println!("dy: {}", dy);
+    let pythagorean_interm: f32 = (dx*dx) + (dy*dy);
+    //println!("pythag interm: {}", pythagorean_interm);
+    let pytha_half: f32 = pythagorean_interm * 0.5;
+    let pythag_bit = pythagorean_interm.to_bits();
+    let mut aprox: f32 = f32::from_bits(0x5f3759df - (pythagorean_interm.to_bits() >> 1)); //logarithm black magic
+    //println!("aprox 1: {}", aprox);
+    aprox *= 1.5 - (pytha_half * aprox * aprox);
+    //println!("aprox 2: {}", aprox);
+    (10.0 * (aprox * pythagorean_interm)).floor() as i32
 }
 
 fn reconstruct_path(
@@ -52,9 +66,10 @@ extern "C" {}
 
 #[wasm_bindgen]
 pub fn a_star(
-    graph: Vec<i32>,
+    graph: &mut [i32],
     start_node: AStarCoordinate,
     target_node: AStarCoordinate,
+    get_waste: bool
 ) -> Vec<AStarCoordinate> {
     const ITERATOR: [i32; 8] = [
         0b0100, 0b1100, 0b0001, 0b0011, 0b0101, 0b1111, 0b0111, 0b1101,
@@ -62,10 +77,12 @@ pub fn a_star(
     const NORMAL: [i32; 2] = [1, -1];
     const UNDEFINED: (AStarCoordinate, i32) = (AStarCoordinate(0, 0), 2147483647);
 
+    #[inline(always)]
     fn bubble_up_fn(l_idx: (AStarCoordinate, i32), p_idx: (AStarCoordinate, i32)) -> bool {
         l_idx.1 < p_idx.1
     }
 
+    #[inline(always)]
     fn bubble_down_fn(
         c_idx: (AStarCoordinate, i32),
         c1_idx: Option<&(AStarCoordinate, i32)>,
@@ -82,7 +99,7 @@ pub fn a_star(
 
         (
             c_idx.1 > c1_val.1 || c_idx.1 > c2_val.1,
-            if c1_val.1 > c2_val.1 { true } else { false },
+            c1_val.1 > c2_val.1,
         )
     }
 
@@ -107,12 +124,13 @@ pub fn a_star(
 
     'main: loop {
         if f_cost.get_size() == 0 && loop_limit >= 10000 {
+            println!("Loop Limit Reached Or No Avaiable Node");
             break 'main;
         }
 
         let extracted_val: (AStarCoordinate, i32) = handle_option(f_cost.extract(&bubble_down_fn));
         let current_node: AStarCoordinate = extracted_val.0;
-        println!("Best Node: {}", current_node);
+        println!("Best Node: {} f_cost: {}", current_node, extracted_val.1);
         closed_node.insert(current_node);
 
         if target_node == current_node {
@@ -130,28 +148,41 @@ pub fn a_star(
                 continue 'neighbor_search;
             }
             let graph_idx: i32 = graph[(2 + n_x + (n_y * sx)) as usize];
-            println!("{}, {}, {}", n_x, n_y, graph_idx);
             if graph_idx == 0 {
+                continue 'neighbor_search;
+            }
+            if graph[(2 + n_x + ((n_y-(n_y-current_node.1)) * sx)) as usize] == 0 && graph[(2 + (n_x-(n_x-current_node.0)) + (n_y * sx)) as usize] == 0 {
                 continue 'neighbor_search;
             }
             let neighbor_g_cost: i32 = match g_cost.get(&current_node) {
                 Some(&current_g_cost) => current_g_cost + dist(current_node, neighbor_coord),
-                None => dist(start_node, neighbor_coord) + dist(current_node, neighbor_coord),
+                None => panic!("Current Node Not Exist While Being Checked For Neighbor (Impossible)"),
             };
 
             let neighbor_g_cost_in_array = match g_cost.get(&neighbor_coord) {
                 Some(&g_cost) => g_cost,
-                None => 2147483647,
+                None => i32::MAX,
             };
 
             if neighbor_g_cost < neighbor_g_cost_in_array {
                 origin.insert(neighbor_coord, current_node);
-                g_cost.insert(neighbor_coord, neighbor_g_cost);
+                let g_entry = g_cost.entry(neighbor_coord).or_insert(neighbor_g_cost);
+                *g_entry = neighbor_g_cost;
                 f_cost.insert((neighbor_coord, neighbor_g_cost + dist(neighbor_coord, target_node)), &bubble_up_fn);
             };
         }
 
         loop_limit += 1;
+    }
+
+    if get_waste {
+        let mut return_vec: Vec<AStarCoordinate> = Vec::new();
+
+        for coord in closed_node.iter() {
+            return_vec.push(*coord);
+        }
+
+        return return_vec;
     }
 
     reconstruct_path(origin, target_node)
