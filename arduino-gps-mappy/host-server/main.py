@@ -4,6 +4,7 @@ import sys
 import threading
 import time
 import platform
+from applicationTK import Application, ExtendedCanvas
 
 
 def onClose():
@@ -19,8 +20,9 @@ def serialInterface():
     try:
         serialPort = serial.Serial(port, baudRate)
         while running:
-            serBuf = serialPort.read_all()
+            serBuf = serialPort.readline()
             if serBuf:
+                serialPort.write(bytes([0b10000011]))
                 serialMonitorText.config(state=tk.NORMAL)
                 serialBuffer = serialBuffer + str(serBuf)[2:-1]
                 serialMonitorText.insert('insert', str(serBuf)[2:-1])
@@ -40,6 +42,15 @@ elif platform.system() == "Windows":
 
 baudRate = 19200
 serialBuffer = ""
+
+r = Application(name="Test", size="1280x640")
+r.addElement("Test Label", tk.Label, r.root, text="test")
+r.addElement("Test Canvas", ExtendedCanvas, r.root, width=65535, height=65535,
+             bg='white')
+r.modifyReference("Test Canvas", r.getElement("Test Canvas").getCanvas())
+r.placeElement("Test Canvas", x=0, y=0, relwidth=0.9, relheight=0.9)
+r.placeElement("Test Label", x=0, y=0, relwidth=0.5, relheight=0.5)
+r.run()
 
 window = tk.Tk()
 window.title("Mappy Host Module")
