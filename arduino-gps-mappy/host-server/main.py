@@ -3,6 +3,7 @@ import tkinter as tk
 import sys
 import threading
 import time
+import platform
 
 
 def onClose():
@@ -30,7 +31,13 @@ def serialInterface():
         print(f"Error: {e}")
 
 
-port = 'COM3'  # 'dev/ttyUSB0' on linux
+port = '/dev/ttyUSB0'  # 'dev/ttyUSB0' on linux
+if platform.system() == "Linux":
+    port = '/dev/ttyUSB0'
+elif platform.system() == "Windows":
+    port = 'COM3'
+
+
 baudRate = 19200
 serialBuffer = ""
 
