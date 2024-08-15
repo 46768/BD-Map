@@ -43,15 +43,6 @@ elif platform.system() == "Windows":
 baudRate = 19200
 serialBuffer = ""
 
-r = Application(name="Test", size="1280x640")
-r.addElement("Test Label", tk.Label, r.root, text="test")
-r.addElement("Test Canvas", ExtendedCanvas, r.root, width=65535, height=65535,
-             bg='white')
-r.modifyReference("Test Canvas", r.getElement("Test Canvas").getCanvas())
-r.placeElement("Test Canvas", x=0, y=0, relwidth=0.9, relheight=0.9)
-r.placeElement("Test Label", x=0, y=0, relwidth=0.5, relheight=0.5)
-r.run()
-
 window = tk.Tk()
 window.title("Mappy Host Module")
 window.protocol("WM_DELETE_WINDOW", onClose)
@@ -95,4 +86,14 @@ running = True
 serialThread = threading.Thread(target=serialInterface, daemon=True)
 serialThread.start()
 
-window.mainloop()
+app = Application("Mappy Host Module", "1280x640")
+app.addElement("MapFrame", tk.LabelFrame, app.root, text="Map")
+app.addElement("PolygonFrame", tk.LabelFrame, app.root, text="Polygon Monitor")
+app.addElement("SerialFrame", tk.LabelFrame, app.root, text="Serial Monitor")
+
+app.placeElement("MapFrame", x=0, y=0, relheight=0.7, relwidth=0.8)
+app.placeElement("PolygonFrame", x=0, rely=0.7, relheight=0.3, relwidth=0.8)
+app.placeElement("SerialFrame", relx=0.8, y=0, relheight=1, relwidth=0.2)
+app.run()
+
+# window.mainloop()

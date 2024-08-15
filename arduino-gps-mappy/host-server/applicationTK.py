@@ -2,6 +2,21 @@ import tkinter as tk
 import sys
 
 
+class ExtendedText:
+    def __init__(self, master, **kwargs):
+        self.textRef = tk.Text(master, kwargs, state=tk.DISABLED)
+        self.text = ""
+
+    def setText(self, string):
+        self.text = string
+        self.textRef.config(state=tk.NORMAL)
+        
+
+    def getDef(self):
+        return self.textRef
+
+    
+
 class ExtendedCanvas:
     def __init__(self, master, **kwargs):
         self.canvas = tk.Canvas(master, kwargs)

@@ -40,6 +40,25 @@
 //Other
 #define idleLimit 5000
 
+//Button States
+//|  7  |  6  |  5  |  4  |  3  |  2  |  1  |  0  |
+//| btc | bbc | rtc | rbc | btp | bbp | rtp | rbp |
+byte btnStates = 0;
+bool soundEnable = true;
+
+char serialBuf;
+//GPS Buffer
+char GPSBuf;
+double GPSLat = 0;
+double GPSLon = 0;
+bool GPSInit = false;
+bool beepLock = true;
+bool GPSOn = false;
+bool beepLockNd = true;
+TinyGPSPlus gpsParser;
+//LiquidCrystal
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
 enum ProgState {
   MAIN_MENU,  //0
 
@@ -138,7 +157,7 @@ ProgState programState = MAIN_MENU;
 const char* microCodeSetTree[23][9] = {
   { "GO_TO__ GPS_MENU;", "GO_TO__ IO_MENU;", "GO_TO__ UTILS_MENU;", "GO_TO__ SECRET_MENU;", "Mappy", "GPS", "IO", "UTILS", "_" },  //Main Menu 0
 
-  { "GO_TO__ GPS_START;", "GO_TO__ GPS_LOG/IO_SEND RQST_GPS_LOG;", "GO_TO__ GPS_DUMP/EXEC___ DUMP_GPS;", "GO_TO__ MAIN_MENU;", "GPS", "Map", "Log", "Dump", "<" },  //GPS Menu 1
+  { "GO_TO__ GPS_START;", "GO_TO__ GPS_LOG/IO_SEND RQST_GPS_LOG;", "GO_TO__ GPS_DUMP;", "GO_TO__ MAIN_MENU;", "GPS", "Map", "Log", "Dump", "<" },  //GPS Menu 1
   { "GO_TO__ IO_CONNECT/IO_SEND CNCTMSG;", "GO_TO__ IO_LOG/IO_SEND RQST_IO_LOG;", "NOTHING;", "GO_TO__ MAIN_MENU;", "IO", "Conct", "Log", "_", "<" },               //IO Menu 2
   { "GO_TO__ PROG_LOG/IO_SEND RQST_PROG_LOG;", "EXEC___ SOUND_TOGGLE;", "NOTHING;", "GO_TO__ MAIN_MENU;", "UTILS", "PLog", "Sound", "_", "<" },                     //UTILS Menu 3
   { "GO_TO__ BAD_APPLE;", "NOTHING;", "NOTHING;", "GO_TO__ MAIN_MENU;", "Secrets", "badapl", "_", "_", "<" },                                                       //Secret Menu 4
@@ -167,24 +186,7 @@ const char* microCodeSetTree[23][9] = {
 
   { "GO_TO__ MAIN_MENU;", "GO_TO__ MAIN_MENU;", "GO_TO__ MAIN_MENU;", "GO_TO__ MAIN_MENU;", "UNKNOWN", "_", "_", "_", "_" },  //Nothing 22
 };
-//Button States
-//|  7  |  6  |  5  |  4  |  3  |  2  |  1  |  0  |
-//| btc | bbc | rtc | rbc | btp | bbp | rtp | rbp |
-byte btnStates = 0;
-bool soundEnable = true;
 
-char serialBuf;
-//GPS Buffer
-char GPSBuf;
-double GPSLat = 0;
-double GPSLon = 0;
-bool GPSInit = false;
-bool beepLock = true;
-bool GPSOn = true;
-bool beepLockNd = true;
-TinyGPSPlus gpsParser;
-//LiquidCrystal
-LiquidCrystal_I2C lcd(0x27, 16, 2);
 inline void debounceBtn(int btnPin, void (*parseCallback)(int)) {
   //write to 4 bit current state of the pin
   btnStates = digitalRead(btnPin) ? btnStates | (1 << btnPin) : btnStates & ~(1 << btnPin);
@@ -422,15 +424,25 @@ void setup() {
 void loop() {
   if (Serial1.available()) {
     //toneOK();
+    //Serial.print(Serial1.peek());
     GPSOn = true;
     if (GPSOn && beepLockNd) {
-      tonePROCESS();
-      delay(100);
-      tonePROCESS();
-      delay(100);
-      tonePROCESS();
-      delay(100);
-      toneOK();
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print("GPS On");
+        lcd.setCursor(0, 1);
+        lcd.print("Blue Top To Cont");
+        while (!digitalRead(blueTopPin)) {
+            tonePROCESS();
+            delay(100);
+            tonePROCESS();
+            delay(100);
+            toneOK();
+            delay(100);
+            toneOK();
+            delay(1000);
+        }
+        setDisplay(lcd, programState);
       beepLockNd = false;
     }
     gpsParser.encode(Serial1.read());
@@ -445,18 +457,27 @@ void loop() {
       }
   }
 
-  if (gpsParser.location.isUpdated()) {
+  if (gpsParser.location.isUpdated() || false) {
     GPSInit = true;
     GPSLat = gpsParser.location.lat();
     GPSLon = gpsParser.location.lng();
     if (GPSInit && beepLock) {
-      tonePROCESS();
-      delay(100);
-      toneOK();
-      delay(100);
-      tonePROCESS();
-      delay(100);
-      toneOK();
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print("GPS Init");
+        lcd.setCursor(0, 1);
+        lcd.print("Blue Top To Cont");
+        while (!digitalRead(blueTopPin)) {
+            tonePROCESS();
+            delay(100);
+            toneOK();
+            delay(100);
+            tonePROCESS();
+            delay(100);
+            toneOK();
+            delay(1000);
+        }
+        setDisplay(lcd, programState);
       beepLock = false;
     }
   }
