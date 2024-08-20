@@ -35,6 +35,14 @@
 #define hostReceived (char)0b10000011
 #define hostError (char)0b10000100
 
+#define gpsInf (char)0b11000001
+
+#define ioCnct (char)0b11100001
+
+#define logSend (char)0b11010001
+#define logRqst (char)0b11010010
+#define logRecv (char)0b11010011
+
 #define msgTimeout 5000
 
 //Other
@@ -313,11 +321,9 @@ void parseMicro(const char* code, const char* args) {
           avgLat /= gpsAvg;
           avgLon /= gpsAvg;
           Serial.print(microSend);
-          Serial.print("GPS_LAT");
+          Serial.print(gpsInf);
           Serial.print(avgLat, 12);
-          Serial.print(microEnd);
-          Serial.print(microSend);
-          Serial.print("GPS_LON");
+          Serial.print(',')
           Serial.print(avgLon, 12);
           Serial.println(microEnd);
           setDisplay(lcd, programState);
