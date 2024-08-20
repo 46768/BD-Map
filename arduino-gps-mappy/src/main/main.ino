@@ -321,11 +321,9 @@ void parseMicro(const char* code, const char* args) {
           avgLat /= gpsAvg;
           avgLon /= gpsAvg;
           Serial.print(microSend);
-          Serial.print("GPS_LAT");
+          Serial.print(gpsInf);
           Serial.print(avgLat, 12);
-          Serial.print(microEnd);
-          Serial.print(microSend);
-          Serial.print("GPS_LON");
+          Serial.print(',')
           Serial.print(avgLon, 12);
           Serial.println(microEnd);
           setDisplay(lcd, programState);
