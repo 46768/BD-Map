@@ -1,21 +1,33 @@
 import tkinter as tk
+from tkinter import scrolledtext
 import sys
 
 
 class ExtendedText:
     def __init__(self, master, **kwargs):
-        self.textRef = tk.Text(master, kwargs, state=tk.DISABLED)
+        self.textRef = scrolledtext.ScrolledText(
+                master,
+                state=tk.DISABLED, wrap=tk.CHAR)
+
         self.text = ""
 
-    def setText(self, string):
-        self.text = string
+    def insertText(self, string):
         self.textRef.config(state=tk.NORMAL)
-        
+        self.textRef.insert(tk.INSERT, string)
+        self.textRef.config(state=tk.DISABLED)
+        self.text = self.text + string
 
-    def getDef(self):
+    def setText(self, string):
+        self.textRef.config(state=tk.NORMAL)
+        if self.text != "" and tk.END != 0:
+            self.textRef.delete(0, tk.END)
+        self.textRef.insert(tk.INSERT, string)
+        self.textRef.config(state=tk.DISABLED)
+        self.text = string
+
+    def getRef(self):
         return self.textRef
 
-    
 
 class ExtendedCanvas:
     def __init__(self, master, **kwargs):
@@ -44,7 +56,8 @@ class Application:
         self.element[name] = tkWidget(master, **kwargs)
 
     def placeElement(self, name, **kwargs):
-        self.element[name].place(kwargs)
+        if self.element[name]:
+            self.element[name].place(kwargs)
 
     def configElement(self, name, **kwargs):
         if self.element[name]:
@@ -56,3 +69,6 @@ class Application:
     def modifyReference(self, name, newRef):
         if self.element[name]:
             self.element[name] = newRef
+
+    def addReference(self, name, ref):
+        self.element[name] = ref
