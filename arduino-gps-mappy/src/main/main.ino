@@ -323,7 +323,7 @@ void parseMicro(const char* code, const char* args) {
           Serial.print(microSend);
           Serial.print(gpsInf);
           Serial.print(avgLat, 12);
-          Serial.print(',')
+          Serial.print(',');
           Serial.print(avgLon, 12);
           Serial.println(microEnd);
           setDisplay(lcd, programState);
