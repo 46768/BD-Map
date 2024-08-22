@@ -19,7 +19,8 @@ class ExtendedText:
 
     def setText(self, string):
         self.textRef.config(state=tk.NORMAL)
-        if self.text != "" and tk.END != 0:
+        if self.text != "":
+            self.textRef.insert(tk.INSERT, "Del")
             self.textRef.delete(0, tk.END)
         self.textRef.insert(tk.INSERT, string)
         self.textRef.config(state=tk.DISABLED)

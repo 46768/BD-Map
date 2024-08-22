@@ -1,25 +1,25 @@
 import serial
 import tkinter as tk
+from tkinter import ttk
 import platform
 import mappyParser
-from tkinter import ttk
 import threading
-import time
-import platform
 import uuid
 import applicationTK
 
 
 def serialInterface():
-    global serialBuffer
     try:
         serialPort = serial.Serial(port, baudRate)
+
         gpsParser = mappyParser.Parser(serialPort)
         while running:
             serBuf = serialPort.read()
             if serBuf:
+                # print(bin(ord(serBuf)))
                 gpsParser.appendBuffer(ord(serBuf))
-                print(gpsParser.getBuffer())
+                # print(gpsParser.getBuffer())
+                # gpsParser.parse()
                 gpsParser.parse()
     except serial.SerialException as e:
         print(f"Error: {e}")
@@ -34,7 +34,6 @@ elif platform.system() == "Windows":
 
 
 baudRate = 19200
-serialBuffer = ""
 
 
 running = True
@@ -43,7 +42,7 @@ serialThread.start()
 
 
 # Root Structure
-app = Application("Mappy Host Module", "1280x640")
+app = applicationTK.Application("Mappy Host Module", "1280x640")
 app.addElement("MapFrame", tk.LabelFrame, app.root, text="Map")
 app.addElement("PolygonFrame", tk.LabelFrame, app.root, text="Polygon Monitor")
 app.addElement("SerialFrame", tk.LabelFrame, app.root, text="Serial Monitor")
@@ -54,7 +53,8 @@ app.placeElement("SerialFrame", x=0, rely=0.7, relheight=0.3, relwidth=0.8)
 app.placeElement("PolygonFrame", relx=0.8, y=0, relheight=1, relwidth=0.2)
 
 # Map Frame Structure
-app.addElement("MapCanvas", ExtendedCanvas, app.element["MapFrame"],
+app.addElement("MapCanvas", applicationTK.ExtendedCanvas,
+               app.element["MapFrame"],
                confine=False, bg="white")
 
 # Map Frame Rereference
@@ -65,7 +65,8 @@ app.placeElement("MapCanvasRef", relx=0.005, rely=0.005,
                  relwidth=0.99, relheight=0.99)
 
 # Serial Frame Structure
-app.addElement("SerialText", ExtendedText, app.element["SerialFrame"])
+app.addElement("SerialText", applicationTK.ExtendedText,
+               app.element["SerialFrame"])
 
 # Serial Frame Rereference
 app.addReference("SerialTextRef", app.element["SerialText"].getRef())
@@ -105,5 +106,5 @@ app.element["PolygonTree"].insert('Poly2', '8', 'Poly2atrb2', text="c3")
 app.element["PolygonTree"].insert('Poly2', '9', 'Poly2atrb3', text="c4")
 
 app.element["SerialText"].insertText(" Hi yall")
-app.element["SerialText"].setText("Omg lmao")
+# app.element["SerialText"].setText("Omg lmao")
 app.run()
