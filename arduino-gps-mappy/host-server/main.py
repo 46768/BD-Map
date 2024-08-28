@@ -16,10 +16,10 @@ def serialInterface():
         while running:
             serBuf = serialPort.read()
             if serBuf:
-                # print(bin(ord(serBuf)))
+                print(bin(ord(serBuf)))
+                print(serBuf)
                 gpsParser.appendBuffer(ord(serBuf))
                 # print(gpsParser.getBuffer())
-                # gpsParser.parse()
                 gpsParser.parse()
     except serial.SerialException as e:
         print(f"Error: {e}")

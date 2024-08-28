@@ -25,20 +25,20 @@
 #define gpsAvg 10
 
 //Host-Micro Protocol
-#define microSend (char)0b00000001
-#define microEnd (char)0b000000010
-#define microReceived (char)0b00000011
-#define microError (char)0b00000100
+#define microSend (char)0b11110001
+#define microEnd (char)0b11110010
+#define microReceived (char)0b11110011
+#define microError (char)0b11110100
 
 #define hostSend (char)0b10000001
 #define hostEnd (char)0b10000010
 #define hostReceived (char)0b10000011
 #define hostError (char)0b10000100
 
-#define gpsNew (char)0b11000010
-#define gpsInf (char)0b11000001
-#define gpsEnd (char)0b11000010
-#define gpsCnl (char)0b11000011
+#define gpsNew (char)0b11000001
+#define gpsInf (char)0b11000010
+#define gpsEnd (char)0b11000011
+#define gpsCnl (char)0b11000100
 
 #define ioCnct (char)0b11100001
 #define ioMsg (char)0b11100010
@@ -248,7 +248,6 @@ void setDisplay(LiquidCrystal_I2C lcd, ProgState state) {
 }
 void IOSend(char* msg, char header) {
     Serial.print(microSend);
-    Serial.print(header);
     if (strcmp(msg, "_CNCTMSG") == 0) {
         Serial.print(ioCnct);
     } else if (strcmp(msg, "_GPS_NEW") == 0) {
@@ -258,7 +257,8 @@ void IOSend(char* msg, char header) {
     } else if (strcmp(msg, "_GPS_CANCL") == 0) {
         Serial.print(gpsCnl);
     } else {
-        Serial.print(msg);
+        Serial.print(header);
+        Serial.write(msg);
     }
     Serial.print(microEnd);
 }
@@ -293,6 +293,12 @@ void parseMicro(const char* code, const char* args) {
                     if (!GPSInit) {
                         lcd.setCursor(0, 0);
                         lcd.print("GPS Not Init");
+                        char dataBytes[sizeof(double)*2];
+                        double avgLat = 69.420f;
+                        double avgLon = 69.420f;
+                        memcpy(dataBytes, &avgLat, sizeof(avgLat));
+                        memcpy(dataBytes+sizeof(double), &avgLon, sizeof(avgLon));
+                        IOSend(dataBytes, gpsInf);
                         toneERROR();
                         delay(3000);
                         setDisplay(lcd, programState);
@@ -305,7 +311,7 @@ void parseMicro(const char* code, const char* args) {
                     long updateDiff = 0;
                     double avgLat = 0;
                     double avgLon = 0;
-                    char dataBytes[8];
+                    char dataBytes[sizeof(double)*2];
                     while (updateDiff <= gpsAvg - 1) {
                         if (Serial1.available()) {
                             gpsParser.encode(Serial1.read());
@@ -334,8 +340,8 @@ void parseMicro(const char* code, const char* args) {
                     }
                     avgLat /= gpsAvg;
                     avgLon /= gpsAvg;
-                    memcpy(dataBytes, &avgLat, sizeof(double));
-                    memcpy(dataBytes+4, &avgLon, sizeof(double));
+                    memcpy(dataBytes, &avgLat, sizeof(avgLat));
+                    memcpy(dataBytes+sizeof(double), &avgLon, sizeof(avgLon));
                     IOSend(dataBytes, gpsInf);
                     setDisplay(lcd, programState);
                     toneOK();
