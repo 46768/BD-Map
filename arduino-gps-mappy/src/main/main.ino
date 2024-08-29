@@ -246,7 +246,7 @@ void setDisplay(LiquidCrystal_I2C lcd, ProgState state) {
         lcd.print(" ");
     }
 }
-void IOSend(char* msg, char header) {
+void IOSend(char* msg, char header, size_t msgSize) {
     Serial.print(microSend);
     if (strcmp(msg, "_CNCTMSG") == 0) {
         Serial.print(ioCnct);
@@ -258,7 +258,7 @@ void IOSend(char* msg, char header) {
         Serial.print(gpsCnl);
     } else {
         Serial.print(header);
-        Serial.write(msg);
+        Serial.write(msg, msgSize);
     }
     Serial.print(microEnd);
 }
@@ -298,7 +298,7 @@ void parseMicro(const char* code, const char* args) {
                         double avgLon = 69.420f;
                         memcpy(dataBytes, &avgLat, sizeof(avgLat));
                         memcpy(dataBytes+sizeof(double), &avgLon, sizeof(avgLon));
-                        IOSend(dataBytes, gpsInf);
+                        IOSend(dataBytes, gpsInf, sizeof(dataBytes));
                         toneERROR();
                         delay(3000);
                         setDisplay(lcd, programState);
@@ -342,7 +342,7 @@ void parseMicro(const char* code, const char* args) {
                     avgLon /= gpsAvg;
                     memcpy(dataBytes, &avgLat, sizeof(avgLat));
                     memcpy(dataBytes+sizeof(double), &avgLon, sizeof(avgLon));
-                    IOSend(dataBytes, gpsInf);
+                    IOSend(dataBytes, gpsInf, sizeof(dataBytes));
                     setDisplay(lcd, programState);
                     toneOK();
                     break;
@@ -363,7 +363,7 @@ void parseMicro(const char* code, const char* args) {
             }
             break;
         case IO_SEND:
-            IOSend(args, ioMsg);
+            IOSend(args, ioMsg, sizeof(args));
             toneOK();
             break;
         case NOTHING:

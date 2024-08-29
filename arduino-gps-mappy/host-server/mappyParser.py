@@ -76,22 +76,13 @@ class Parser:
                     gpsLonByte = 0
                     # print("gps INF parsing data:")
                     # print(data)
-                    for (idx, byte) in enumerate(data):
-                        # print("loop byte")
-                        # print(byte)
-                        # print(idx)
-                        if idx < 4:
-                            gpsLatByte += byte * ((idx % 4)+1)
-                        else:
-                            gpsLonByte += byte * ((idx % 4)+1)
-
-                    gpsLatByte = gpsLatByte.to_bytes(4, byteorder="big")
-                    gpsLonByte = gpsLonByte.to_bytes(4, byteorder="big")
+                    gpsLatByte = bytes(data[0:4])
+                    gpsLonByte = bytes(data[4:8])
                     # print(gpsLatByte)
                     # print(gpsLonByte)
                     self.persistentData.append((
-                        struct.unpack(">f", gpsLatByte)[0],
-                        struct.unpack(">f", gpsLonByte)[0],
+                        struct.unpack("<f", gpsLatByte)[0],
+                        struct.unpack("<f", gpsLonByte)[0],
                     ))
                 case commsHeader.gpsCnl:
                     print("gpscnl")

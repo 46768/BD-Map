@@ -16,11 +16,12 @@ def serialInterface():
         while running:
             serBuf = serialPort.read()
             if serBuf:
-                print(bin(ord(serBuf)))
-                print(serBuf)
+                # print(bin(ord(serBuf)))
+                # print(serBuf)
                 gpsParser.appendBuffer(ord(serBuf))
                 # print(gpsParser.getBuffer())
                 gpsParser.parse()
+                print(gpsParser.persistentData)
     except serial.SerialException as e:
         print(f"Error: {e}")
         return
@@ -106,5 +107,5 @@ app.element["PolygonTree"].insert('Poly2', '8', 'Poly2atrb2', text="c3")
 app.element["PolygonTree"].insert('Poly2', '9', 'Poly2atrb3', text="c4")
 
 app.element["SerialText"].insertText(" Hi yall")
-# app.element["SerialText"].setText("Omg lmao")
+app.element["SerialText"].setText("Omg lmao")
 app.run()

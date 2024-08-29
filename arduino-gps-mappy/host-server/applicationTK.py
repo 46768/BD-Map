@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import scrolledtext
+from tkinter import ttk
 import sys
 
 
@@ -19,15 +20,25 @@ class ExtendedText:
 
     def setText(self, string):
         self.textRef.config(state=tk.NORMAL)
+        self.textRef.insert(tk.INSERT, "Del")
         if self.text != "":
             self.textRef.insert(tk.INSERT, "Del")
-            self.textRef.delete(0, tk.END)
+            self.textRef.delete('1.0', tk.END)
         self.textRef.insert(tk.INSERT, string)
         self.textRef.config(state=tk.DISABLED)
         self.text = string
 
     def getRef(self):
         return self.textRef
+
+
+class ExtendedTreeview:
+    def __init(self, master, **kwargs):
+        self.treeview = ttk.Treeview(master, kwargs)
+        self.scrollbar = tk.Scrollbar(master,
+                                      orient="vertical",
+                                      command=self.treeview.yview,
+                                      )
 
 
 class ExtendedCanvas:
