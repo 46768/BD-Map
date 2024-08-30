@@ -1,7 +1,9 @@
+import uuid
 import tkinter as tk
 from tkinter import scrolledtext
 from tkinter import ttk
 import sys
+from typing import List, Dict
 
 
 class ExtendedText:
@@ -33,12 +35,71 @@ class ExtendedText:
 
 
 class ExtendedTreeview:
-    def __init(self, master, **kwargs):
-        self.treeview = ttk.Treeview(master, kwargs)
+    def __init__(self, master, **kwargs):
+        self.treeview = ttk.Treeview(master)
         self.scrollbar = tk.Scrollbar(master,
                                       orient="vertical",
                                       command=self.treeview.yview,
                                       )
+        self.data: Dict[str, List[str]] = {"temp": []}
+        self.namespaceUUID = uuid.uuid4()
+        self.treeData = []
+
+        self.treeview.config(yscrollcommand=self.scrollbar.set)
+
+    def placeElement(self):
+        self.treeview.place(
+                relx=0.025, rely=0.025,
+                relwidth=0.95, relheight=0.95
+        )
+        self.scrollbar.place(
+                relx=0.95, rely=0,
+                relwidth=0.0125, relheight=1
+        )
+
+    def refreshTree(self):
+        self.treeview.delete(*self.treeview.get_children())
+        self.treeData = []
+        for k, v in self.data.items():
+            keyUUID = uuid.uuid3(self.namespaceUUID, k)
+            self.treeData.append([
+                '',
+                keyUUID,
+                keyUUID
+            ])
+            for data in v:
+                self.treeData.append([
+                    keyUUID,
+                    uuid.uuid3(keyUUID, data),
+                    data
+                ])
+
+        for data in self.treeData:
+            self.treeview.insert(
+                    data[0],
+                    tk.END,
+                    data[1],
+                    text=data[2]
+                )
+
+    def replicateFromTemp(self, label):
+        self.data[label] = self.data["temp"]
+
+    def setData(self, label, data):
+        self.data[label] = data
+
+    def addData(self, label, data):
+        if not (label in self.data):
+            self.data[label] = []
+
+        self.data[label].append(data)
+        self.refreshTree()
+
+    def clearTemp(self):
+        self.data["temp"] = []
+
+    def getTreeview(self):
+        return self.treeview
 
 
 class ExtendedCanvas:
@@ -68,18 +129,18 @@ class Application:
         self.element[name] = tkWidget(master, **kwargs)
 
     def placeElement(self, name, **kwargs):
-        if self.element[name]:
+        if name in self.element:
             self.element[name].place(kwargs)
 
     def configElement(self, name, **kwargs):
-        if self.element[name]:
+        if name in self.element:
             self.element[name].config(kwargs)
 
     def getElement(self, name):
         return self.element[name]
 
     def modifyReference(self, name, newRef):
-        if self.element[name]:
+        if name in self.element:
             self.element[name] = newRef
 
     def addReference(self, name, ref):

@@ -1,18 +1,17 @@
 import serial
 import tkinter as tk
-from tkinter import ttk
 import platform
 import mappyParser
 import threading
-import uuid
 import applicationTK
 
 
-def serialInterface():
+def serialInterface(PolygonTreeHandler):
+    PolygonTree = PolygonTreeHandler
     try:
         serialPort = serial.Serial(port, baudRate)
 
-        gpsParser = mappyParser.Parser(serialPort)
+        gpsParser = mappyParser.Parser(serialPort, PolygonTree)
         while running:
             serBuf = serialPort.read()
             if serBuf:
@@ -33,14 +32,7 @@ if platform.system() == "Linux":
 elif platform.system() == "Windows":
     port = 'COM3'
 
-
 baudRate = 19200
-
-
-running = True
-serialThread = threading.Thread(target=serialInterface, daemon=True)
-serialThread.start()
-
 
 # Root Structure
 app = applicationTK.Application("Mappy Host Module", "1280x640")
@@ -77,35 +69,22 @@ app.placeElement("SerialTextRef", relx=0.025, rely=0.025,
                  relwidth=0.95, relheight=0.95)
 
 # Polygon Frame Structure
-app.addElement("PolygonTree", ttk.Treeview, app.element["PolygonFrame"])
-app.addElement("PolyTreeScroll", tk.Scrollbar, app.element["PolygonFrame"],
-               orient="vertical", command=app.element["PolygonTree"].yview)
-
-# Polygon Frame Configing
-app.configElement("PolygonTree", yscrollcommand=app.element["PolyTreeScroll"].
-                  set)
+app.addElement("PolygonTree", applicationTK.ExtendedTreeview,
+               app.element["PolygonFrame"])
 
 # Polygon Frame Placement
-app.placeElement("PolygonTree", relx=0.025, rely=0.025,
-                 relwidth=0.95, relheight=0.95)
-app.placeElement("PolyTreeScroll", relx=0.95, rely=0,
-                 relheight=1, relwidth=0.0125)
+app.element["PolygonTree"].placeElement()
 
+# Variable Definition
+PolygonTree: applicationTK.ExtendedTreeview = app.element["PolygonTree"]
+SerialText: applicationTK.ExtendedText = app.element["SerialText"]
+
+running = True
+serialThread = threading.Thread(target=serialInterface, daemon=True,
+                                args=(PolygonTree,))
+serialThread.start()
 
 # Testing
-app.element["SerialText"].insertText("Hello World!")
-app.element["PolygonTree"].insert('', '0', 'Poly1', text=str(uuid.uuid4()))
-app.element["PolygonTree"].insert('Poly1', '1', 'Poly1atrb0', text="c1")
-app.element["PolygonTree"].insert('Poly1', '2', 'Poly1atrb1', text="c2")
-app.element["PolygonTree"].insert('Poly1', '3', 'Poly1atrb2', text="c3")
-app.element["PolygonTree"].insert('Poly1', '4', 'Poly1atrb3', text="c4")
-
-app.element["PolygonTree"].insert('', '5', 'Poly2', text=str(uuid.uuid4()))
-app.element["PolygonTree"].insert('Poly2', '6', 'Poly2atrb0', text="c1")
-app.element["PolygonTree"].insert('Poly2', '7', 'Poly2atrb1', text="c2")
-app.element["PolygonTree"].insert('Poly2', '8', 'Poly2atrb2', text="c3")
-app.element["PolygonTree"].insert('Poly2', '9', 'Poly2atrb3', text="c4")
-
-app.element["SerialText"].insertText(" Hi yall")
-app.element["SerialText"].setText("Omg lmao")
+PolygonTree.addData("Poly1", "c1")
+PolygonTree.addData("Poly1", "c2")
 app.run()

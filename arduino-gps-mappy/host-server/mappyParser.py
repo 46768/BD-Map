@@ -1,5 +1,7 @@
 import serial
 import struct
+import applicationTK
+import uuid
 
 
 # micro host Comms
@@ -28,7 +30,8 @@ class commsHeader:
 
 
 class Parser:
-    def __init__(self, serialHandler: serial.Serial):
+    def __init__(self, serialHandler: serial.Serial,
+                 TreeviewHandler: applicationTK.ExtendedTreeview):
         self.serBuffer = 0
         self.dataBuffer = []
         self.parsing = False
@@ -36,6 +39,7 @@ class Parser:
         self.microHeader = 0b00000000
         self.persistentData = []
         self.serialHandler = serialHandler
+        self.treeview = TreeviewHandler
 
     def appendBuffer(self, data):
         self.serBuffer = data
@@ -80,15 +84,20 @@ class Parser:
                     gpsLonByte = bytes(data[4:8])
                     # print(gpsLatByte)
                     # print(gpsLonByte)
-                    self.persistentData.append((
+                    dataTuple = (
                         struct.unpack("<f", gpsLatByte)[0],
                         struct.unpack("<f", gpsLonByte)[0],
-                    ))
+                    )
+                    self.persistentData.append(dataTuple)
+                    self.treeview.addData("temp", ", ".join(
+                        map(str, dataTuple)))
                 case commsHeader.gpsCnl:
                     print("gpscnl")
                     self.persistentData = []
+                    self.treeview.clearTemp()
                 case commsHeader.gpsEnd:
                     print("gpsEnd")
+                    self.treeview.replicateFromTemp(uuid.uuid4())
                 case commsHeader.ioCnct:
                     print("ioCnct")
                     self.serialHandler.write(commsHeader.hostSend)
