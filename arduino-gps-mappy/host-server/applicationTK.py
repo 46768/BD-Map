@@ -3,6 +3,8 @@ import tkinter as tk
 from tkinter import scrolledtext
 from tkinter import ttk
 import sys
+import os
+import json
 from typing import List, Dict
 
 
@@ -17,6 +19,7 @@ class ExtendedText:
     def insertText(self, string):
         self.textRef.config(state=tk.NORMAL)
         self.textRef.insert(tk.INSERT, string)
+        self.textRef.see(tk.END)
         self.textRef.config(state=tk.DISABLED)
         self.text = self.text + string
 
@@ -27,6 +30,7 @@ class ExtendedText:
             self.textRef.insert(tk.INSERT, "Del")
             self.textRef.delete('1.0', tk.END)
         self.textRef.insert(tk.INSERT, string)
+        self.textRef.see(tk.END)
         self.textRef.config(state=tk.DISABLED)
         self.text = string
 
@@ -70,7 +74,7 @@ class ExtendedTreeview:
             for data in v:
                 self.treeData.append([
                     keyUUID,
-                    uuid.uuid3(keyUUID, data),
+                    uuid.uuid3(keyUUID, data+str(uuid.uuid4())),
                     data
                 ])
 
@@ -83,10 +87,13 @@ class ExtendedTreeview:
                 )
 
     def replicateFromTemp(self, label):
-        self.data[label] = self.data["temp"]
+        print(f"temp replaced into {label}")
+        self.data[str(label)] = self.data["temp"]
+        self.refreshTree()
 
     def setData(self, label, data):
         self.data[label] = data
+        self.refreshTree()
 
     def addData(self, label, data):
         if not (label in self.data):
@@ -97,6 +104,7 @@ class ExtendedTreeview:
 
     def clearTemp(self):
         self.data["temp"] = []
+        self.refreshTree()
 
     def getTreeview(self):
         return self.treeview
@@ -108,6 +116,64 @@ class ExtendedCanvas:
 
     def getCanvas(self):
         return self.canvas
+
+
+class commands:
+    export = "export"
+    clear = "clear"
+    test = "test"
+
+
+class CommandLine:
+    def __init__(self, master, polygonHandler: ExtendedTreeview):
+        self.commandFrame = tk.Frame(master)
+        self.commandline = tk.Entry(self.commandFrame)
+        self.commandTerminal = ExtendedText(self.commandFrame)
+        self.commandline.bind("<Return>", self.runCommand)
+        self.polygonHandler = polygonHandler
+
+        self.commandTerminal.insertText("[host]: ")
+
+    def runCommand(self, event):
+        inpt = self.commandline.get()
+        self.commandTerminal.insertText(f'{inpt}\n')
+
+        match inpt:
+            case commands.export:
+                exported = {}
+                for label in self.polygonHandler.data:
+                    if label != "temp":
+                        self.commandTerminal.insertText(f'exporting {label}\n')
+                        exported[label] = self.polygonHandler.data[label]
+                    if not os.path.exists("export/"):
+                        os.mkdir("export/")
+
+                    with open("export/export.json", "w") as file:
+                        file.write(json.dumps(exported))
+                        file.close()
+                self.commandTerminal.insertText("exported\n")
+            case commands.clear:
+                self.commandTerminal.setText("")
+            case commands.test:
+                for i in range(20):
+                    self.polygonHandler.addData(str(uuid.uuid4()),
+                                                "69.420, 69.320")
+            case _:
+                self.commandTerminal.insertText("unknown command\n")
+
+        self.commandTerminal.insertText("[host]: ")
+        self.commandline.delete("0", tk.END)
+        print(inpt)
+
+    def getFrame(self):
+        return self.commandFrame
+
+    def placeElement(self):
+        self.commandFrame.place(x=0,y=0,relwidth=1,relheight=1)
+        self.commandline.place(relx=0.0125,rely=0.0125,relwidth=0.975)
+        self.commandTerminal.getRef().place(
+                relx=0.0125,rely=0.125,relwidth=0.975,
+                                   relheight=0.8625)
 
 
 class Application:
@@ -126,7 +192,12 @@ class Application:
         sys.exit()
 
     def addElement(self, name, tkWidget, master, **kwargs):
-        self.element[name] = tkWidget(master, **kwargs)
+        if kwargs:
+            print("kwag")
+            self.element[name] = tkWidget(master, **kwargs)
+        else:
+            print("no kwag")
+            self.element[name] = tkWidget(master=master)
 
     def placeElement(self, name, **kwargs):
         if name in self.element:

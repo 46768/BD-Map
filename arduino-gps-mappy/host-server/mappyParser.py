@@ -98,6 +98,7 @@ class Parser:
                 case commsHeader.gpsEnd:
                     print("gpsEnd")
                     self.treeview.replicateFromTemp(uuid.uuid4())
+                    self.treeview.clearTemp()
                 case commsHeader.ioCnct:
                     print("ioCnct")
                     self.serialHandler.write(commsHeader.hostSend)
