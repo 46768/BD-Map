@@ -1,2 +1,2 @@
-astar : main.c
-	gcc main.c -o astar
+astar.out : main.c
+	gcc main.c -o astar.out
