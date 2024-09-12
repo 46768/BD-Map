@@ -55,6 +55,9 @@ uintstd_t* dijkstra(uintstd_t* graph, uintstd_t source, uintstd_t target, uintst
 		//if (debug > 5) break;
 	}
 
+	free(dist);
+	free(visited);
+
 	return path;
 }
 
