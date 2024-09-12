@@ -1,25 +1,77 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include <stdbool.h>
 
-#define NODEC 2
+#define NODEC 6
 #define NODENC 2
-#define uintstd_s sizeof(uint16_t)
+#define uintstd_t uint16_t
+#define uintstd_s sizeof(uintstd_t)
+#define uintstd_l 65535
+#define bool_s sizeof(bool)
 
-// [...nodend(s(nodenc)), ...noden(s(nodenc))][]
-uint16_t* dijkstra(uint16_t* graph, uint16_t source, uint16_t target, uint16_t nodec, uint16_t nodenc) {
-	printf("nodec: %d\nnodenc: %d\n", nodec, nodenc);
-	uint16_t* p_cost = (uint16_t*)malloc(nodec*uintstd_s);
-	uint16_t* path = (uint16_t*)malloc(nodec*uintstd_s);
+bool validate_path(uintstd_t* path) {
+	return true;
+}
 
-	free(p_cost);
+//graph structure
+//[...node_neighbor_dist(size=node_neighbor_count),
+//...node_neighbor(size=node_neighbor_count)]
+//each dist correspond to each neighbor
+uintstd_t* dijkstra(uintstd_t* graph, uintstd_t source, uintstd_t target, uintstd_t nodec, uintstd_t nodenc) {
+	bool* visited = (bool*)malloc(nodec*bool_s);
+	uintstd_t* dist = (uintstd_t*)malloc(nodec*uintstd_s);
+	uintstd_t* path = (uintstd_t*)malloc(nodec*uintstd_s);
+
+	memset(dist, uintstd_l, nodec*uintstd_s);
+	dist[source] = 0;
+
+	uintstd_t current_node = source;
+	int debug = 0;
+
+	while (current_node != target) {
+		uintstd_t min_dist = uintstd_l;
+		uintstd_t next_node = current_node;
+		uintstd_t graph_offset = current_node*2*nodenc;
+		for (int i = 0; i < nodenc; i++) {
+			uintstd_t node_dist = dist[current_node] + graph[graph_offset + i];
+			uintstd_t node = graph[graph_offset + i + nodenc]; 
+			printf("node %d, dist %d\n", node, node_dist);
+			if (node == uintstd_l || visited[node]) continue;
+			if (node_dist <= dist[node]) {
+				dist[node] = node_dist;
+				path[node] = current_node;
+			}
+			if (node_dist < min_dist) {
+				min_dist = node_dist;
+				next_node = node;
+			}
+		}
+		printf("next node: %d, current node: %d\n------------------\n", next_node, current_node);
+		visited[current_node] = true;
+		current_node = next_node;
+		debug++;
+		if (debug > 5) break;
+	}
+
 	return path;
 }
 
 int main(int argc, char *argv[]) {
-	uint16_t testg[NODEC][NODENC] = {{1, 2}, {3, 4}};
-	uint16_t* test = dijkstra(testg, 1, 2, NODEC, NODENC);
-	free(test);
+	uintstd_t test_graph[NODEC][2*NODENC] = {
+		{1, 2, 1, 2},
+		{1, 2, 2, 3},
+		{1, 2, 3, 4},
+		{5, 2, 4, 5},
+		{1, 2, 5, 0},
+		{3, 2, 0, 1},
+	};
+	uintstd_t* test_path = dijkstra(test_graph, 0, 5, NODEC, NODENC);
+	for (int i = 0; i < NODEC*uintstd_s; i++) {
+		printf("%d: %d\n", i, test_path[i]);
+	}
+	free(test_path);
 	printf("working!\n");
     return 0;
 }
