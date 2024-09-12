@@ -52,7 +52,7 @@ uintstd_t* dijkstra(uintstd_t* graph, uintstd_t source, uintstd_t target, uintst
 		visited[current_node] = true;
 		current_node = next_node;
 		debug++;
-		if (debug > 5) break;
+		//if (debug > 5) break;
 	}
 
 	return path;
