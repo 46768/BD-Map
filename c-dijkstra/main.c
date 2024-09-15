@@ -25,10 +25,11 @@ uintstd_t* dijkstra(uintstd_t* graph, uintstd_t source, uintstd_t target, uintst
 	uintstd_t* path = (uintstd_t*)malloc(nodec*uintstd_s);
 
 	memset(dist, uintstd_l, nodec*uintstd_s);
+	memset(path, uintstd_l, nodec*uintstd_s);
+	memset(visited, false, nodec*bool_s);
 	dist[source] = 0;
 
 	uintstd_t current_node = source;
-	int debug = 0;
 
 	while (current_node != target) {
 		uintstd_t min_dist = uintstd_l;
@@ -37,7 +38,6 @@ uintstd_t* dijkstra(uintstd_t* graph, uintstd_t source, uintstd_t target, uintst
 		for (int i = 0; i < nodenc; i++) {
 			uintstd_t node_dist = dist[current_node] + graph[graph_offset + i];
 			uintstd_t node = graph[graph_offset + i + nodenc]; 
-			printf("node %d, dist %d\n", node, node_dist);
 			if (node == uintstd_l || visited[node]) continue;
 			if (node_dist <= dist[node]) {
 				dist[node] = node_dist;
@@ -48,11 +48,9 @@ uintstd_t* dijkstra(uintstd_t* graph, uintstd_t source, uintstd_t target, uintst
 				next_node = node;
 			}
 		}
-		printf("next node: %d, current node: %d\n------------------\n", next_node, current_node);
+		if (next_node == current_node) break;
 		visited[current_node] = true;
 		current_node = next_node;
-		debug++;
-		//if (debug > 5) break;
 	}
 
 	free(dist);
