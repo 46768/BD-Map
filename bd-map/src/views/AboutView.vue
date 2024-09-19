@@ -1,15 +1,10 @@
 <template>
-  <div class="about">
-    <h1>This is an about page</h1>
-  </div>
+	<p>source: https://github.com/46768/BD-Map</p>
+	<p>backend: python, C</p>
+	<p>frontend: vue+vite</p>
+	<p>embedded system: C + Arduino.h</p>
+	<p>2567/2024 PBL</p>
 </template>
 
 <style>
-@media (min-width: 1024px) {
-  .about {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-  }
-}
 </style>
