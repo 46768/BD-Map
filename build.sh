@@ -11,4 +11,5 @@ if [ -d ./dist ]; then
 		rm -rf ../dist
 	fi
 	mv ./dist ..
+	ls -R ../dist
 fi
