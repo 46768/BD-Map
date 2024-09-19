@@ -2,6 +2,7 @@
 
 cd bd-map
 pwd
+npm ci
 chmod +x csvStatic.sh
 ./csvStatic.sh && npm run build-only
 
