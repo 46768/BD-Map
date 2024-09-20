@@ -4,7 +4,6 @@ from tkinter import scrolledtext
 from tkinter import ttk
 import sys
 import os
-import json
 from typing import List, Dict
 
 
@@ -140,24 +139,32 @@ class CommandLine:
 
         match inpt:
             case commands.export:
-                exported = {}
-                for label in self.polygonHandler.data:
-                    if label != "temp":
+                polygonData = self.polygonHandler.data
+                if not os.path.exists("export/"):
+                    os.mkdir("export/")
+                with open("export/export.csv", "w", newline='\n') as file:
+                    for label in polygonData:
+                        if label == "temp" and len(polygonData[label]) != 4:
+                            continue
+                        data = [label] + polygonData[label]
                         self.commandTerminal.insertText(f'exporting {label}\n')
-                        exported[label] = self.polygonHandler.data[label]
-                    if not os.path.exists("export/"):
-                        os.mkdir("export/")
-
-                    with open("export/export.json", "w") as file:
-                        file.write(json.dumps(exported))
-                        file.close()
+                        file.write(",".join(data))
+                        file.write('\n')
+                    file.close()
                 self.commandTerminal.insertText("exported\n")
             case commands.clear:
                 self.commandTerminal.setText("")
             case commands.test:
                 for i in range(20):
-                    self.polygonHandler.addData(str(uuid.uuid4()),
-                                                "69.420, 69.320")
+                    dataKey = str(uuid.uuid4())
+                    self.polygonHandler.addData(dataKey,
+                                                "69.420,68.320")
+                    self.polygonHandler.addData(dataKey,
+                                                "79.420,68.320")
+                    self.polygonHandler.addData(dataKey,
+                                                "79.420,70.320")
+                    self.polygonHandler.addData(dataKey,
+                                                "69.420,70.320")
             case _:
                 self.commandTerminal.insertText("unknown command\n")
 
