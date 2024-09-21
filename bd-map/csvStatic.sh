@@ -18,3 +18,4 @@ echo $translationCsv
 cp ./map.data/$graphCsv ./data && mv ./data/$graphCsv ./data/graph.csv
 cp ./map.data/$graphicCsv ./data && mv ./data/$graphicCsv ./data/graphic.csv
 cp ./map.data/$translationCsv ./data && mv ./data/$translationCsv ./data/translation.csv
+rm -r ./map.data/

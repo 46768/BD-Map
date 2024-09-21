@@ -53,13 +53,17 @@
 		}
 
 		for (let polygonDat of polygonData) {
-			canvasCtx.fillStyle = `rgba(${polygonDat[5]}, ${polygonDat[6]}, ${polygonDat[7]}, ${polygonDat[8]})`
+			canvasCtx.fillStyle = `rgba(${polygonDat[5]}, ${polygonDat[6]}, ${polygonDat[7]}, ${polygonDat[8]/100})`
 			canvasCtx.fillRect(polygonDat[0]+x.value, polygonDat[1]+y.value, polygonDat[2], polygonDat[3])
 		}
 	}
 
-	function mouseBtnHandler(evt: MouseEvent) {
-		dragging.value = !dragging.value
+	function mouseBtnHandlerDown() {
+		dragging.value = true
+	}
+
+	function mouseBtnHandlerUp() {
+		dragging.value = false
 	}
 	
 	function mouseMoveHandler(evt: MouseEvent) {
@@ -78,6 +82,7 @@
 
 	function parseGraphic(csvData: string) {
 		polygon.value = csvData.split('\n').map(dataBlock => dataBlock.split(',').map(val => parseInt(val)))
+		console.log(polygon.value)
 		if (canvasCtx.value) {
 			drawScreen(canvasCtx.value, polygon.value, props.currentLayer)
 		}
@@ -105,8 +110,8 @@
 
 <template>
 	<canvas
-		@mousedown="mouseBtnHandler"
-		@mouseup="mouseBtnHandler"
+		@mousedown="mouseBtnHandlerDown"
+		@mouseup="mouseBtnHandlerUp"
 		@mousemove="mouseMoveHandler"
 		ref="canvas-ref"></canvas>
 </template>
