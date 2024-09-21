@@ -11,10 +11,6 @@
 #define uintstd_l 65535
 #define bool_s sizeof(bool)
 
-bool validate_path(uintstd_t* path) {
-	return true;
-}
-
 //graph structure
 //[...node_neighbor_dist(size=node_neighbor_count),
 //...node_neighbor(size=node_neighbor_count)]
