@@ -31,13 +31,11 @@
 		const lineOffsetX = (x.value) % lineGap
 		const lineOffsetY = (y.value) % lineGap
 
-		console.log(VH, VW)
 		canvasCtx.canvas.height = VH
 		canvasCtx.canvas.width = VW
 		canvasCtx.fillStyle = "rgb(0, 204, 102)"
 		canvasCtx.fillRect(0, 0, VW, VH)
 
-		console.log(VH, VW)
 		for (let xLine = 0; xLine < VW+lineGap; xLine+=lineGap) {
 			canvasCtx.strokeStyle = lineStyle
 			canvasCtx.beginPath()
@@ -55,7 +53,7 @@
 		}
 
 		for (let polygonDat of polygonData) {
-			canvasCtx.fillStyle = `rgb(${polygonDat[5]}, ${polygonDat[6]}, ${polygonDat[7]})`
+			canvasCtx.fillStyle = `rgba(${polygonDat[5]}, ${polygonDat[6]}, ${polygonDat[7]}, ${polygonDat[8]})`
 			canvasCtx.fillRect(polygonDat[0]+x.value, polygonDat[1]+y.value, polygonDat[2], polygonDat[3])
 		}
 	}
