@@ -8,8 +8,8 @@
 	const position = ref<CanvasCoord>({x: 0, y: 0})
 	const cvsRef = ref<HTMLCanvasElement | null>()
 	const ctx = ref<CanvasRenderingContext2D | null>()
-	const height = ref<number>(10)
-	const width = ref<number>(10)
+	const height = ref<number>(props.height)
+	const width = ref<number>(props.width)
 	const dragging = ref<boolean>(false)
 	function handleMUp() {
 		dragging.value = false
@@ -31,11 +31,18 @@
 			ctx.value = newRef.getContext("2d")
 		}
 	})
-	watch(() => props.width, (newWidth) => width.value = newWidth)
-	watch(() => props.height, (newHeight) => height.value = newHeight)
+	watch(() => props.width, (newWidth) => {
+		width.value = newWidth
+		console.log(`new width: ${newWidth}`)
+	})
+	watch(() => props.height, (newHeight) => {
+		height.value = newHeight
+		console.log(`new height: ${newHeight}`)
+	})
 	defineExpose({ position, ctx })
 </script>
 
 <template>
-	<canvas ref="csvRef" @mouseup="handleMUp" @mousedown="handleMDown" @mousemove="handleMMove"></canvas>
+	<canvas ref="csvRef" @mouseup="handleMUp" @mousedown="handleMDown" @mousemove="handleMMove"
+		:width="width" :height="height"></canvas>
 </template>

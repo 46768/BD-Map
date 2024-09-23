@@ -25,13 +25,5 @@
 </script>
 
 <template>
-	<Map 
-	:source="0"
-	:target="0"
-	:current-loc="[0,0]"
-	:current-layer="0" 
-	:graph-c-s-v="graphData"
-	:translation-c-s-v="translationData"
-	:graphic-c-s-v="graphicData"
-	class="fixed top-0 left-0"/>
+	<Map class="fixed top-0 left-0"/>
 </template>
