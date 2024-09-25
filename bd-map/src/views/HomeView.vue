@@ -25,5 +25,5 @@
 </script>
 
 <template>
-	<Map class="fixed top-0 left-0"/>
+	<Map/>
 </template>

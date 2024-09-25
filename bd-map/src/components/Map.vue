@@ -19,7 +19,6 @@
 	function drawBackground(ctx: CanvasRenderingContext2D, r: number, g: number, b: number) {
 		ctx.fillStyle = `rgb(${r}, ${g}, ${b})`
 		ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-		console.log("background filled")
 	}
 
 	function drawLine(ctx: CanvasRenderingContext2D, start: CanvasCoord, end: CanvasCoord, strokeStyle: string) {
@@ -28,7 +27,6 @@
 		ctx.moveTo(start.x, start.y)
 		ctx.lineTo(end.x, end.y)
 		ctx.stroke()
-		console.log("line stroked")
 	}
 
 	function drawShape(ctx: CanvasRenderingContext2D, shapeData: number[]) {
@@ -43,24 +41,24 @@
 		ctx.fill()
 	}
 			
-	function drawCanvas(cH: number, cW: number) {
-		console.log("drawCanvas called")
+	function drawCanvas() {
 		if (cvsCtx.value) {
-			console.log("ctx exist")
 			const ctx: CanvasRenderingContext2D = cvsCtx.value
+			const cW = window.innerWidth
+			const cH = window.innerHeight
+
+			ctx.canvas.width = cW
+			ctx.canvas.height = cH
 
 			const lineGap: number = 32
 
 			const offsetX: number = cvsCoord.value.x%lineGap
 			const offsetY: number = cvsCoord.value.y%lineGap
-			console.log(`offsetX: ${offsetX}, offsetY: ${offsetY}`)
 			ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 
 			drawBackground(ctx, 0, 204, 102)
-			console.log("background drawn")
 
 			for (let lX = 0; lX < cW+lineGap; lX+=lineGap) {
-				console.log(`drawing lX at ${lX+offsetX}`)
 				drawLine(
 				ctx,
 				CanvasCoord(lX+(offsetX), 0),
@@ -69,7 +67,6 @@
 				)
 			}
 			for (let lY = 0; lY < cH+lineGap; lY+=lineGap) {
-				console.log(`drawing lY at ${lY+offsetY}`)
 				drawLine(
 				ctx,
 				CanvasCoord(0, lY+(offsetY)),
@@ -80,26 +77,25 @@
 		}
 	}
 
-	drawCanvas(wHeight.value, wWidth.value)
-
 
 	function updateWDim() {
-		wHeight.value = window.innerHeight
 		wWidth.value = window.innerWidth
-		drawCanvas(wHeight.value, wWidth.value)
+		wHeight.value = window.innerHeight
+		drawCanvas()
+		console.log("window resized")
 	}
 
 	function handleVDrag(coordIn: CanvasCoord) {
 		cvsCoord.value = coordIn
-		drawCanvas(wHeight.value, wWidth.value)
+		drawCanvas()
 	}
 
 	watch(cvsRef, (newRef) => {
 		if (newRef) {
 			cvsCtx.value = newRef.getContext("2d")
-			drawCanvas(wHeight.value, wWidth.value)
+			drawCanvas()
 		}
-	}, {immediate: true})
+	})
 
 	onMounted(() => {
 		window.addEventListener('resize', updateWDim)
@@ -112,6 +108,9 @@
 </script>
 
 <template>
-	<canvas class="fixed top-0 left-0" :width="wWidth" :height="wHeight"
-		ref="cvsRef" v-drag="handleVDrag"></canvas>
+	<div>
+		<canvas class="fixed top-0 left-0"
+				ref="cvsRef" v-drag="handleVDrag"></canvas>
+		<p>hello?</p>
+	</div>
 </template>
