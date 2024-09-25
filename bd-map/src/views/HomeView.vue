@@ -4,7 +4,7 @@
 	const graphicData = ref<string>("")
 	const graphData = ref<string>("")
 	const translationData = ref<string>("")
-
+/*
 	fetch('/BD-Map/data/graphic.csv')
 	.then(res => res.text())
 	.then(text => {graphicData.value = text; console.log(graphicData.value)})
@@ -19,7 +19,7 @@
 	.then(res => res.text())
 	.then(text => {graphData.value = text; console.log(graphData.value)})
 	.catch(error => console.error("Failed fetching graph.csv: HomeView: ", error))
-
+*/
 	onMounted(() => {
 	})
 </script>

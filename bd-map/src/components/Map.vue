@@ -1,11 +1,11 @@
 <script setup lang="ts">
-	import { ref, useTemplateRef, computed, onMounted, onBeforeUnmount } from 'vue'
+	import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
 	import type { CanvasCoord, IShapeData } from '../definitions/canvas'
 	import useCanvas from './useCanvas.vue'
 
-	const cvsRef = useTemplateRef("use-cvs")
-	const cvsCoord = computed(() => {return cvsRef.value?.position})
-	const cvsCtx = computed(() => {return cvsRef.value?.ctx})
+	const cvsRef = ref()
+	const cvsCoord = 1
+	const cvsCtx = 	ref<CanvasRenderingContext2D | null>()
 	const wHeight = ref<number>(window.innerHeight)
 	const wWidth = ref<number>(window.innerWidth)
 
@@ -78,6 +78,14 @@
 		wWidth.value = window.innerWidth
 	}
 
+	watch(cvsRef, (newRef) => {
+		console.log(cvsCtx)
+		if (newRef?.ctx) {
+			cvsCtx.value = newRef.ctx
+		}
+		console.log(cvsCtx)
+	}, {immediate: true})
+
 	onMounted(() => {
 		window.addEventListener('resize', updateWDim)
 	})
@@ -87,5 +95,5 @@
 </script>
 
 <template>
-	<useCanvas class="fixed top-0 left-0" :width="wWidth" :height="wHeight" ref="use-cvs"/>
+	<useCanvas class="fixed top-0 left-0" :width="wWidth" :height="wHeight" ref="cvsRef"/>
 </template>
