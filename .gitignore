@@ -13,6 +13,8 @@ target/
 #Output
 rust-bitmap-tools/png
 rust-integration-test/png
+arduino-gps-mappy/host-server/export
+arduino-gps-mappy/host-server/log
 
 #VSCode
 .vscode
@@ -28,6 +30,8 @@ wasm-pack.log
 #dataFiles
 bd-map/public/data
 
+#python
+__pycache__
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
