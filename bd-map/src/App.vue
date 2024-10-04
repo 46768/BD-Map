@@ -6,7 +6,7 @@
 	<nav class="w-full relative top-0 z-50">
 		<RouterLink to='/'>Home</RouterLink>
 		<RouterLink to='/about'>About</RouterLink>
-		<RouterLink to='/mapdev'>Map Editor</RouterLink>
+		<RouterLink to='/dev/editor'>Map Editor</RouterLink>
 	</nav>
 	<main>
 		<RouterView />

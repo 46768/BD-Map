@@ -1,5 +1,5 @@
-import type { VBinding } from '../definitions/directives'
-import type { CanvasCoord } from '../definitions/canvas'
+import type { VBinding } from './def'
+import type { CanvasCoord } from '@/components/map/def'
 function onMouseDown(){};
 export const vDrag = {
 	mounted: (el: HTMLElement, binding: VBinding) => {

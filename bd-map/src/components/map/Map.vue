@@ -1,7 +1,8 @@
 <script setup lang="ts">
 	import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
-	import { vDrag } from '../directives/vDrag'
-	import type { CanvasCoord, IShapeData } from '../definitions/canvas'
+	import { vDrag } from '@/directives/vDrag'
+	import { vMouse } from '@/directives/vMouse'
+	import type { CanvasCoord, IShapeData } from './def'
 
 	const cvsRef = ref<HTMLCanvasElement>()
 	const cvsCoord = ref({x: 0, y: 0})
@@ -9,7 +10,11 @@
 	const wHeight = ref<number>(window.innerHeight)
 	const wWidth = ref<number>(window.innerWidth)
 
-	const iShapeData = ref<IShapeData[]>([])
+	const props = defineProps<{
+		coord: {x: number, y: number, layer: number}
+		data: {graph: number[][], translation: [number, ...string[]][], graphic: IShapeData[]}
+		getCoord?: (inpt: CanvasCoord) => any
+	}>()
 
 	function CanvasCoord(x: number, y: number): CanvasCoord {
 		return { x: x, y: y }
@@ -29,16 +34,29 @@
 		ctx.stroke()
 	}
 
-	function drawShape(ctx: CanvasRenderingContext2D, shapeData: number[]) {
+	function drawShape(ctx: CanvasRenderingContext2D, shapeData: number[], shapeColor: [number, number, number, number], highlighed: boolean) {
 		if (shapeData.length % 2 != 0) {console.error("shapeData Invalid"); return;}
+		const coord = cvsCoord.value
 
+		ctx.fillStyle = `rgba(${shapeColor[0]}, ${shapeColor[1]}, ${shapeColor[2]}, ${shapeColor[3]})`
 		ctx.beginPath()
-		ctx.moveTo(shapeData[0], shapeData[1])
+		ctx.moveTo(shapeData[0]+coord.x, shapeData[1]+coord.y)
 		for (let i = 1; i < (shapeData.length/2); i++) {
-			ctx.lineTo(shapeData[2*i], shapeData[(2*i)+1])
+			ctx.lineTo(shapeData[2*i]+coord.x, shapeData[(2*i)+1]+coord.y)
 		}
-		ctx.lineTo(shapeData[0], shapeData[1])
+		ctx.lineTo(shapeData[0]+coord.x, shapeData[1]+coord.y)
 		ctx.fill()
+		if (highlighed) {
+			ctx.strokeStyle = `rgba(39, 153, 230, 1)`
+			ctx.lineWidth = 5
+			ctx.beginPath()
+			ctx.moveTo(shapeData[0]+coord.x, shapeData[1]+coord.y)
+			for (let i = 1; i < (shapeData.length/2); i++) {
+				ctx.lineTo(shapeData[2*i]+coord.x, shapeData[(2*i)+1]+coord.y)
+			}
+			ctx.lineTo(shapeData[0]+coord.x, shapeData[1]+coord.y)
+			ctx.stroke()
+		}
 	}
 			
 	function drawCanvas() {
@@ -74,6 +92,11 @@
 				"rgba(70, 70, 70, 0.25)"
 				)
 			}
+
+			drawShape(ctx, [-50, -50, 50, -50, 50, 50, -50, 50], [255, 0, 0, 0.5], false)
+			for (let polygon of props.data.graphic.filter(pData => pData.shapeLayer.value == props.coord.layer)) {
+				drawShape(ctx, polygon.shapeDrawn.value, polygon.shapeColor.value, polygon.hightlighted.value)
+			}
 		}
 	}
 
@@ -87,6 +110,13 @@
 
 	function handleVDrag(coordIn: CanvasCoord) {
 		cvsCoord.value = coordIn
+		if (props.getCoord) {
+			props.getCoord(coordIn)
+		}
+		drawCanvas()
+	}
+	
+	function handleVMouse() {
 		drawCanvas()
 	}
 
@@ -96,6 +126,8 @@
 			drawCanvas()
 		}
 	})
+
+	watch(() => props.data.graphic, () => drawCanvas())
 
 	onMounted(() => {
 		window.addEventListener('resize', updateWDim)
@@ -110,7 +142,7 @@
 <template>
 	<div>
 		<canvas class="fixed top-0 left-0"
-				ref="cvsRef" v-drag="handleVDrag"></canvas>
+				ref="cvsRef" v-drag="handleVDrag" v-mouse="handleVMouse"></canvas>
 		<p>hello?</p>
 	</div>
 </template>
