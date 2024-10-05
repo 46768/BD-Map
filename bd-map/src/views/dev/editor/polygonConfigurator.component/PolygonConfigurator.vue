@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-	import { watch, reactive, computed } from 'vue'
+	import { watch, ref, computed } from 'vue'
 	import { Polygon } from '@/components/map/polygon.class/main'
 
 	const props = defineProps<{
@@ -33,13 +33,13 @@
 		}
 	})
 
-	const color = reactive(props.polygon.color)
+	const color = ref(props.polygon.color)
 	watch(color, (newColor) => {
 		props.polygon.color = newColor
 		console.log("new color")
 		emit('update')
 	})
-	const vertices = reactive(props.polygon.vertices)
+	const vertices = ref(props.polygon.vertices)
 	watch(vertices, (newVertices) => {
 		props.polygon.vertices = newVertices
 		console.log("new vertices")

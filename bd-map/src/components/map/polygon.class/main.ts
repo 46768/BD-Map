@@ -76,17 +76,28 @@ export class Polygon {
 	 * @returns {Boolean} true if is overlapping, false otherwise
 	*/
 	isOverlapping(x: number, y: number): boolean {
+		const boundingBox: number[] = this._BoundingBox
+		if ((boundingBox[0]>x)===(boundingBox[1]>x)) return false
+		if ((boundingBox[2]>y)===(boundingBox[3]>y)) return false
 		const Vertices: number[] = this._Vertices
 		let overlap: boolean = false
 		let prevIdx: number = (Vertices.length>>1)-1
 		for (let vertIdx = 0; vertIdx < Vertices.length>>1; vertIdx++) {
-			const xi: number = Vertices[vertIdx<<1]
-			const xj: number = Vertices[prevIdx<<1]
-			const yi: number = Vertices[(vertIdx<<1)+1]
-			const yj: number = Vertices[(prevIdx<<1)+1]
-			const slope: number = (xj-xi)/(yj-yi)
+			const xi = Vertices[vertIdx*2], yi = Vertices[(vertIdx*2)+1]
+			const xj = Vertices[prevIdx*2], yj = Vertices[(prevIdx*2)+1]
+			if (xj===xi) {
+				if (x < xi) overlap = !overlap
+				prevIdx = vertIdx
+				continue
+			}
+			if (yj===yi) {
+				prevIdx = vertIdx
+				continue
+			}
+			const slope = (yj-yi)/(xj-xi)
 			//y is between yi and yj if its not larger or smaller than both of them
-			if (isBehindLine(x, y, slope, yi-(slope*xi)) && ((yj>y) !== (yi>y))) overlap = !overlap
+			const intersecting = isBehindLine(x, y, slope, yi-(slope*xi)) && ((yi>y) !== (yj>y))
+			if (intersecting) overlap = !overlap
 			prevIdx = vertIdx
 		}
 		return overlap

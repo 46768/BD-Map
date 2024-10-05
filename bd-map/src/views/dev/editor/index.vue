@@ -3,6 +3,7 @@
 	import { Polygon } from '@/components/map/polygon.class/main'
 	import { CSVReader } from './csvReader.class/main'
 	import { vMouse } from '@/directives/vMouse'
+	import { vClick } from '@/directives/vClick'
 	import Map from '@/components/map/Map.vue'
 	import PolygonConfigurator from './polygonConfigurator.component/PolygonConfigurator.vue'
 	import type { Ref } from 'vue'
@@ -24,7 +25,9 @@
 	const polygonData: Ref<Polygon[]> = ref<Polygon[]>([])
 	const canvasOffset: Ref<CanvasCoord> = ref<CanvasCoord>({x: 0, y: 0})
 	const mouseCoord: Ref<CanvasCoord> = ref<CanvasCoord>({x: 0, y: 0})
+
 	const selectingPolygon: Ref<Polygon> = ref<Polygon>(Polygon.blank)
+	const hoveringPolygon: Ref<Polygon> = ref<Polygon>(Polygon.blank)
 
 	function handleUpdate() {
 	}
@@ -37,19 +40,22 @@
 		.catch(err => console.error(err))
 	}
 
-	function clearInput() { csvReader.clearInput() }
+	function clearInput() { csvReader.clearInput(); polygonData.value = [] }
 	function updateCanvasOffset(inpt: CanvasCoord) { canvasOffset.value = inpt }
 	function updateMouseCoord(inpt: CanvasCoord) {
 		mouseCoord.value = inpt
+		hoveringPolygon.value = Polygon.blank
 		for (let i = 0; i < polygonData.value.length; i++) {
 			const poly = polygonData.value[i]
 			poly.highlighted = false
 			if (poly.isOverlapping(mouseCoord.value.x-canvasOffset.value.x, mouseCoord.value.y-canvasOffset.value.y)) {
 				poly.highlighted = true
+				hoveringPolygon.value = poly
 				break
 			}
 		}
 	}
+	function handleClick() { selectingPolygon.value = hoveringPolygon.value; console.log(selectingPolygon.value) }
 
 	onMounted(() => {
 		if (csvInputEl.value) {
@@ -66,7 +72,7 @@
 
 <template>
 	<Map class="z-0" :coord="{x: 0, y: 0, layer: 0}" :data="{graph:[], translation:[], graphic:polygonData}" 
-		:get-coord="updateCanvasOffset" v-mouse="updateMouseCoord"/>
+		:get-coord="updateCanvasOffset" v-mouse="updateMouseCoord" v-click="handleClick"/>
 	<PolygonConfigurator class="fixed top-10 right-2 z-10" :polygon="selectingPolygon" @update="handleUpdate"/>
 	<!--UI-->
 	<div class="z-20">
