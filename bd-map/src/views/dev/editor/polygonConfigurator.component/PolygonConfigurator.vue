@@ -1,51 +1,54 @@
 <script setup lang='ts'>
-	import { computed } from 'vue'
+	import { watch, reactive, computed } from 'vue'
 	import { Polygon } from '@/components/map/polygon.class/main'
 
-	const model = defineModel<Polygon>({ required: true })
+	const props = defineProps<{
+		polygon: Polygon
+	}>()
+
+	const emit = defineEmits<{
+		update: [e?: any]
+	}>()
 
 	const id = computed({
 		get() {
-			return model.value.id
+			return props.polygon.id
 		},
 
 		set(newID: string) {
-			model.value.id = newID
+			props.polygon.id = newID
 			console.log("new name")
+			emit('update')
 		}
 	})
 
 	const layer = computed({
 		get() {
-			return model.value.layer
+			return props.polygon.layer
 		},
 		set(newLayer: number) {
-			model.value.layer = newLayer
+			props.polygon.layer = newLayer
 			console.log("new layer")
+			emit('update')
 		}
 	})
 
-	const color = computed({
-		get() {
-			return model.value.color
-		},
-		set(newColor: number[]) {
-			console.log("new color")
-		}
+	const color = reactive(props.polygon.color)
+	watch(color, (newColor) => {
+		props.polygon.color = newColor
+		console.log("new color")
+		emit('update')
 	})
-
-	const vertices = computed({
-		get() {
-			return model.value.vertices
-		},
-		set(newVertices: number[]) {
-			console.log("new vertices")
-		}
+	const vertices = reactive(props.polygon.vertices)
+	watch(vertices, (newVertices) => {
+		props.polygon.vertices = newVertices
+		console.log("new vertices")
+		emit('update')
 	})
 </script>
 
 <template>
-	<div class="w-[24rem] bg-white">
+	<div class="w-[24rem] bg-white" :class="id === 'blank' ? 'hidden' : 'visible'">
 		<!--Polygon ID-->
 		<div class="mb-1">
 			<p class="inline">Polygon ID</p>
@@ -54,7 +57,7 @@
 		<!--Polygon Layer-->
 		<div class="mb-1">
 			<p class="inline">Polygon Layer</p>
-			<input class="inline w-[13rem]" type="number" v-model="layer"></input>
+			<input class="inline w-[13rem]" type="number" min="0" v-model="layer"></input>
 		</div>
 		<!--Polygon RGBA-->
 		<div class="mb-1">

@@ -1,14 +1,17 @@
 import { isBehindLine } from '@/components/utils/math'
 
 export class Polygon {
-	#BoundingBox: number[]
-	#Highlighted: boolean
-	constructor(private _ID: string, private _Layer: number, private _Color: number[], private _Vertices: number[]) {
+
+	static blank = new Polygon("blank", -1, [0,0,0,0], [0,0])
+
+	_BoundingBox: number[]
+	_Highlighted: boolean
+	constructor(public _ID: string, public _Layer: number, public _Color: number[], public _Vertices: number[]) {
 		//x coordinates are stored in even indices, y coordinates are stored in odd indices
 		const xCoords = this._Vertices.filter((_, idx) => !(idx & 1))
 		const yCoords = this._Vertices.filter((_, idx) => (idx & 1))
-		this.#BoundingBox = [Math.min(...xCoords), Math.max(...xCoords), Math.min(...yCoords), Math.max(...yCoords)]
-		this.#Highlighted = false
+		this._BoundingBox = [Math.min(...xCoords), Math.max(...xCoords), Math.min(...yCoords), Math.max(...yCoords)]
+		this._Highlighted = false
 	}
 
 	get id() {
@@ -28,7 +31,11 @@ export class Polygon {
 	}
 
 	get highlighted() {
-		return this.#Highlighted
+		return this._Highlighted
+	}
+
+	get boundingBox() {
+		return this._BoundingBox
 	}
 
 	set id(newID: string) {
@@ -41,7 +48,7 @@ export class Polygon {
 
 	set color(newColor: number[]) {
 		if (newColor.length !== 4) {
-			console.error(`setting color of ${this.ID} with an invalid color, ${newColor.length} RGBA property provided`)
+			console.error(`setting color of ${this._ID} with an invalid color, ${newColor.length} RGBA property provided`)
 			return
 		}
 		this._Color = newColor
@@ -49,17 +56,17 @@ export class Polygon {
 
 	set vertices(newVertices: number[]) {
 		if (newVertices.length & 1) {
-			console.error(`setting vertices of ${this.ID} with an invalid vertices, ${newVertices.length} Vertices Provided, Need Even Amount`)
+			console.error(`setting vertices of ${this._ID} with an invalid vertices, ${newVertices.length} Vertices Provided, Need Even Amount`)
 		}
 		this._Vertices = newVertices
 		//x coordinates are stored in even indices, y coordinates are stored in odd indices
 		const xCoords: number[] = newVertices.filter((_, idx) => !(idx & 1))
 		const yCoords: number[] = newVertices.filter((_, idx) => (idx & 1))
-		this.#BoundingBox = [Math.min(...xCoords), Math.max(...xCoords), Math.min(...yCoords), Math.max(...yCoords)]
+		this._BoundingBox = [Math.min(...xCoords), Math.max(...xCoords), Math.min(...yCoords), Math.max(...yCoords)]
 	}
 
 	set highlighted(isHighlighted: boolean) {
-		this.#Highlighted = isHighlighted
+		this._Highlighted = isHighlighted
 	}
 
 	/**
@@ -69,7 +76,7 @@ export class Polygon {
 	 * @returns {Boolean} true if is overlapping, false otherwise
 	*/
 	isOverlapping(x: number, y: number): boolean {
-		const Vertices: number[] = this.Vertices
+		const Vertices: number[] = this._Vertices
 		let overlap: boolean = false
 		let prevIdx: number = (Vertices.length>>1)-1
 		for (let vertIdx = 0; vertIdx < Vertices.length>>1; vertIdx++) {

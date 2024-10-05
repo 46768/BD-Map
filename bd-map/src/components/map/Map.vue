@@ -2,17 +2,16 @@
 	import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
 	import { vDrag } from '@/directives/vDrag'
 	import { vMouse } from '@/directives/vMouse'
-	import type { CanvasCoord, IShapeData } from './def'
+	import { Polygon } from './polygon.class/main'
+	import type { CanvasCoord } from './def'
 
 	const cvsRef = ref<HTMLCanvasElement>()
 	const cvsCoord = ref({x: 0, y: 0})
 	const cvsCtx = 	ref<CanvasRenderingContext2D | null>()
-	const wHeight = ref<number>(window.innerHeight)
-	const wWidth = ref<number>(window.innerWidth)
 
 	const props = defineProps<{
 		coord: {x: number, y: number, layer: number}
-		data: {graph: number[][], translation: [number, ...string[]][], graphic: IShapeData[]}
+		data: {graph: number[][], translation: [number, ...string[]][], graphic: Polygon[]}
 		getCoord?: (inpt: CanvasCoord) => any
 	}>()
 
@@ -34,27 +33,22 @@
 		ctx.stroke()
 	}
 
-	function drawShape(ctx: CanvasRenderingContext2D, shapeData: number[], shapeColor: [number, number, number, number], highlighed: boolean) {
-		if (shapeData.length % 2 != 0) {console.error("shapeData Invalid"); return;}
+	function drawShape(ctx: CanvasRenderingContext2D, polygon: Polygon) {
 		const coord = cvsCoord.value
+		const [r, g, b, a] = polygon.color
+		const vertices = polygon.vertices
 
-		ctx.fillStyle = `rgba(${shapeColor[0]}, ${shapeColor[1]}, ${shapeColor[2]}, ${shapeColor[3]})`
+		ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${a})`
 		ctx.beginPath()
-		ctx.moveTo(shapeData[0]+coord.x, shapeData[1]+coord.y)
-		for (let i = 1; i < (shapeData.length/2); i++) {
-			ctx.lineTo(shapeData[2*i]+coord.x, shapeData[(2*i)+1]+coord.y)
+		ctx.moveTo(vertices[0]+coord.x, vertices[1]+coord.y)
+		for (let i = 1; i < (vertices.length>>1); i++) {
+			ctx.lineTo(vertices[2*i]+coord.x, vertices[(2*i)+1]+coord.y)
 		}
-		ctx.lineTo(shapeData[0]+coord.x, shapeData[1]+coord.y)
+		ctx.closePath()
 		ctx.fill()
-		if (highlighed) {
+		if (polygon.highlighted) {
 			ctx.strokeStyle = `rgba(39, 153, 230, 1)`
 			ctx.lineWidth = 5
-			ctx.beginPath()
-			ctx.moveTo(shapeData[0]+coord.x, shapeData[1]+coord.y)
-			for (let i = 1; i < (shapeData.length/2); i++) {
-				ctx.lineTo(shapeData[2*i]+coord.x, shapeData[(2*i)+1]+coord.y)
-			}
-			ctx.lineTo(shapeData[0]+coord.x, shapeData[1]+coord.y)
 			ctx.stroke()
 		}
 	}
@@ -64,7 +58,7 @@
 			const ctx: CanvasRenderingContext2D = cvsCtx.value
 			const cW = window.innerWidth
 			const cH = window.innerHeight
-
+			const gridLineStyle = "rgba(70, 70, 70, 0.5)"
 			ctx.canvas.width = cW
 			ctx.canvas.height = cH
 
@@ -72,7 +66,6 @@
 
 			const offsetX: number = cvsCoord.value.x%lineGap
 			const offsetY: number = cvsCoord.value.y%lineGap
-			ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 
 			drawBackground(ctx, 0, 204, 102)
 
@@ -81,7 +74,7 @@
 				ctx,
 				CanvasCoord(lX+(offsetX), 0),
 				CanvasCoord(lX+(offsetX), cH),
-				"rgba(70, 70, 70, 0.25)"
+				gridLineStyle
 				)
 			}
 			for (let lY = 0; lY < cH+lineGap; lY+=lineGap) {
@@ -89,23 +82,19 @@
 				ctx,
 				CanvasCoord(0, lY+(offsetY)),
 				CanvasCoord(cW, lY+(offsetY)),
-				"rgba(70, 70, 70, 0.25)"
+				gridLineStyle
 				)
 			}
 
-			drawShape(ctx, [-50, -50, 50, -50, 50, 50, -50, 50], [255, 0, 0, 0.5], false)
-			for (let polygon of props.data.graphic.filter(pData => pData.shapeLayer.value == props.coord.layer)) {
-				drawShape(ctx, polygon.shapeDrawn.value, polygon.shapeColor.value, polygon.hightlighted.value)
+			for (let polygon of props.data.graphic.filter(pData => pData.layer == props.coord.layer)) {
+				drawShape(ctx, polygon)
 			}
 		}
 	}
 
 
 	function updateWDim() {
-		wWidth.value = window.innerWidth
-		wHeight.value = window.innerHeight
 		drawCanvas()
-		console.log("window resized")
 	}
 
 	function handleVDrag(coordIn: CanvasCoord) {
@@ -127,15 +116,15 @@
 		}
 	})
 
-	watch(() => props.data.graphic, () => drawCanvas())
+	watch(() => props.data.graphic, () => {
+		drawCanvas()
+	})
 
 	onMounted(() => {
 		window.addEventListener('resize', updateWDim)
-		console.log("reize handler mounted")
 	})
 	onBeforeUnmount(() => {
 		window.removeEventListener('resize', updateWDim)
-		console.log("reize handler unmounted")
 	})
 </script>
 
