@@ -3,7 +3,7 @@
 </script>
 
 <template>
-	<nav class="w-full relative top-0 z-50">
+	<nav class="w-full relative top-4 z-50">
 		<RouterLink to='/'>Home</RouterLink>
 		<RouterLink to='/about'>About</RouterLink>
 		<RouterLink to='/dev/editor'>Map Editor</RouterLink>
@@ -16,12 +16,18 @@
 <style scoped>
 	a {
 		margin: 10px;
-		font-size: 2.5rem;
+		padding-left: 2px;
+		padding-right: 2px;
+		font-size: 2rem;
 		transition: 100ms;
+		background: var(--color-el-background);
+		border: solid var(--color-border) 1px;
+		border-radius: 5px;
 	}
 
 	a:hover {
-		border: solid var(--color-border-hover);
+		border: solid var(--color-border-hover) 2px;
 		border-radius: 5px;
+		background: var(--color-el-background-hover);
 	}
 </style>

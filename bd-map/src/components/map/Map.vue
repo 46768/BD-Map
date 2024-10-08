@@ -10,6 +10,7 @@
 	const cvsCtx = 	ref<CanvasRenderingContext2D | null>()
 
 	const props = defineProps<{
+		dev?: boolean
 		coord: {x: number, y: number, layer: number}
 		data: {graph: number[][], translation: [number, ...string[]][], graphic: Polygon[]}
 		getCoord?: (inpt: CanvasCoord) => any
@@ -40,16 +41,36 @@
 
 		ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${a})`
 		ctx.beginPath()
-		ctx.moveTo(vertices[0]+coord.x, vertices[1]+coord.y)
-		for (let i = 1; i < (vertices.length>>1); i++) {
-			ctx.lineTo(vertices[2*i]+coord.x, vertices[(2*i)+1]+coord.y)
+		ctx.moveTo(vertices[0][0]+coord.x, vertices[0][1]+coord.y)
+		for (let i = 1; i < (vertices.length); i++) {
+			ctx.lineTo(vertices[i][0]+coord.x, vertices[i][1]+coord.y)
 		}
 		ctx.closePath()
 		ctx.fill()
+		if (props.dev) {
+			ctx.strokeStyle = "rgba(0, 0, 0, 1)"
+			ctx.lineWidth = 1
+			ctx.strokeRect(polygon.boundingBox[0][0]+coord.x, polygon.boundingBox[1][0]+coord.y,
+				polygon.boundingBox[0][1]-polygon.boundingBox[0][0],
+				polygon.boundingBox[1][1]-polygon.boundingBox[1][0],
+			)
+		}
 		if (polygon.highlighted) {
-			ctx.strokeStyle = `rgba(39, 153, 230, 1)`
+			ctx.strokeStyle = "rgba(39, 153, 230, 1)"
 			ctx.lineWidth = 5
 			ctx.stroke()
+			if (props.dev) {
+				ctx.font = "20px inter"
+				for (let j = 0; j < vertices.length; j++) {
+					const x = vertices[j][0]+coord.x, y = vertices[j][1]+coord.y
+					ctx.fillStyle = "rgba(39, 153, 230, 1)"
+					ctx.beginPath()
+					ctx.arc(x, y, 20, 0, 2*Math.PI)
+					ctx.fill()
+					ctx.fillStyle = "rgba(0, 0, 0, 1)"
+					ctx.fillText(`${j+1}`, x-3, y+5)
+				}
+			}
 		}
 	}
 			
@@ -59,6 +80,7 @@
 			const cW = window.innerWidth
 			const cH = window.innerHeight
 			const gridLineStyle = "rgba(70, 70, 70, 0.5)"
+
 			ctx.canvas.width = cW
 			ctx.canvas.height = cH
 
@@ -118,13 +140,17 @@
 
 	watch(() => props.data.graphic, () => {
 		drawCanvas()
-	})
+	}, {deep: false})
 
 	onMounted(() => {
 		window.addEventListener('resize', updateWDim)
 	})
 	onBeforeUnmount(() => {
 		window.removeEventListener('resize', updateWDim)
+	})
+
+	defineExpose({
+		drawCanvas
 	})
 </script>
 

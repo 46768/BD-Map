@@ -14,13 +14,19 @@
 		const polygonData: Polygon[] = rawCSV.map(data => {
 			const dat: string[] = data
 			const polyID: string | undefined = dat.shift()
-			const coordDat: number[] = dat.map(coord => parseFloat(coord))
+			const coordDatInter: number[] = dat.map(coord => parseFloat(coord))
+			const coordDat: [number, number][] = []
+			for (let idx = 0; idx < coordDatInter.length; idx+=2) {
+				coordDat.push([coordDatInter[idx], coordDatInter[idx+1]])
+			}
 
-			if (!polyID) return new Polygon("invalid", -1, [0,0,0,0], [0,0])
+			if (!polyID) return Polygon.blank
 			return new Polygon(polyID, 0, [70, 70, 70, 0.5], coordDat)
 		})
 		return polygonData
 	})
+
+	const mapRef = ref()
 
 	const polygonData: Ref<Polygon[]> = ref<Polygon[]>([])
 	const canvasOffset: Ref<CanvasCoord> = ref<CanvasCoord>({x: 0, y: 0})
@@ -29,9 +35,10 @@
 	const selectingPolygon: Ref<Polygon> = ref<Polygon>(Polygon.blank)
 	const hoveringPolygon: Ref<Polygon> = ref<Polygon>(Polygon.blank)
 
-	function handleUpdate() {
-	}
-
+	function handleUpdate() { if (mapRef.value) {mapRef.value.drawCanvas()} }
+	function clearInput() { csvReader.clearInput(); polygonData.value = [] }
+	function updateCanvasOffset(inpt: CanvasCoord) { canvasOffset.value = inpt }
+	function handleClick() { selectingPolygon.value = hoveringPolygon.value }
 	function handleFileInput() {
 		csvReader.readFile()
 		.then(data => {
@@ -39,23 +46,24 @@
 		})
 		.catch(err => console.error(err))
 	}
-
-	function clearInput() { csvReader.clearInput(); polygonData.value = [] }
-	function updateCanvasOffset(inpt: CanvasCoord) { canvasOffset.value = inpt }
 	function updateMouseCoord(inpt: CanvasCoord) {
 		mouseCoord.value = inpt
 		hoveringPolygon.value = Polygon.blank
-		for (let i = 0; i < polygonData.value.length; i++) {
-			const poly = polygonData.value[i]
+		for (let poly of polygonData.value) {
 			poly.highlighted = false
+		}
+		selectingPolygon.value.highlighted = true
+		for (let poly of polygonData.value) {
 			if (poly.isOverlapping(mouseCoord.value.x-canvasOffset.value.x, mouseCoord.value.y-canvasOffset.value.y)) {
 				poly.highlighted = true
 				hoveringPolygon.value = poly
 				break
 			}
 		}
+		if (mapRef.value) {
+			mapRef.value.drawCanvas()
+		}
 	}
-	function handleClick() { selectingPolygon.value = hoveringPolygon.value; console.log(selectingPolygon.value) }
 
 	onMounted(() => {
 		if (csvInputEl.value) {
@@ -71,7 +79,7 @@
 </script>
 
 <template>
-	<Map class="z-0" :coord="{x: 0, y: 0, layer: 0}" :data="{graph:[], translation:[], graphic:polygonData}" 
+	<Map dev ref="mapRef" class="z-0" :coord="{x: 0, y: 0, layer: 0}" :data="{graph:[], translation:[], graphic:polygonData}" 
 		:get-coord="updateCanvasOffset" v-mouse="updateMouseCoord" v-click="handleClick"/>
 	<PolygonConfigurator class="fixed top-10 right-2 z-10" :polygon="selectingPolygon" @update="handleUpdate"/>
 	<!--UI-->
@@ -80,6 +88,8 @@
 		<input class="fixed bottom-2 left-2" type="file" accept="text/csv" @input="handleFileInput" ref="csvInputEl"></input>
 		<!--Input Clear-->
 		<button class="fixed bottom-10 left-2" @click="clearInput">clear input</button>
+		<button class="fixed bottom-[4.5rem] left-2" @click="console.log(polygonData)">get polygon data</button>
+		<button class="fixed bottom-[6.5rem] left-2" @click="polygonData.forEach(p=>p.refresh())">refresh polygon data</button>
 	</div>
 </template>
 
