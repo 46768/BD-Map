@@ -1,7 +1,0 @@
-[package]
-name = "rust_gps_parser"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
-"rust_bitmap_tools" = { path = "../rust-bitmap-tools" }
