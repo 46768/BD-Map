@@ -1,4 +1,4 @@
-import type { Coord, Color } from './def';
+import type { Coord, Color } from '@/mod/data/com/vertex';
 
 /**
  * Polygon class for storing and making draw commands
@@ -14,7 +14,7 @@ export class Polygon {
      * @param {Color} _color - color in RGBA for the polygon
      */
     public _boundingBox: [Coord, Coord];
-    public _drawCommand = [];
+    public _highlighted: boolean = false;
 
     constructor(
         public _vertices: Coord[],
@@ -24,7 +24,7 @@ export class Polygon {
         const yCoord: number[] = _vertices.map((pos) => pos[1]);
         const x: number = Math.min(...xCoord),
             y: number = Math.min(...yCoord),
-			w: number = Math.max(...xCoord) - Math.min(...xCoord),
+            w: number = Math.max(...xCoord) - Math.min(...xCoord),
             h: number = Math.max(...yCoord) - Math.min(...yCoord);
 
         this._boundingBox = [
@@ -46,7 +46,7 @@ export class Polygon {
             const yCoord: number[] = newVertices.map((pos) => pos[1]);
             const x: number = Math.min(...xCoord),
                 y: number = Math.min(...yCoord),
-				w: number = Math.max(...xCoord) - Math.min(...xCoord),
+                w: number = Math.max(...xCoord) - Math.min(...xCoord),
                 h: number = Math.max(...yCoord) - Math.min(...yCoord);
 
             this._boundingBox = [
@@ -76,10 +76,12 @@ export class Polygon {
     }
 
     /**
-     * Return the draw commands
-     * @return current draw commands based of the vertices
+     * Return true if the polygon is highlighted
+     * @param {boolean} isHighlighted - If provdided replace the current one with this one
+     * @return {boolean} true if polygon is highlighted, false otherwise
      */
-    getDrawCommands() {
-        return this._drawCommand;
+    highlighted(isHighlighted?: boolean): boolean {
+        if (isHighlighted) this._highlighted = isHighlighted;
+        return this._highlighted;
     }
 }
