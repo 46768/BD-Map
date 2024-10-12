@@ -84,4 +84,32 @@ export class Polygon {
         if (isHighlighted) this._highlighted = isHighlighted;
         return this._highlighted;
     }
+
+    /**
+     * Add a vertex to the end of vertices
+     * @param {Coord} vertexCoord - a set of coordinate for the vertex to add
+     */
+    addVertex(vertexCoord: Coord) {
+        this._vertices.push(vertexCoord);
+        const newVertices: Coord[] = this._vertices;
+        const xCoord: number[] = newVertices.map((pos) => pos[0]);
+        const yCoord: number[] = newVertices.map((pos) => pos[1]);
+        const x: number = Math.min(...xCoord),
+            y: number = Math.min(...yCoord),
+            w: number = Math.max(...xCoord) - Math.min(...xCoord),
+            h: number = Math.max(...yCoord) - Math.min(...yCoord);
+
+        this._boundingBox = [
+            [x, y],
+            [w, h],
+        ];
+    }
+
+    /**
+     * Remove a vertex based on an index given
+     * @param {Number} vertexIdx - the index of the vertex to remove
+     */
+    removeVertex(vertexIdx: number) {
+        this.vertices(this._vertices.filter((_, idx) => idx !== vertexIdx));
+    }
 }
