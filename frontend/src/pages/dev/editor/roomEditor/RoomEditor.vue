@@ -10,53 +10,57 @@ const { roomSrc } = defineProps<{
 const emit = defineEmits(['update']);
 
 const roomCode = computed<number>({
-    get: () => roomSrc.roomCode(),
+    get: () => roomSrc.roomCode,
     set: (newCode) => {
-        roomSrc.roomCode(newCode);
+        roomSrc.updateCode(newCode);
         emit('update');
     },
 });
 const floor = computed<number>({
-    get: () => roomSrc.floor(),
+    get: () => roomSrc.floor,
     set: (newFloor) => {
-        roomSrc.floor(newFloor);
+        roomSrc.updateFloor(newFloor);
         emit('update');
     },
 });
-const aliases = ref<string[]>(roomSrc.alias());
-const poly = roomSrc.polygon();
-const polyVertices = ref<Coord[]>(poly.vertices());
-const polyColor = ref<Color>(poly.color());
+const aliases = ref<string[]>(roomSrc.alias);
+const polyVertices = ref<Coord[]>(roomSrc.polygon.vertices);
+const polyColor = ref<Color>(roomSrc.polygon.color);
 
 function addAlias(alias: string) {
     console.log('new alias');
     roomSrc.addAlias(alias);
+    aliases.value = [...roomSrc.alias];
     emit('update');
 }
-function removeAlias(alias: string) {
+function removeAlias(aliasIdx: number) {
     console.log('remove alias');
-    roomSrc.removeAlias(alias);
+    roomSrc.removeAlias(aliasIdx);
+    aliases.value = [...roomSrc.alias];
     emit('update');
 }
-function addVertex(vertex: Coord) {
+function addVertex(coord: Coord) {
     console.log('new vertex');
-    roomSrc.polygon().addVertex(vertex);
+    roomSrc.polygon.addVertex(coord);
+    polyVertices.value = roomSrc.polygon.vertices;
+    console.log(polyVertices.value);
     emit('update');
 }
 function removeVertex(vertexIdx: number) {
     console.log('called remove vertex');
-    roomSrc.polygon().removeVertex(vertexIdx);
+    roomSrc.polygon.removeVertex(vertexIdx);
+    polyVertices.value = roomSrc.polygon.vertices;
     emit('update');
 }
 
 watch(
-    () => roomSrc.roomCode(),
+    () => roomSrc.id,
     () => {
-        roomCode.value = roomSrc.roomCode();
-        floor.value = roomSrc.floor();
-        const newPoly = roomSrc.polygon();
-        polyVertices.value = newPoly.vertices();
-        polyColor.value = newPoly.color();
+		const newPoly = roomSrc.polygon;
+        roomCode.value = roomSrc.roomCode;
+        floor.value = roomSrc.floor;
+        polyVertices.value = newPoly.vertices;
+        polyColor.value = newPoly.color;
     }
 );
 
@@ -64,6 +68,7 @@ watch(
     aliases,
     () => {
         console.log('alias changed');
+		roomSrc.updateAlias(aliases.value)
         emit('update');
     },
     { deep: true }
@@ -72,6 +77,7 @@ watch(
     polyVertices,
     () => {
         console.log('vertices changed');
+		roomSrc.polygon.updateVertices(polyVertices.value)
         emit('update');
     },
     { deep: true }
@@ -87,7 +93,10 @@ watch(
 </script>
 
 <template>
-    <div class="p-1 max-w-[24rem] fixed top-10 right-2 bg-white">
+    <div
+        class="p-1 max-w-[24rem] fixed top-10 right-2 bg-white"
+        :class="roomCode === -1 ? 'hidden' : 'visible'"
+    >
         <!--Room Code-->
         <div class="block">
             <p class="inline-block w-1/5">Code:</p>
@@ -170,9 +179,7 @@ watch(
             <div class="h-[8rem] overflow-y-scroll">
                 <template v-for="idx in aliases.length" :key="`${idx}alias`">
                     <div class="inline-block">
-                        <button class="inline-block w-1/6" @click="removeAlias(aliases[idx - 1])">
-                            -
-                        </button>
+                        <button class="inline-block w-1/6" @click="removeAlias(idx - 1)">-</button>
                         <input class="inline-block w-5/6" type="text" v-model="aliases[idx - 1]" />
                     </div>
                 </template>

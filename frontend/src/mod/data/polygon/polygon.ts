@@ -1,115 +1,97 @@
+import { isPointLeftToLine } from '@/utils/math';
+
 import type { Coord, Color } from '@/mod/data/com/vertex';
 
-/**
- * Polygon class for storing and making draw commands
- */
 export class Polygon {
+    static blank = new Polygon([[0, 0]], [0, 0, 0, 0]);
     /**
      * Construct a polygon
-     * _vertices - array of vertices
-     * _color - color of the polygon in RGBA
-     * _boundingBox - bounding box of the polygon, used in hit detection
-     * _drawCommand - draw command cache
      * @param {Coord[]} _vertices - vertices for the polygon, drawn in order from 0 to vertices.length-1
      * @param {Color} _color - color in RGBA for the polygon
      */
-    public _boundingBox: [Coord, Coord];
-    public _highlighted: boolean = false;
+    public readonly boundingBox: [Coord, Coord];
+    public highlighted: boolean = false;
+
+	_calculateBoundingBox(): [Coord, Coord] {
+        const xCoord: number[] = this.vertices.map((pos) => pos[0]);
+        const yCoord: number[] = this.vertices.map((pos) => pos[1]);
+        const lowerX: number = Math.min(...xCoord),
+            lowerY: number = Math.min(...yCoord),
+            upperX: number = Math.max(...xCoord),
+            upperY: number = Math.max(...yCoord);
+		return [
+            [lowerX, upperX],
+            [lowerY, upperY],
+        ];
+
+	}
 
     constructor(
         public _vertices: Coord[],
-        public _color: Color
+        public color: Color
     ) {
-        const xCoord: number[] = _vertices.map((pos) => pos[0]);
-        const yCoord: number[] = _vertices.map((pos) => pos[1]);
-        const x: number = Math.min(...xCoord),
-            y: number = Math.min(...yCoord),
-            w: number = Math.max(...xCoord) - Math.min(...xCoord),
-            h: number = Math.max(...yCoord) - Math.min(...yCoord);
+        this.boundingBox =  this._calculateBoundingBox()
+	}
 
-        this._boundingBox = [
-            [x, y],
-            [w, h],
-        ];
-    }
+	get vertices(): Coord[] {
+		return this._vertices
+	}
 
-    /**
-     * Return the vertices
-     * @param {Coord[]} newVertices - If provided replace the vertices with the new one and recalculate the bounding box
-     * @return {Coord[]} current/new vertices of the polygon
-     */
-    vertices(newVertices?: Coord[]): Coord[] {
-        if (newVertices) {
+    set vertices(newVertices: Coord[]) {
             this._vertices = newVertices;
-
-            const xCoord: number[] = newVertices.map((pos) => pos[0]);
-            const yCoord: number[] = newVertices.map((pos) => pos[1]);
-            const x: number = Math.min(...xCoord),
-                y: number = Math.min(...yCoord),
-                w: number = Math.max(...xCoord) - Math.min(...xCoord),
-                h: number = Math.max(...yCoord) - Math.min(...yCoord);
-
-            this._boundingBox = [
-                [x, y],
-                [w, h],
-            ];
-        }
-        return this._vertices;
+			this.boundingBox =  this._calculateBoundingBox()
     }
 
-    /**
-     * Return the color
-     * @param {Color} newColor - If provided replace the color with the new one
-     * @return {Color} current/new color of the polygon
-     */
-    color(newColor?: Color): Color {
-        if (newColor) this._color = newColor;
-        return this._color;
-    }
+	updateVertices(newVertices: Coord[]) {
+		this.vertices = newVertices
+	}
 
-    /**
-     * Return the bounding box
-     * @return {[Coord, Coord]} current bounding box of the polygon
-     */
-    getBoundingBox(): [Coord, Coord] {
-        return this._boundingBox;
-    }
+	refresh() {
+		const vertices = this._vertices
+		this.vertices = vertices
+	}
 
-    /**
-     * Return true if the polygon is highlighted
-     * @param {boolean} isHighlighted - If provdided replace the current one with this one
-     * @return {boolean} true if polygon is highlighted, false otherwise
-     */
-    highlighted(isHighlighted?: boolean): boolean {
-        if (isHighlighted) this._highlighted = isHighlighted;
-        return this._highlighted;
-    }
-
-    /**
-     * Add a vertex to the end of vertices
-     * @param {Coord} vertexCoord - a set of coordinate for the vertex to add
-     */
     addVertex(vertexCoord: Coord) {
         this._vertices.push(vertexCoord);
-        const newVertices: Coord[] = this._vertices;
-        const xCoord: number[] = newVertices.map((pos) => pos[0]);
-        const yCoord: number[] = newVertices.map((pos) => pos[1]);
-        const x: number = Math.min(...xCoord),
-            y: number = Math.min(...yCoord),
-            w: number = Math.max(...xCoord) - Math.min(...xCoord),
-            h: number = Math.max(...yCoord) - Math.min(...yCoord);
-
-        this._boundingBox = [
-            [x, y],
-            [w, h],
-        ];
+		this.boundingBox =  this._calculateBoundingBox()
     }
 
-    /**
-     * Remove a vertex based on an index given
-     * @param {Number} vertexIdx - the index of the vertex to remove
-     */
     removeVertex(vertexIdx: number) {
-        this.vertices(this._vertices.filter((_, idx) => idx !== vertexIdx));
+        this._vertices = this._vertices.filter((_, idx) => idx !== vertexIdx);
+		this.boundingBox =  this._calculateBoundingBox()
     }
+
+	isInBoundingBox(x: number, y: number): boolean {
+		const [[lowerX, upperX], [lowerY, upperY]]: [Coord, Coord] = this.boundingBox;
+		if (lowerX > x === upperX > x) return false;
+		if (lowerY > y === upperY > y) return false;
+		return true
+	}
+
+	isPointInPolygon([x, y]: Coord): boolean {
+		if (!this.isInBoundingBox(x, y)) return false;
+		const vertices: Coord[] = this.vertices;
+		let isPointIn: boolean = false;
+		let prevIdx: number = vertices.length - 1;
+		for (let vertIdx = 0; vertIdx < vertices.length; vertIdx++) {
+			const [xVert, yVert] = vertices[vertIdx];
+			const [xPrev, yPrev] = vertices[prevIdx];
+			if (xPrev === xVert) {
+				if (x < xVert) isPointIn = !isPointIn;
+				prevIdx = vertIdx;
+				continue;
+			}
+			if (yPrev === yVert) {
+				prevIdx = vertIdx;
+				continue;
+			}
+			const slope = (yPrev - yVert) / (xPrev - xVert);
+			//y is between yi and yj if its not larger or smaller than both of them
+			const isIntersecting =
+				isPointLeftToLine(x, y, slope, yVert - slope * xVert) && yVert > y !== yPrev > y;
+			if (isIntersecting) isPointIn = !isPointIn;
+			prevIdx = vertIdx;
+		}
+		return isPointIn;
+	}
 }

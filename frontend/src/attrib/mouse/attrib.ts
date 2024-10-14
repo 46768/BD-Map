@@ -34,3 +34,26 @@ export const vMouseDrag: Directive = {
         el.addEventListener('mousedown', onMouseDown);
     },
 };
+
+export const vMouseClick: Directive = {
+    mounted(el, binding) {
+        let px: number = 0;
+        let py: number = 0;
+        function onMouseDown(evt: MouseEvent) {
+            px = evt.clientX;
+            py = evt.clientY;
+            el.addEventListener('mouseup', onMouseUp);
+        }
+
+        function onMouseUp(evt: MouseEvent) {
+            if (Math.abs(evt.clientX - px) <= 10 && Math.abs(evt.clientY - py) <= 10) {
+                if (typeof binding.value === 'function') {
+                    binding.value();
+                }
+            }
+            el.removeEventListener('mouseup', onMouseUp);
+        }
+
+        el.addEventListener('mousedown', onMouseDown);
+    },
+};

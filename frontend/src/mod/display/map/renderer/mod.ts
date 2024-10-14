@@ -31,26 +31,24 @@ export class Renderer {
         this._objectBuffer[zLayer].push(object);
     }
 
-    /**
-     * Create a line object and insert into object buffer
-     * @param {Coord} start - start of the line
-     * @param {Coord} end - end of the line
-     * @param {Color} color - color of the line
-     * @param {number} thickness - thickness of the line
-     * @param {ClosureConfig} options - options of the object
-     */
+	_getOffset(opts: ClosureOptions, options: ClosureConfig): Coord {
+		if (options.static) {
+			return [0, 0]
+		}
+		if (options.repeating) {
+			return [
+				opts.coordinateOffset[0] % options.repeating,
+				opts.coordinateOffset[1] % options.repeating,
+			]
+		}
+		return opts.coordinateOffset
+	}
+
     createLine(start: Coord, end: Coord, color: Color, thickness: number, options: ClosureConfig) {
         const [sx, sy]: Coord = start;
         const [ex, ey]: Coord = end;
         this._insertObject((ctx: CanvasRenderingContext2D, opts: ClosureOptions) => {
-            const [offX, offY] = options.static
-                ? [0, 0]
-                : options.repeating
-                  ? [
-                        opts.coordinateOffset[0] % options.repeating,
-                        opts.coordinateOffset[1] % options.repeating,
-                    ]
-                  : opts.coordinateOffset;
+            const [offX, offY] = this._getOffset(opts, options)
             ctx.strokeStyle = colorToCSS(color);
             ctx.lineWidth = thickness;
             ctx.beginPath();
@@ -60,24 +58,10 @@ export class Renderer {
         }, options.zLayer);
     }
 
-    /**
-     * Create a dot object and insert into object buffer
-     * @param {Coord} pos - position of the dot
-     * @param {number} radius - radius of the dot
-     * @param {Color} color - color of the dot
-     * @param {ClosureConfig} options - options of the object
-     */
     createDot(pos: Coord, radius: number, color: Color, options: ClosureConfig) {
         const [x, y]: Coord = pos;
         this._insertObject((ctx: CanvasRenderingContext2D, opts: ClosureOptions) => {
-            const [offX, offY] = options.static
-                ? [0, 0]
-                : options.repeating
-                  ? [
-                        opts.coordinateOffset[0] % opts.canvasSize[0],
-                        opts.coordinateOffset[1] % opts.canvasSize[1],
-                    ]
-                  : opts.coordinateOffset;
+            const [offX, offY] = this._getOffset(opts, options)
             ctx.fillStyle = colorToCSS(color);
             ctx.beginPath();
             ctx.arc(x + offX, y + offY, radius, 0, Math.PI * 2);
@@ -85,23 +69,11 @@ export class Renderer {
         }, options.zLayer);
     }
 
-    /**
-     * Create a polygon object and insert into object buffer
-     * @param {Polygon} poly - the polygon
-     * @param {Color} color - color of the polygon
-     * @param {ClosureConfig} options - options of the object
-     */
     createPolygon(poly: Polygon, color: Color, options: ClosureConfig) {
-        const vertices: Coord[] = poly.vertices();
         this._insertObject((ctx: CanvasRenderingContext2D, opts: ClosureOptions) => {
-            const [offX, offY] = options.static
-                ? [0, 0]
-                : options.repeating
-                  ? [
-                        opts.coordinateOffset[0] % opts.canvasSize[0],
-                        opts.coordinateOffset[1] % opts.canvasSize[1],
-                    ]
-                  : opts.coordinateOffset;
+            const vertices: Coord[] = poly.vertices;
+            const [[lx, ux], [ly, uy]] = poly.boundingBox;
+            const [offX, offY] = this._getOffset(opts, options)
             const [xBegin, yBegin] = vertices[0];
             ctx.fillStyle = colorToCSS(color);
             ctx.beginPath();
@@ -111,31 +83,27 @@ export class Renderer {
             }
             ctx.closePath();
             ctx.fill();
-            if (poly.highlighted()) {
+            if (poly.highlighted) {
                 ctx.strokeStyle = 'rgba(39, 153, 230, 1)';
                 ctx.lineWidth = 5;
                 ctx.stroke();
             }
+            ctx.strokeStyle = 'rgb(0, 0, 0)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(lx + offX, ly + offY);
+            ctx.lineTo(lx + offX, uy + offY);
+            ctx.lineTo(ux + offX, uy + offY);
+            ctx.lineTo(ux + offX, ly + offY);
+            ctx.closePath();
+            ctx.stroke();
         }, options.zLayer);
     }
 
-    /**
-     * Create a polygon outline object and insert into object buffer
-     * @param {Polygon} poly - the polygon to create an outline
-     * @param {Color} color - color of the outline
-     * @param {ClosureConfig} options - options of the object
-     */
     createOutline(poly: Polygon, color: Color, options: ClosureConfig) {
-        const vertices: Coord[] = poly.vertices();
         this._insertObject((ctx: CanvasRenderingContext2D, opts: ClosureOptions) => {
-            const [offX, offY] = options.static
-                ? [0, 0]
-                : options.repeating
-                  ? [
-                        opts.coordinateOffset[0] % opts.canvasSize[0],
-                        opts.coordinateOffset[1] % opts.canvasSize[1],
-                    ]
-                  : opts.coordinateOffset;
+            const vertices: Coord[] = poly.vertices;
+            const [offX, offY] = this._getOffset(opts, options)
             const [xBegin, yBegin] = vertices[0];
             ctx.strokeStyle = colorToCSS(color);
             ctx.beginPath();
@@ -148,23 +116,10 @@ export class Renderer {
         }, options.zLayer);
     }
 
-    /**
-     * Create a line object and insert into object buffer
-     * @param {string} text - the text to render
-     * @param {Coord} pos - position of the text
-     * @param {ClosureConfig} options - options of the object
-     */
     createText(text: string, pos: Coord, options: ClosureConfig) {
         const [x, y]: Coord = pos;
         this._insertObject((ctx: CanvasRenderingContext2D, opts: ClosureOptions) => {
-            const [offX, offY] = options.static
-                ? [0, 0]
-                : options.repeating
-                  ? [
-                        opts.coordinateOffset[0] % opts.canvasSize[0],
-                        opts.coordinateOffset[1] % opts.canvasSize[1],
-                    ]
-                  : opts.coordinateOffset;
+            const [offX, offY] = this._getOffset(opts, options)
             ctx.fillStyle = 'rgba(0, 0, 0, 1)';
             ctx.fillText(text, x + offX, y + offY);
         }, options.zLayer);

@@ -1,36 +1,33 @@
 import { Polygon } from '@/mod/data/polygon/polygon';
 
 export class Room {
-    public _alias: string[] = [];
+    static blank = new Room(-1, -1, Polygon.blank, '');
+
+    public alias: string[] = [];
     constructor(
-        public _roomCode: number,
-        public _floor: number,
-        public _polygon: Polygon
+        public roomCode: number,
+        public floor: number,
+        public readonly polygon: Polygon,
+        public readonly id: string
     ) {}
 
+	updateCode(newCode: number) {
+		this.roomCode = newCode
+	}
+
+	updateFloor(newFloor: number) {
+		this.floor = newFloor
+	}
+
     addAlias(alias: string) {
-        this._alias.push(alias);
+        this.alias.push(alias);
     }
 
-    removeAlias(alias: string) {
-        this._alias = this._alias.filter((ali) => ali !== alias);
+    removeAlias(aliasIdx: number) {
+        this.alias = this.alias.filter((_, idx) => idx !== aliasIdx);
     }
 
-    alias(): string[] {
-        return this._alias;
-    }
-
-    roomCode(newCode?: number): number {
-        if (newCode) this._roomCode = newCode;
-        return this._roomCode;
-    }
-
-    floor(newFloor?: number): number {
-        if (newFloor) this._floor = newFloor;
-        return this._floor;
-    }
-
-    polygon(): Polygon {
-        return this._polygon;
-    }
+	updateAlias(newAlias: string[]) {
+		this.alias = newAlias
+	}
 }

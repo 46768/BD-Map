@@ -11,11 +11,13 @@ const props = defineProps<{
     gpsCoord: Coord;
     pathData: any;
     roomData: Room[];
+    getOffset?: (coord: Coord) => any;
 }>();
 
 // refs and variables
 const renderer = ref<Renderer>();
 const canvasRef = ref<HTMLCanvasElement>();
+const roomList: Set<string> = new Set();
 const lineGap: number = 32;
 
 // functions
@@ -54,6 +56,9 @@ function generateDivider(lineGap: number) {
 function changeOffset(newOffset: Coord) {
     if (!renderer.value) return;
     renderer.value.updateOffset(newOffset);
+    if (props.getOffset) {
+        props.getOffset(newOffset);
+    }
     callRender();
 }
 
@@ -78,13 +83,32 @@ watch(renderer, (newRenderer) => {
         }
         newRenderer.createDot([0, 0], 32, [255, 0, 0, 0.5], { zLayer: 1 });
         for (let room of props.roomData) {
-            newRenderer.createPolygon(room.polygon(), room.polygon().color(), {
-                zLayer: 2,
-            });
+            if (!roomList.has(room.id)) {
+                newRenderer.createPolygon(room.polygon, room.polygon.color, {
+                    zLayer: 2,
+                });
+                roomList.add(room.id);
+            }
         }
         callRender();
     }
 });
+
+watch(
+    () => props.roomData,
+    (newRoomData) => {
+        if (!renderer.value) return;
+        for (let room of newRoomData) {
+            if (!roomList.has(room.id)) {
+                renderer.value.createPolygon(room.polygon, room.polygon.color, {
+                    zLayer: 2,
+                });
+                roomList.add(room.id);
+            }
+        }
+        callRender();
+    }
+);
 
 // event listeners
 function onResize() {
