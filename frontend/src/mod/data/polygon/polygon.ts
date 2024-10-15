@@ -9,7 +9,7 @@ export class Polygon {
      * @param {Coord[]} _vertices - vertices for the polygon, drawn in order from 0 to vertices.length-1
      * @param {Color} _color - color in RGBA for the polygon
      */
-    public readonly boundingBox: [Coord, Coord];
+    public boundingBox: [Coord, Coord];
     public highlighted: boolean = false;
 
     _calculateBoundingBox(): [Coord, Coord] {
