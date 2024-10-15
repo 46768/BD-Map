@@ -1,6 +1,6 @@
 #!/bin/sh
 
-cd bd-map
+cd frontend
 pwd
 npm ci
 chmod +x csvStatic.sh
@@ -11,5 +11,4 @@ if [ -d ./dist ]; then
 		rm -rf ../dist
 	fi
 	mv ./dist ..
-	ls -R ../dist
 fi
