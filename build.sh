@@ -1,6 +1,6 @@
 #!/bin/sh
 
-cd bd-map
+cd frontend
 pwd
 npm ci
 chmod +x csvStatic.sh

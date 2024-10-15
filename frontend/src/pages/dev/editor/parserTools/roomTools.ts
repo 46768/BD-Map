@@ -4,6 +4,8 @@ import { getPolygonEdges, validatePolygonTouching } from './polygonTools';
 
 import type { Line } from './polygonTools';
 
+const objectHasOwnProperty: (obj: Object, key: PropertyKey) => boolean = Object.prototype.hasOwnProperty.call
+
 export function lineToString(line: Line): string {
     return line.join(',');
 }
@@ -33,7 +35,7 @@ export function getTouchingRooms(roomArray: Room[]): [string, string][] {
                 record = slopeRecord;
                 edgeKey = edge[0];
             }
-            if (!record.hasOwnProperty(edgeKey)) {
+            if (!objectHasOwnProperty(record, edgeKey)) {
                 record[edgeKey] = new Set<string>([roomID]);
             } else {
                 record[edgeKey].add(roomID);
@@ -50,8 +52,8 @@ export function getTouchingRooms(roomArray: Room[]): [string, string][] {
                 const id1: string = roomIDArray[i];
                 const id2: string = roomIDArray[j];
                 if (validatePolygonTouching(roomRecord[id1].polygon, roomRecord[id2].polygon)) {
-                    if (!checked.hasOwnProperty(id1)) checked[id1] = new Set<string>();
-                    if (!checked.hasOwnProperty(id2)) checked[id2] = new Set<string>();
+                    if (!objectHasOwnProperty(checked, id1)) checked[id1] = new Set<string>();
+                    if (!objectHasOwnProperty(checked, id2)) checked[id2] = new Set<string>();
                     checked[id1].add(id2);
                     checked[id2].add(id1);
                 }

@@ -1,3 +1,5 @@
 # Frontend
-- Finished work on parser tools (all tests passed)
-- Added tests for room touching, polygon touch validation
+- Fixed using .hasOwnProperty on objects than Object.prototype.hasOwnProperty.call
+
+# CI
+- Updated frontend directory path
