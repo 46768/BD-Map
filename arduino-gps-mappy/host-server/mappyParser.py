@@ -89,7 +89,7 @@ class Parser:
                         struct.unpack("<f", gpsLonByte)[0],
                     )
                     self.persistentData.append(dataTuple)
-                    self.treeview.addData("temp", ", ".join(
+                    self.treeview.addData("temp", ",".join(
                         map(str, dataTuple)))
                 case commsHeader.gpsCnl:
                     print("gpscnl")

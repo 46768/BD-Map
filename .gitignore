@@ -7,6 +7,10 @@ yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
 
+#Playwright
+playwright-report/
+test-results/
+
 #Rust
 target/
 
@@ -27,6 +31,9 @@ Cargo.lock
 bin/
 pkg/
 wasm-pack.log
+
+#dataFiles
+bd-map/public/data
 
 #python
 __pycache__
