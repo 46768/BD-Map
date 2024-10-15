@@ -56,7 +56,7 @@ function removeVertex(vertexIdx: number) {
 watch(
     () => roomSrc.id,
     () => {
-		const newPoly = roomSrc.polygon;
+        const newPoly = roomSrc.polygon;
         roomCode.value = roomSrc.roomCode;
         floor.value = roomSrc.floor;
         polyVertices.value = newPoly.vertices;
@@ -68,7 +68,7 @@ watch(
     aliases,
     () => {
         console.log('alias changed');
-		roomSrc.updateAlias(aliases.value)
+        roomSrc.updateAlias(aliases.value);
         emit('update');
     },
     { deep: true }
@@ -77,7 +77,7 @@ watch(
     polyVertices,
     () => {
         console.log('vertices changed');
-		roomSrc.polygon.updateVertices(polyVertices.value)
+        roomSrc.polygon.updateVertices(polyVertices.value);
         emit('update');
     },
     { deep: true }

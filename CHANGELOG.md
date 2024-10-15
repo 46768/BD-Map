@@ -1,3 +1,3 @@
 # Frontend
-Start work on parser tools
-Added tests for polygon, room, parser tools
+- Finished work on parser tools (all tests passed)
+- Added tests for room touching, polygon touch validation

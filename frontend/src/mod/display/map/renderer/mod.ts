@@ -31,24 +31,24 @@ export class Renderer {
         this._objectBuffer[zLayer].push(object);
     }
 
-	_getOffset(opts: ClosureOptions, options: ClosureConfig): Coord {
-		if (options.static) {
-			return [0, 0]
-		}
-		if (options.repeating) {
-			return [
-				opts.coordinateOffset[0] % options.repeating,
-				opts.coordinateOffset[1] % options.repeating,
-			]
-		}
-		return opts.coordinateOffset
-	}
+    _getOffset(opts: ClosureOptions, options: ClosureConfig): Coord {
+        if (options.static) {
+            return [0, 0];
+        }
+        if (options.repeating) {
+            return [
+                opts.coordinateOffset[0] % options.repeating,
+                opts.coordinateOffset[1] % options.repeating,
+            ];
+        }
+        return opts.coordinateOffset;
+    }
 
     createLine(start: Coord, end: Coord, color: Color, thickness: number, options: ClosureConfig) {
         const [sx, sy]: Coord = start;
         const [ex, ey]: Coord = end;
         this._insertObject((ctx: CanvasRenderingContext2D, opts: ClosureOptions) => {
-            const [offX, offY] = this._getOffset(opts, options)
+            const [offX, offY] = this._getOffset(opts, options);
             ctx.strokeStyle = colorToCSS(color);
             ctx.lineWidth = thickness;
             ctx.beginPath();
@@ -61,7 +61,7 @@ export class Renderer {
     createDot(pos: Coord, radius: number, color: Color, options: ClosureConfig) {
         const [x, y]: Coord = pos;
         this._insertObject((ctx: CanvasRenderingContext2D, opts: ClosureOptions) => {
-            const [offX, offY] = this._getOffset(opts, options)
+            const [offX, offY] = this._getOffset(opts, options);
             ctx.fillStyle = colorToCSS(color);
             ctx.beginPath();
             ctx.arc(x + offX, y + offY, radius, 0, Math.PI * 2);
@@ -73,7 +73,7 @@ export class Renderer {
         this._insertObject((ctx: CanvasRenderingContext2D, opts: ClosureOptions) => {
             const vertices: Coord[] = poly.vertices;
             const [[lx, ux], [ly, uy]] = poly.boundingBox;
-            const [offX, offY] = this._getOffset(opts, options)
+            const [offX, offY] = this._getOffset(opts, options);
             const [xBegin, yBegin] = vertices[0];
             ctx.fillStyle = colorToCSS(color);
             ctx.beginPath();
@@ -103,7 +103,7 @@ export class Renderer {
     createOutline(poly: Polygon, color: Color, options: ClosureConfig) {
         this._insertObject((ctx: CanvasRenderingContext2D, opts: ClosureOptions) => {
             const vertices: Coord[] = poly.vertices;
-            const [offX, offY] = this._getOffset(opts, options)
+            const [offX, offY] = this._getOffset(opts, options);
             const [xBegin, yBegin] = vertices[0];
             ctx.strokeStyle = colorToCSS(color);
             ctx.beginPath();
@@ -119,7 +119,7 @@ export class Renderer {
     createText(text: string, pos: Coord, options: ClosureConfig) {
         const [x, y]: Coord = pos;
         this._insertObject((ctx: CanvasRenderingContext2D, opts: ClosureOptions) => {
-            const [offX, offY] = this._getOffset(opts, options)
+            const [offX, offY] = this._getOffset(opts, options);
             ctx.fillStyle = 'rgba(0, 0, 0, 1)';
             ctx.fillText(text, x + offX, y + offY);
         }, options.zLayer);

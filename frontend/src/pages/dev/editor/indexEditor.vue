@@ -29,15 +29,15 @@ function callRender() {
 }
 
 function handleUpdate() {
-	selectingRoom.value.polygon.refresh()
-	callRender()
+    selectingRoom.value.polygon.refresh();
+    callRender();
 }
 
 function getHoveringPolygon(hoverPoint: Coord) {
     const [pointX, pointY]: Coord = hoverPoint;
     const [offsetX, offsetY]: Coord = canvasOffset.value;
     for (let room of csvData.value) {
-        room.polygon.highlighted =false;
+        room.polygon.highlighted = false;
     }
     selectingRoom.value.polygon.highlighted = true;
 
@@ -123,7 +123,12 @@ watch(csvInput, (newInputEl) => {
 
         <div>
             <RoomEditor :room-src="selectingRoom" @update="handleUpdate" />
-            <input class="fixed bottom-[2rem] left-2" ref="csvInput" type="file" accept="text/csv"/>
+            <input
+                class="fixed bottom-[2rem] left-2"
+                ref="csvInput"
+                type="file"
+                accept="text/csv"
+            />
             <button class="fixed bottom-[4rem] left-2" @click="console.log(csvData)">
                 dump data
             </button>
