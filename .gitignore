@@ -19,6 +19,7 @@ rust-bitmap-tools/png
 rust-integration-test/png
 arduino-gps-mappy/host-server/export
 arduino-gps-mappy/host-server/log
+*.out
 
 #VSCode
 .vscode
