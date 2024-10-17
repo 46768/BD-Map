@@ -36,13 +36,13 @@ export function getPolygonEdges(polygon: Polygon): Line[] {
 }
 
 export function getPolygonLabelledEdges(polygon: Polygon): Record<string, [number, number]> {
-	const edgeRecord: Record<string, [number, number]> = {}
+    const edgeRecord: Record<string, [number, number]> = {};
     const edgeArray: string[] = getPolygonEdges(polygon).map(lineToString);
     const vertices: Coord[] = polygon.vertices;
 
     let prevIdx: number = vertices.length - 1;
     for (let vertIdx = 0; vertIdx < vertices.length; vertIdx++) {
-		edgeRecord[edgeArray[vertIdx]] = [vertices[vertIdx][0], vertices[prevIdx][0]]
+        edgeRecord[edgeArray[vertIdx]] = [vertices[vertIdx][0], vertices[prevIdx][0]];
         prevIdx = vertIdx;
     }
     return edgeRecord;
