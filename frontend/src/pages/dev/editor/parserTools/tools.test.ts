@@ -50,19 +50,21 @@ test('polygon touching validation', () => {
     const testResult: boolean = polygonTools.validatePolygonTouching(testPolygon, testPolygon2);
     const testResult2: boolean = polygonTools.validatePolygonTouching(testPolygon, testPolygon3);
     expect(testResult).toBe(true);
-	expect(testResult2).toBe(false);
+    expect(testResult2).toBe(false);
 });
 
 test('room touch extraction', () => {
-	const testResult: [string, string][] = roomTools.getTouchingRooms([testRoom, testRoom2])
-	const testResult2: [string, string][] = roomTools.getTouchingRooms([testRoom, testRoom3])
-	const testResult3: [string, string][] = roomTools.getTouchingRooms([testRoom, testRoom2, testRoom3])
-    expect(testResult).toEqual([
-		["testRoomID", "testRoom2ID"]
-	]);
-	expect(testResult2).toEqual([])
+    const testResult: [string, string][] = roomTools.getTouchingRooms([testRoom, testRoom2]);
+    const testResult2: [string, string][] = roomTools.getTouchingRooms([testRoom, testRoom3]);
+    const testResult3: [string, string][] = roomTools.getTouchingRooms([
+        testRoom,
+        testRoom2,
+        testRoom3,
+    ]);
+    expect(testResult).toEqual([['testRoomID', 'testRoom2ID']]);
+    expect(testResult2).toEqual([]);
     expect(testResult3).toEqual([
-		["testRoomID", "testRoom2ID"],
-		["testRoom2ID", "testRoom3ID"]
-	]);
+        ['testRoomID', 'testRoom2ID'],
+        ['testRoom2ID', 'testRoom3ID'],
+    ]);
 });

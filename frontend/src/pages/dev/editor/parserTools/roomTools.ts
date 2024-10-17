@@ -4,7 +4,8 @@ import { getPolygonEdges, validatePolygonTouching } from './polygonTools';
 
 import type { Line } from './polygonTools';
 
-const objectHasOwnProperty: (obj: Object, key: PropertyKey) => boolean = Object.prototype.hasOwnProperty.call
+const objectHasOwnProperty: (obj: Object, key: PropertyKey) => boolean =
+    Object.prototype.hasOwnProperty.call;
 
 export function lineToString(line: Line): string {
     return line.join(',');
@@ -70,12 +71,12 @@ export function getTouchingRooms(roomArray: Room[]): [string, string][] {
         checkRoomList(roomList);
     }
 
-	const insertedMap: Map<string, string> = new Map<string, string>()
+    const insertedMap: Map<string, string> = new Map<string, string>();
     for (const [key, value] of Object.entries(checked)) {
         for (const roomID of value) {
-			if (insertedMap.get(roomID) === key) continue;
+            if (insertedMap.get(roomID) === key) continue;
             returnArray.push([key, roomID]);
-			insertedMap.set(key, roomID);
+            insertedMap.set(key, roomID);
         }
     }
 
