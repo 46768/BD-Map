@@ -11,6 +11,7 @@ function hueristic(source: Coord, target: Coord): number {
 }
 
 function heapSwap(heap: number[], idx1: number, idx2: number) {
+    if (idx1 === idx2) return;
     heap[idx1] = heap[idx1] ^ heap[idx2];
     heap[idx2] = heap[idx1] ^ heap[idx2];
     heap[idx1] = heap[idx1] ^ heap[idx2];
@@ -19,14 +20,15 @@ function heapSwap(heap: number[], idx1: number, idx2: number) {
 function heapInsert(heap: number[], fCost: number[], inserts: number) {
     heap.push(inserts);
     if (heap.length === 1) return;
-    const childIdx = heap.length - 1;
-    const parentIdx = (childIdx - 1) >> 1;
+    let childIdx = heap.length - 1;
 
     while (true) {
+        const parentIdx = (childIdx - 1) >> 1;
         const childFCost = fCost[heap[childIdx]];
         const parentFCost = fCost[heap[parentIdx]];
         if (!(childFCost < parentFCost || childIdx !== 0)) break;
         heapSwap(heap, childIdx, parentIdx);
+        childIdx = parentIdx;
     }
 }
 
@@ -76,7 +78,8 @@ function buildPath(path: number[], pathEnd: number) {
         nextIdx = path[nextIdx];
     }
 
-    return prunedPath.reverse();
+    prunedPath.reverse();
+    return prunedPath;
 }
 
 export function aStar(nodes: Coord[], nebors: number[][], source: number, target: number) {
@@ -107,10 +110,11 @@ export function aStar(nodes: Coord[], nebors: number[][], source: number, target
 
         for (const neborIdx of nebors[currentIdx]) {
             const neborNode = nodes[neborIdx];
-            const neborGCost = gCost[source] + dist(currentNode, neborNode);
+            const neborGCost = gCost[currentIdx] + dist(currentNode, neborNode);
             const neborFCost = neborGCost + hueristic(neborNode, targetNode);
 
             if (neborGCost < gCost[neborIdx]) {
+                path[neborIdx] = currentIdx;
                 gCost[neborIdx] = neborGCost;
                 fCost[neborIdx] = neborFCost;
                 if (!queueSet.has(neborIdx)) {

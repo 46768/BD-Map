@@ -3,6 +3,7 @@ import { Polygon } from '@/mod/data/polygon/polygon';
 import { Room } from '@/mod/data/room/room';
 import * as polygonTools from './polygonTools';
 import * as roomTools from './roomTools';
+import * as graphTools from './graphTools';
 
 const testPolygon = new Polygon(
     [
@@ -54,17 +55,23 @@ test('polygon touching validation', () => {
 });
 
 test('room touch extraction', () => {
-    const testResult: [string, string][] = roomTools.getTouchingRooms([testRoom, testRoom2]);
-    const testResult2: [string, string][] = roomTools.getTouchingRooms([testRoom, testRoom3]);
-    const testResult3: [string, string][] = roomTools.getTouchingRooms([
+    const testResult: [Room, Room][] = roomTools.getTouchingRooms([testRoom, testRoom2]);
+    const testResult2: [Room, Room][] = roomTools.getTouchingRooms([testRoom, testRoom3]);
+    const testResult3: [Room, Room][] = roomTools.getTouchingRooms([
         testRoom,
         testRoom2,
         testRoom3,
     ]);
-    expect(testResult).toEqual([['testRoomID', 'testRoom2ID']]);
+    expect(testResult).toEqual([[testRoom, testRoom2]]);
     expect(testResult2).toEqual([]);
     expect(testResult3).toEqual([
-        ['testRoomID', 'testRoom2ID'],
-        ['testRoom2ID', 'testRoom3ID'],
+        [testRoom, testRoom2],
+        [testRoom2, testRoom3],
     ]);
+});
+
+test('graph generation test', () => {
+    const graph = graphTools.generateGraph([testRoom, testRoom2, testRoom3]);
+    console.log(graph);
+    expect(true).toBe(true);
 });

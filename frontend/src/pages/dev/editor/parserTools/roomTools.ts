@@ -4,9 +4,6 @@ import { getPolygonEdges, validatePolygonTouching } from './polygonTools';
 
 import type { Line } from './polygonTools';
 
-const objectHasOwnProperty: (obj: Object, key: PropertyKey) => boolean =
-    Object.prototype.hasOwnProperty.call;
-
 export function lineToString(line: Line): string {
     return line.join(',');
 }
@@ -16,12 +13,12 @@ export function stringToLine(lineStr: string): Line {
     return [slope === 'false' ? false : parseFloat(slope), parseFloat(base)];
 }
 
-export function getTouchingRooms(roomArray: Room[]): [string, string][] {
+export function getTouchingRooms(roomArray: Room[]): [Room, Room][] {
     const roomRecord: Record<string, Room> = {};
     const slopeRecord: Record<number, Set<string>> = {};
     const verticalRecord: Record<number, Set<string>> = {};
 
-    const returnArray: [string, string][] = [];
+    const returnArray: [Room, Room][] = [];
 
     for (const room of roomArray) {
         const roomID: string = room.id;
@@ -30,13 +27,13 @@ export function getTouchingRooms(roomArray: Room[]): [string, string][] {
 
         roomRecord[roomID] = room;
         for (const edge of polyEdges) {
-            let record: Record<string, Set<string>> = verticalRecord;
+            let record: Record<number, Set<string>> = verticalRecord;
             let edgeKey: number = edge[1];
             if (typeof edge[0] === 'number') {
                 record = slopeRecord;
                 edgeKey = edge[0];
             }
-            if (!objectHasOwnProperty(record, edgeKey)) {
+            if (!Object.prototype.hasOwnProperty.call(record, edgeKey)) {
                 record[edgeKey] = new Set<string>([roomID]);
             } else {
                 record[edgeKey].add(roomID);
@@ -53,8 +50,10 @@ export function getTouchingRooms(roomArray: Room[]): [string, string][] {
                 const id1: string = roomIDArray[i];
                 const id2: string = roomIDArray[j];
                 if (validatePolygonTouching(roomRecord[id1].polygon, roomRecord[id2].polygon)) {
-                    if (!objectHasOwnProperty(checked, id1)) checked[id1] = new Set<string>();
-                    if (!objectHasOwnProperty(checked, id2)) checked[id2] = new Set<string>();
+                    if (!Object.prototype.hasOwnProperty.call(checked, id1))
+                        checked[id1] = new Set<string>();
+                    if (!Object.prototype.hasOwnProperty.call(checked, id2))
+                        checked[id2] = new Set<string>();
                     checked[id1].add(id2);
                     checked[id2].add(id1);
                 }
@@ -75,7 +74,7 @@ export function getTouchingRooms(roomArray: Room[]): [string, string][] {
     for (const [key, value] of Object.entries(checked)) {
         for (const roomID of value) {
             if (insertedMap.get(roomID) === key) continue;
-            returnArray.push([key, roomID]);
+            returnArray.push([roomRecord[key], roomRecord[roomID]]);
             insertedMap.set(key, roomID);
         }
     }

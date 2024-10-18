@@ -9,6 +9,9 @@ module.exports = {
 		'@vue/eslint-config-typescript',
 		'@vue/eslint-config-prettier/skip-formatting'
 	],
+	rules: {
+		"no-constant-condition": ["error", { "checkLoops": false }],
+	},
 	overrides: [
 		{
 			files: [
