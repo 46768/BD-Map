@@ -2,33 +2,23 @@ import type { Closure, ClosureConfig, ClosureOptions } from './def';
 import type { Coord, Color } from '@/mod/data/com/vertex';
 import { Polygon } from '@/mod/data/polygon/polygon';
 import { colorToCSS } from '@/utils/dataConverter';
-/**
- * Canvas renderer component
- */
+
 export class Renderer {
-    public _objectBuffer: Closure[][] = [];
-    public _background: Color = [255, 255, 255, 1];
-    public _closureOption: ClosureOptions = {
+    public objectBuffer: Closure[][] = [];
+    public background: Color = [255, 255, 255, 1];
+    public closureOption: ClosureOptions = {
         coordinateOffset: [0, 0],
         canvasSize: [window.innerWidth, window.innerHeight],
     };
-    /**
-     * Construct a renderer with object caching
-     * @param {CanvasRenderingContext2D} _context - canvas 2d context for drawing
-     */
-    constructor(public _context: CanvasRenderingContext2D) {
-        this._context.canvas.width = this._closureOption.canvasSize[0];
-        this._context.canvas.height = this._closureOption.canvasSize[1];
+
+    constructor(public context: CanvasRenderingContext2D) {
+        this.context.canvas.width = this.closureOption.canvasSize[0];
+        this.context.canvas.height = this.closureOption.canvasSize[1];
     }
 
-    /**
-     * Inset a closure at a z layer
-     * @param {Closure} object - a closure to insert
-     * @param {number} zLayer - the layer to insert to
-     */
     _insertObject(object: Closure, zLayer: number): void {
-        if (!this._objectBuffer[zLayer]) this._objectBuffer[zLayer] = [];
-        this._objectBuffer[zLayer].push(object);
+        if (!this.objectBuffer[zLayer]) this.objectBuffer[zLayer] = [];
+        this.objectBuffer[zLayer].push(object);
     }
 
     _getOffset(opts: ClosureOptions, options: ClosureConfig): Coord {
@@ -129,12 +119,12 @@ export class Renderer {
      * Render a frame from object buffer
      */
     render() {
-        const [sx, sy] = this._closureOption.canvasSize;
-        const objects = this._objectBuffer;
-        const ctx = this._context;
-        const opts = this._closureOption;
+        const [sx, sy] = this.closureOption.canvasSize;
+        const objects = this.objectBuffer;
+        const ctx = this.context;
+        const opts = this.closureOption;
         ctx.clearRect(0, 0, sx, sy);
-        ctx.fillStyle = colorToCSS(this._background);
+        ctx.fillStyle = colorToCSS(this.background);
         ctx.fillRect(0, 0, sx, sy);
         for (const zLayer of objects) {
             for (const obj of zLayer) {
@@ -144,25 +134,17 @@ export class Renderer {
     }
 
     backgroundColor(newColor?: Color) {
-        if (newColor) this._background = newColor;
-        return this._background;
+        if (newColor) this.background = newColor;
+        return this.background;
     }
 
-    /**
-     * Update coordinate offset
-     * @param {Coord} newOffset - new set of coordinate for offset
-     */
     updateOffset(newOffset: Coord) {
-        this._closureOption.coordinateOffset = newOffset;
+        this.closureOption.coordinateOffset = newOffset;
     }
 
-    /**
-     * Update canvas size
-     * @param {Coord} newSize - new set of size
-     */
     updateSize(newSize: Coord) {
-        this._closureOption.canvasSize = newSize;
-        this._context.canvas.width = newSize[0];
-        this._context.canvas.height = newSize[1];
+        this.closureOption.canvasSize = newSize;
+        this.context.canvas.width = newSize[0];
+        this.context.canvas.height = newSize[1];
     }
 }

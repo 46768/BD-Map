@@ -5,6 +5,8 @@ import * as polygonTools from './polygonTools';
 import * as roomTools from './roomTools';
 import * as graphTools from './graphTools';
 
+import type { Line } from '@/mod/data/com/line';
+
 const testPolygon = new Polygon(
     [
         [0, 0],
@@ -38,7 +40,7 @@ const testRoom2 = new Room(7107, 1, testPolygon2, 'testRoom2ID');
 const testRoom3 = new Room(7109, 1, testPolygon3, 'testRoom3ID');
 
 test('polygon edge extraction', () => {
-    const edges: polygonTools.Line[] = polygonTools.getPolygonEdges(testPolygon);
+    const edges: Line[] = polygonTools.getPolygonEdges(testPolygon);
     expect(edges).toEqual([
         [0, 0],
         [false, 0],
@@ -72,6 +74,5 @@ test('room touch extraction', () => {
 
 test('graph generation test', () => {
     const graph = graphTools.generateGraph([testRoom, testRoom2, testRoom3]);
-    console.log(graph);
     expect(true).toBe(true);
 });

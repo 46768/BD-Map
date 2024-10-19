@@ -1,2 +1,2 @@
 # Parser
-- got graph generation prototype working, optimization soon
+- cleaned up graph generator, got visualizing working a bit

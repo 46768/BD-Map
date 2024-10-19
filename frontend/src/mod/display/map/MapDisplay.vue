@@ -3,13 +3,15 @@ import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
 import { Renderer } from './renderer/mod';
 import { Room } from '@/mod/data/room/room';
 import { vMouseDrag } from '@/attrib/mouse/attrib';
+
 import type { Coord, Color } from '@/mod/data/com/vertex';
 import type { LineData } from './renderer/def';
+import type { GraphData } from '@/mod/algorithm/parserTools/graphTools';
 
 // header macros
 const props = defineProps<{
     gpsCoord: Coord;
-    pathData: any;
+    pathData: GraphData;
     roomData: Room[];
     getOffset?: (coord: Coord) => any;
 }>();
@@ -76,6 +78,7 @@ watch(canvasRef, (newCanvas) => {
 watch(renderer, (newRenderer) => {
     if (newRenderer) {
         const dividerLines = generateDivider(lineGap);
+		const [nodes, neighbors]: GraphData = props.pathData;
         newRenderer.backgroundColor([0, 204, 102, 1]);
         for (let line of dividerLines) {
             const [start, end, color, thickness, options]: LineData = line;
@@ -90,6 +93,16 @@ watch(renderer, (newRenderer) => {
                 roomList.add(room.id);
             }
         }
+		for (let node of nodes) {
+			newRenderer.createDot(node, 5, [255, 0, 0, 1], {zLayer: 3})
+		}
+		for (let idx = 0; idx < nodes.length; idx++) {
+			const nodeCrd: Coord = nodes[idx];
+			for (let nbrIdx of neighbors[idx]) {
+				const nbrCrd: Coord = nodes[nbrIdx];
+				newRenderer.createLine(nodeCrd, nbrCrd, [255, 0, 0, 1], 2, {zLayer:3})
+			}
+		}
         callRender();
     }
 });
@@ -106,6 +119,17 @@ watch(
                 roomList.add(room.id);
             }
         }
+        callRender();
+    }
+);
+watch(
+    () => props.pathData,
+    (newPathData) => {
+        if (!renderer.value) return;
+		const [nodes, neighbors]: GraphData = newPathData;
+		for (let node of nodes) {
+			renderer.value.createDot(node, 5, [255, 0, 0, 1], {zLayer: 1})
+		}
         callRender();
     }
 );
