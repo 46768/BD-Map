@@ -36,16 +36,10 @@ const testRoom2 = new Room(7107, 1, testPolygon2, 'testRoom2ID');
 const testRoom3 = new Room(7109, 1, testPolygon3, 'testRoom3ID');
 
 function getRooms() {
-	return [testRoom, testRoom2, testRoom3];
+    return [testRoom, testRoom2, testRoom3];
 }
-
 </script>
 
 <template>
-            <MapDisplay
-                ref="display"
-                :gps-coord="[0, 0]"
-                :path-data="[]"
-                :room-data="getRooms()"
-            />
+    <MapDisplay ref="display" :gps-coord="[0, 0]" :path-data="[]" :room-data="getRooms()" />
 </template>

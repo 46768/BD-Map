@@ -78,7 +78,7 @@ watch(canvasRef, (newCanvas) => {
 watch(renderer, (newRenderer) => {
     if (newRenderer) {
         const dividerLines = generateDivider(lineGap);
-		const [nodes, neighbors]: GraphData = props.pathData;
+        const [nodes, neighbors]: GraphData = props.pathData;
         newRenderer.backgroundColor([0, 204, 102, 1]);
         for (let line of dividerLines) {
             const [start, end, color, thickness, options]: LineData = line;
@@ -93,16 +93,16 @@ watch(renderer, (newRenderer) => {
                 roomList.add(room.id);
             }
         }
-		for (let node of nodes) {
-			newRenderer.createDot(node, 5, [255, 0, 0, 1], {zLayer: 3})
-		}
-		for (let idx = 0; idx < nodes.length; idx++) {
-			const nodeCrd: Coord = nodes[idx];
-			for (let nbrIdx of neighbors[idx]) {
-				const nbrCrd: Coord = nodes[nbrIdx];
-				newRenderer.createLine(nodeCrd, nbrCrd, [255, 0, 0, 1], 2, {zLayer:3})
-			}
-		}
+        for (let node of nodes) {
+            newRenderer.createDot(node, 5, [255, 0, 0, 1], { zLayer: 3 });
+        }
+        for (let idx = 0; idx < nodes.length; idx++) {
+            const nodeCrd: Coord = nodes[idx];
+            for (let nbrIdx of neighbors[idx]) {
+                const nbrCrd: Coord = nodes[nbrIdx];
+                newRenderer.createLine(nodeCrd, nbrCrd, [255, 0, 0, 1], 2, { zLayer: 3 });
+            }
+        }
         callRender();
     }
 });
@@ -126,10 +126,10 @@ watch(
     () => props.pathData,
     (newPathData) => {
         if (!renderer.value) return;
-		const [nodes, neighbors]: GraphData = newPathData;
-		for (let node of nodes) {
-			renderer.value.createDot(node, 5, [255, 0, 0, 1], {zLayer: 1})
-		}
+        const [nodes, neighbors]: GraphData = newPathData;
+        for (let node of nodes) {
+            renderer.value.createDot(node, 5, [255, 0, 0, 1], { zLayer: 1 });
+        }
         callRender();
     }
 );

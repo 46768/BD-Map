@@ -1,11 +1,7 @@
 import { expect, test } from 'vitest';
 import { Polygon } from '@/mod/data/polygon/polygon';
 import { Room } from '@/mod/data/room/room';
-import * as polygonTools from './polygonTools';
-import * as roomTools from './roomTools';
-import * as graphTools from './graphTools';
-
-import type { Line } from '@/mod/data/com/line';
+import * as graphTools from '../graphTools';
 
 const testPolygon = new Polygon(
     [
@@ -68,7 +64,7 @@ const testPolygon7 = new Polygon(
         [300, 300],
         [300, 200],
     ],
-	[70, 70, 70, 1]
+    [70, 70, 70, 1]
 );
 
 const testRoom = new Room(7108, 1, testPolygon, 'testRoomID');
@@ -80,6 +76,14 @@ const testRoom6 = new Room(7103, 1, testPolygon6, 'testRoom6ID');
 const testRoom7 = new Room(7104, 1, testPolygon7, 'testRoom7ID');
 
 test('graph generation test', () => {
-    const graph = graphTools.generateGraph([testRoom, testRoom2, testRoom3, testRoom4, testRoom5, testRoom6, testRoom7]);
+    const graph = graphTools.generateGraph([
+        testRoom,
+        testRoom2,
+        testRoom3,
+        testRoom4,
+        testRoom5,
+        testRoom6,
+        testRoom7,
+    ]);
     expect(true).toBe(true);
 });

@@ -8,8 +8,8 @@ const testPolygon = new Polygon(
     [
         [0, 0],
         [0, 100],
-        [100, 100],
-        [100, 0],
+        [95, 100],
+        [95, 0],
     ],
     [70, 70, 70, 1]
 );
@@ -24,8 +24,8 @@ const testPolygon2 = new Polygon(
 );
 const testPolygon3 = new Polygon(
     [
-        [200, 0],
-        [200, 100],
+        [205, 0],
+        [205, 100],
         [300, 100],
         [300, 0],
     ],
@@ -34,8 +34,8 @@ const testPolygon3 = new Polygon(
 const testPolygon4 = new Polygon(
     [
         [25, 100],
-        [50, 100],
-        [50, 200],
+        [75, 100],
+        [75, 200],
         [25, 200],
     ],
     [70, 70, 70, 1]
@@ -43,8 +43,8 @@ const testPolygon4 = new Polygon(
 const testPolygon5 = new Polygon(
     [
         [125, 100],
-        [150, 100],
-        [150, 200],
+        [175, 100],
+        [175, 200],
         [125, 200],
     ],
     [70, 70, 70, 1]
@@ -52,8 +52,8 @@ const testPolygon5 = new Polygon(
 const testPolygon6 = new Polygon(
     [
         [225, 100],
-        [250, 100],
-        [250, 200],
+        [275, 100],
+        [275, 200],
         [225, 200],
     ],
     [70, 70, 70, 1]
@@ -65,7 +65,7 @@ const testPolygon7 = new Polygon(
         [300, 300],
         [300, 200],
     ],
-	[70, 70, 70, 1]
+    [70, 70, 70, 1]
 );
 
 const testRoom = new Room(7108, 1, testPolygon, 'testRoomID');
@@ -77,20 +77,14 @@ const testRoom6 = new Room(7103, 1, testPolygon6, 'testRoom6ID');
 const testRoom7 = new Room(7104, 1, testPolygon7, 'testRoom7ID');
 
 function getRooms() {
-	return [testRoom, testRoom2, testRoom3, testRoom4, testRoom5, testRoom6, testRoom7];
+    return [testRoom, testRoom2, testRoom3, testRoom4, testRoom5, testRoom6, testRoom7];
 }
 
 function getGraph(): graphTools.GraphData {
-	return graphTools.generateGraph(getRooms());
+    return graphTools.generateGraph(getRooms());
 }
-
 </script>
 
 <template>
-            <MapDisplay
-                ref="display"
-                :gps-coord="[0, 0]"
-                :path-data="getGraph()"
-                :room-data="getRooms()"
-            />
+    <MapDisplay ref="display" :gps-coord="[0, 0]" :path-data="getGraph()" :room-data="getRooms()" />
 </template>

@@ -15,7 +15,7 @@ export type Nodes = Coord[];
 export type Neighbors = number[][];
 export type GraphData = [Nodes, Neighbors];
 
-export const blankGraph: GraphData = [[],[]];
+export const blankGraph: GraphData = [[], []];
 
 export function generateGraph(roomData: Room[]): GraphData {
     const touchingRooms: [Room, Room][] = getTouchingRooms(roomData);
@@ -28,33 +28,31 @@ export function generateGraph(roomData: Room[]): GraphData {
     for (const [room1, room2] of touchingRooms) {
         const room1CenterCoord: Coord = getPolygonCenter(room1.polygon);
         const room2CenterCoord: Coord = getPolygonCenter(room2.polygon);
-		const room1CCString: string = coordToString(room1CenterCoord);
-		const room2CCString: string = coordToString(room2CenterCoord);
+        const room1CCString: string = coordToString(room1CenterCoord);
+        const room2CCString: string = coordToString(room2CenterCoord);
 
-		//inter room nodes will connect to other connecting rooms later
+        //inter room nodes will connect to other connecting rooms later
         if (!roomNodeSet.has(room1CCString)) {
-            roomNodeSet.set(room1CCString, nodes.push(room1CenterCoord)-1);
+            roomNodeSet.set(room1CCString, nodes.push(room1CenterCoord) - 1);
             neighbors.push([]);
         }
         if (!roomNodeSet.has(room2CCString)) {
-            roomNodeSet.set(room2CCString, nodes.push(room2CenterCoord)-1);
+            roomNodeSet.set(room2CCString, nodes.push(room2CenterCoord) - 1);
             neighbors.push([]);
         }
 
-		commonEdges.push([
-            getPolygonCommonEdge(room1.polygon, room2.polygon),
-            room1,
-            room2,
-		]);
+        commonEdges.push([getPolygonCommonEdge(room1.polygon, room2.polygon), room1, room2]);
     }
 
     for (const [segmentData, room1, room2] of commonEdges) {
-        const room1CCIdx: number = roomNodeSet.get(coordToString(getPolygonCenter(room1.polygon))) ?? -1;
-        const room2CCIdx: number = roomNodeSet.get(coordToString(getPolygonCenter(room2.polygon))) ?? -1;
+        const room1CCIdx: number =
+            roomNodeSet.get(coordToString(getPolygonCenter(room1.polygon))) ?? -1;
+        const room2CCIdx: number =
+            roomNodeSet.get(coordToString(getPolygonCenter(room2.polygon))) ?? -1;
         for (const [segment1, segment2] of segmentData) {
             const intersectingSegment: LineSegment = getOverlappingLineSegment(segment1, segment2);
 
-			// no reason to generate a node for line segment with 0 length
+            // no reason to generate a node for line segment with 0 length
             if (isCoordEqual(intersectingSegment[1], intersectingSegment[2])) {
                 continue;
             }
@@ -63,12 +61,12 @@ export function generateGraph(roomData: Room[]): GraphData {
             const interSegmentMidIdx = nodes.push(interSegmentMid) - 1;
             neighbors.push([room1CCIdx, room2CCIdx]);
             for (const connectingNode of [...neighbors[room1CCIdx], ...neighbors[room2CCIdx]]) {
-				// add node to each inter room nodes of both rooms
+                // add node to each inter room nodes of both rooms
                 neighbors[connectingNode].push(interSegmentMidIdx);
                 neighbors[interSegmentMidIdx].push(connectingNode);
             }
 
-			// add node as both room's neighbors
+            // add node as both room's neighbors
             neighbors[room1CCIdx].push(interSegmentMidIdx);
             neighbors[room2CCIdx].push(interSegmentMidIdx);
         }
