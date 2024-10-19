@@ -28,26 +28,21 @@ const polyVertices = ref<Coord[]>(roomSrc.polygon.vertices);
 const polyColor = ref<Color>(roomSrc.polygon.color);
 
 function addAlias(alias: string) {
-    console.log('new alias');
     roomSrc.addAlias(alias);
     aliases.value = [...roomSrc.alias];
     emit('update');
 }
 function removeAlias(aliasIdx: number) {
-    console.log('remove alias');
     roomSrc.removeAlias(aliasIdx);
     aliases.value = [...roomSrc.alias];
     emit('update');
 }
 function addVertex(coord: Coord) {
-    console.log('new vertex');
     roomSrc.polygon.addVertex(coord);
     polyVertices.value = roomSrc.polygon.vertices;
-    console.log(polyVertices.value);
     emit('update');
 }
 function removeVertex(vertexIdx: number) {
-    console.log('called remove vertex');
     roomSrc.polygon.removeVertex(vertexIdx);
     polyVertices.value = roomSrc.polygon.vertices;
     emit('update');
@@ -67,7 +62,6 @@ watch(
 watch(
     aliases,
     () => {
-        console.log('alias changed');
         roomSrc.updateAlias(aliases.value);
         emit('update');
     },
@@ -76,7 +70,6 @@ watch(
 watch(
     polyVertices,
     () => {
-        console.log('vertices changed');
         roomSrc.polygon.updateVertices(polyVertices.value);
         emit('update');
     },
@@ -85,7 +78,6 @@ watch(
 watch(
     polyColor,
     () => {
-        console.log('color changed');
         emit('update');
     },
     { deep: true }

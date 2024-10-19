@@ -1,14 +1,19 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
+import type { Ref } from 'vue';
+
 import { Polygon } from '@/mod/data/polygon/polygon';
 import { Room } from '@/mod/data/room/room';
-import MapDisplay from '@/mod/display/map/MapDisplay.vue';
-import RoomEditor from './roomEditor/RoomEditor.vue';
+import { blankGraph, generateGraph } from '@/mod/algorithm/parserTools/graphTools';
 import { vMouseMove, vMouseClick } from '@/attrib/mouse/attrib';
-
-import type { Ref } from 'vue';
+import MapDisplay from '@/mod/display/map/MapDisplay.vue';
 import type { MapDisplayElement } from '@/mod/display/map/def';
 import type { Coord } from '@/mod/data/com/vertex';
+import type { GraphData } from '@/mod/algorithm/parserTools/graphTools';
+
+import { parseCSV } from './fileHandler/csvHandler';
+import { testData } from './testData';
+import RoomEditor from './roomEditor/RoomEditor.vue';
 
 // Element refs
 const display: Ref<MapDisplayElement | undefined> = ref<MapDisplayElement>();
@@ -17,9 +22,12 @@ const csvInput: Ref<HTMLInputElement | undefined> = ref<HTMLInputElement>();
 // Variables / Refs
 const fileReader: FileReader = new FileReader();
 const csvData: Ref<Room[]> = ref([]);
+const pathData: Ref<GraphData> = ref(blankGraph);
 const canvasOffset: Ref<Coord> = ref([0, 0]);
 const hoveringRoom: Ref<Room> = ref(Room.blank);
 const selectingRoom: Ref<Room> = ref(Room.blank);
+const pathfindData: Ref<[number, number] | undefined> = ref()
+const pathfindHold: Ref<[number, number]> = ref([0, 0])
 
 // Functions
 function callRender() {
@@ -27,12 +35,10 @@ function callRender() {
         display.value.callRender();
     }
 }
-
 function handleUpdate() {
     selectingRoom.value.polygon.refresh();
     callRender();
 }
-
 function getHoveringPolygon(hoverPoint: Coord) {
     const [pointX, pointY]: Coord = hoverPoint;
     const [offsetX, offsetY]: Coord = canvasOffset.value;
@@ -53,9 +59,9 @@ function getHoveringPolygon(hoverPoint: Coord) {
     }
     callRender();
 }
-
-function getCanvasOffset(offset: Coord) {
-    canvasOffset.value = offset;
+function generatePath() {
+	pathData.value = generateGraph(csvData.value)
+	console.log(pathData.value);
 }
 
 // Event listeners
@@ -66,24 +72,7 @@ fileReader.addEventListener('load', () => {
     }
     const fileData: string = fileReader.result;
 
-    const nestedArrayData: string[][] = fileData.split('\n').map((line) => line.split(','));
-    // Remove the last line due to trailing \n
-    nestedArrayData.pop();
-
-    const roomDataArray: Room[] = [];
-
-    for (let dataLine of nestedArrayData) {
-        const id: string = dataLine[0];
-        const vertices: Coord[] = [];
-        for (let idx = 1; idx < dataLine.length; idx += 2) {
-            vertices.push([parseFloat(dataLine[idx]), parseFloat(dataLine[idx + 1])]);
-        }
-        const roomPolygon: Polygon = new Polygon(vertices, [70, 70, 70, 0.4]);
-        const roomData: Room = new Room(0, 0, roomPolygon, id);
-        roomDataArray.push(roomData);
-    }
-
-    csvData.value = roomDataArray;
+    csvData.value = parseCSV(fileData);
     callRender();
 });
 
@@ -106,18 +95,15 @@ watch(csvInput, (newInputEl) => {
         <div
             class="fixed top-0 left-0"
             v-mouse-move="getHoveringPolygon"
-            v-mouse-click="
-                () => {
-                    selectingRoom = hoveringRoom;
-                }
-            "
+			v-mouse-click="() => {selectingRoom = hoveringRoom}"
         >
             <MapDisplay
                 ref="display"
                 :gps-coord="[0, 0]"
-                :path-data="[]"
+				:path-data="pathData"
                 :room-data="csvData"
-                :get-offset="getCanvasOffset"
+				:pathfinding-data="pathfindData"
+				:get-offset="(offset) => canvasOffset = offset"
             />
         </div>
 
@@ -135,6 +121,15 @@ watch(csvInput, (newInputEl) => {
             <button class="fixed bottom-[6rem] left-2" @click="console.log(csvData)">
                 export data
             </button>
+            <button class="fixed bottom-[8rem] left-2" @click="generatePath">
+                generate path
+            </button>
+			<div class="fixed bottom-[10rem] left-2">
+				<button class="inline" @click="() => pathfindData = pathfindHold">pathfind</button>
+				<input class="inline w-[4rem]" type="number" v-model="pathfindHold[0]"/>
+				<input class="inline w-[4rem]" type="number" v-model="pathfindHold[1]"/>
+			</div>
+			<button class="fixed bottom-[12rem] left-2" @click="() => csvData = testData">use test data</button>
         </div>
     </div>
 </template>
@@ -145,5 +140,8 @@ p {
 }
 button {
     background: rgb(215, 215, 215);
+}
+input {
+    background: rgb(205, 205, 205);
 }
 </style>

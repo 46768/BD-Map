@@ -17,6 +17,10 @@ export type GraphData = [Nodes, Neighbors];
 
 export const blankGraph: GraphData = [[], []];
 
+function findCoordInNodes(nodes: Nodes, coord: Coord): number {
+	return nodes.findIndex(element => coordToString(coord) === coordToString(element))
+}
+
 export function generateGraph(roomData: Room[]): GraphData {
     const touchingRooms: [Room, Room][] = getTouchingRooms(roomData);
     const commonEdges: [[LineSegment, LineSegment][], Room, Room][] = [];
@@ -57,18 +61,19 @@ export function generateGraph(roomData: Room[]): GraphData {
                 continue;
             }
             const interSegmentMid: Coord = getLineSegmentMidPoint(intersectingSegment);
+			if (findCoordInNodes(nodes, interSegmentMid) !== -1) continue;
 
             const interSegmentMidIdx = nodes.push(interSegmentMid) - 1;
             neighbors.push([room1CCIdx, room2CCIdx]);
             for (const connectingNode of [...neighbors[room1CCIdx], ...neighbors[room2CCIdx]]) {
                 // add node to each inter room nodes of both rooms
-                neighbors[connectingNode].push(interSegmentMidIdx);
-                neighbors[interSegmentMidIdx].push(connectingNode);
+                if (neighbors[connectingNode].indexOf(interSegmentMidIdx) === -1) neighbors[connectingNode].push(interSegmentMidIdx);
+                if (neighbors[interSegmentMidIdx].indexOf(connectingNode) === -1) neighbors[interSegmentMidIdx].push(connectingNode);
             }
 
             // add node as both room's neighbors
-            neighbors[room1CCIdx].push(interSegmentMidIdx);
-            neighbors[room2CCIdx].push(interSegmentMidIdx);
+            if (neighbors[room1CCIdx].indexOf(interSegmentMidIdx) === -1) neighbors[room1CCIdx].push(interSegmentMidIdx);
+            if (neighbors[room2CCIdx].indexOf(interSegmentMidIdx) === -1) neighbors[room2CCIdx].push(interSegmentMidIdx);
         }
     }
 

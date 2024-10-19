@@ -1,2 +1,5 @@
 # Parser
-- cleaned up graph generator, got visualizing working a bit
+- fixed overlapping nodes and overlapping neighbors
+
+# A*
+- fixed A*'s heap not working properly

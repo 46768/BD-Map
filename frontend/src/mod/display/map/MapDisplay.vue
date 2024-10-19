@@ -3,8 +3,10 @@ import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
 import { Renderer } from './renderer/mod';
 import { Room } from '@/mod/data/room/room';
 import { vMouseDrag } from '@/attrib/mouse/attrib';
+import { generateDivider } from './utils';
+import { generatePathObjects } from './pathfinder/mod';
 
-import type { Coord, Color } from '@/mod/data/com/vertex';
+import type { Coord } from '@/mod/data/com/vertex';
 import type { LineData } from './renderer/def';
 import type { GraphData } from '@/mod/algorithm/parserTools/graphTools';
 
@@ -13,6 +15,7 @@ const props = defineProps<{
     gpsCoord: Coord;
     pathData: GraphData;
     roomData: Room[];
+	pathfindingData?: [number, number];
     getOffset?: (coord: Coord) => any;
 }>();
 
@@ -28,42 +31,6 @@ function callRender() {
     renderer.value.render();
 }
 
-function generateDivider(lineGap: number) {
-    const lineData: LineData[] = [];
-    const dividerColor: Color = [20, 20, 20, 0.2];
-    const dividerThickness: number = 1;
-
-    for (let x = 0; x < window.outerWidth + lineGap; x += lineGap) {
-        lineData.push([
-            [x, -lineGap],
-            [x, window.outerHeight + lineGap],
-            dividerColor,
-            dividerThickness,
-            { zLayer: 0, repeating: lineGap },
-        ]);
-    }
-    for (let y = 0; y < window.outerHeight + lineGap; y += lineGap) {
-        lineData.push([
-            [-lineGap, y],
-            [window.outerWidth + lineGap, y],
-            dividerColor,
-            dividerThickness,
-            { zLayer: 0, repeating: lineGap },
-        ]);
-    }
-
-    return lineData;
-}
-
-function changeOffset(newOffset: Coord) {
-    if (!renderer.value) return;
-    renderer.value.updateOffset(newOffset);
-    if (props.getOffset) {
-        props.getOffset(newOffset);
-    }
-    callRender();
-}
-
 // watchers
 watch(canvasRef, (newCanvas) => {
     const ctx: CanvasRenderingContext2D | null | undefined = newCanvas?.getContext('2d');
@@ -77,6 +44,7 @@ watch(canvasRef, (newCanvas) => {
 
 watch(renderer, (newRenderer) => {
     if (newRenderer) {
+        roomList.clear();
         const dividerLines = generateDivider(lineGap);
         const [nodes, neighbors]: GraphData = props.pathData;
         newRenderer.backgroundColor([0, 204, 102, 1]);
@@ -84,37 +52,38 @@ watch(renderer, (newRenderer) => {
             const [start, end, color, thickness, options]: LineData = line;
             newRenderer.createLine(start, end, color, thickness, options);
         }
-        newRenderer.createDot([0, 0], 32, [255, 0, 0, 0.5], { zLayer: 1 });
         for (let room of props.roomData) {
             if (!roomList.has(room.id)) {
                 newRenderer.createPolygon(room.polygon, room.polygon.color, {
                     zLayer: 2,
+					tag: "polygon",
                 });
                 roomList.add(room.id);
             }
         }
         for (let node of nodes) {
-            newRenderer.createDot(node, 5, [255, 0, 0, 1], { zLayer: 3 });
+            newRenderer.createDot(node, 5, [255, 0, 0, 1], { zLayer: 3, tag: "node point" });
         }
         for (let idx = 0; idx < nodes.length; idx++) {
             const nodeCrd: Coord = nodes[idx];
             for (let nbrIdx of neighbors[idx]) {
                 const nbrCrd: Coord = nodes[nbrIdx];
-                newRenderer.createLine(nodeCrd, nbrCrd, [255, 0, 0, 1], 2, { zLayer: 3 });
+                newRenderer.createLine(nodeCrd, nbrCrd, [255, 0, 0, 1], 2, { zLayer: 3, tag: "nebor path" });
             }
         }
         callRender();
     }
 });
-
 watch(
     () => props.roomData,
     (newRoomData) => {
         if (!renderer.value) return;
+		renderer.value.clearTag("polygon");
         for (let room of newRoomData) {
             if (!roomList.has(room.id)) {
                 renderer.value.createPolygon(room.polygon, room.polygon.color, {
                     zLayer: 2,
+					tag: "polygon",
                 });
                 roomList.add(room.id);
             }
@@ -126,18 +95,53 @@ watch(
     () => props.pathData,
     (newPathData) => {
         if (!renderer.value) return;
+		renderer.value.clearTag("node point");
+		renderer.value.clearTag("nebor path");
         const [nodes, neighbors]: GraphData = newPathData;
         for (let node of nodes) {
-            renderer.value.createDot(node, 5, [255, 0, 0, 1], { zLayer: 1 });
+            renderer.value.createDot(node, 5, [255, 0, 0, 1], { zLayer: 3, tag: "node point" });
+        }
+        for (let idx = 0; idx < nodes.length; idx++) {
+            const nodeCrd: Coord = nodes[idx];
+            for (let nbrIdx of neighbors[idx]) {
+                const nbrCrd: Coord = nodes[nbrIdx];
+                renderer.value.createLine(nodeCrd, nbrCrd, [255, 0, 0, 1], 2, { zLayer: 3, tag: "nebor path" });
+            }
         }
         callRender();
     }
 );
+watch(
+	() => props.pathfindingData,
+	(newData) => {
+		if (!renderer.value) return;
+		renderer.value.clearTag("pathfind-obj");
+		if (!newData) return;
+		const [source, target] = newData;
+		const [lines, points] = generatePathObjects(props.pathData, source, target);
+		for (let point of points) {
+			renderer.value.createDot(...point);
+		}
+		for (let line of lines) {
+			renderer.value.createLine(...line);
+		}
+		callRender();
+	}
+, {deep: true});
 
 // event listeners
+function changeOffset(newOffset: Coord) {
+    if (!renderer.value) return;
+    renderer.value.offset = newOffset;
+    if (props.getOffset) {
+        props.getOffset(newOffset);
+    }
+    callRender();
+}
+
 function onResize() {
     if (!renderer.value) return;
-    renderer.value.updateSize([window.innerWidth, window.innerHeight]);
+    renderer.value.size = [window.innerWidth, window.innerHeight];
     callRender();
 }
 window.addEventListener('resize', onResize);
