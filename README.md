@@ -6,7 +6,8 @@ Webpage Under Development
 # Tasks
 - [x] Webpage Navigation
 - [x] Map System
-- [ ] Single Floor A* Algorithm
+- [ ] Parsers
+- [x] Single Floor A* Algorithm
 - [ ] Multi Floor A* Algorithm
 - [ ] Waypoint And Landmark
 
