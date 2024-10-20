@@ -7,7 +7,7 @@ export interface ClosureOptions {
 }
 export interface ClosureConfig {
     zLayer: number;
-    floor?: (number | (() => number));
+    floor?: number | (() => number);
     tag?: string;
     static?: boolean;
     repeating?: number;

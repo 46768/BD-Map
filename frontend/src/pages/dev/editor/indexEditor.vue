@@ -37,10 +37,10 @@ function callRender() {
     }
 }
 function refreshRenderer() {
-	csvData.value = [...csvData.value];
-	pathData.value = [...pathData.value];
-	console.log(csvData.value);
-	console.log(pathData.value);
+    csvData.value = [...csvData.value];
+    pathData.value = [...pathData.value];
+    console.log(csvData.value);
+    console.log(pathData.value);
 }
 function handleUpdate() {
     selectingRoom.value.polygon.refresh();
@@ -147,8 +147,8 @@ watch(csvInput, (newInputEl) => {
                 use test data
             </button>
             <input class="fixed bottom-[14rem] left-2" type="number" v-model="currentFloor" />
-			<button class="fixed bottom-[16rem] left-2" @click="refreshRenderer">
-				refresh map
+            <button class="fixed bottom-[16rem] left-2" @click="refreshRenderer">
+                refresh map
             </button>
         </div>
     </div>
