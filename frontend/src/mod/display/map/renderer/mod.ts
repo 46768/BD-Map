@@ -10,6 +10,7 @@ export class Renderer {
     public closureOption: ClosureOptions = {
         coordinateOffset: [0, 0],
         canvasSize: [window.innerWidth, window.innerHeight],
+        renderingFloor: 1,
     };
 
     constructor(public context: CanvasRenderingContext2D) {
@@ -38,6 +39,13 @@ export class Renderer {
         }
         return opts.coordinateOffset;
     }
+	_isNotCorrectFloor(opts: ClosureOptions, options: ClosureConfig) {
+		if (options.floor) {
+            if (typeof options.floor === "number") return Math.abs(options.floor - opts.renderingFloor) > 0.5;
+            if (typeof options.floor === "function") return Math.abs(options.floor() - opts.renderingFloor) > 0.5;
+		}
+		return false;
+	}
 
     clearTag(tag: string) {
         const tagLayer = this.tagRecord.get(tag);
@@ -51,6 +59,7 @@ export class Renderer {
         const [ex, ey]: Coord = end;
         this._insertObject(
             (ctx: CanvasRenderingContext2D, opts: ClosureOptions) => {
+				if (this._isNotCorrectFloor(opts, options)) return;
                 const [offX, offY] = this._getOffset(opts, options);
                 ctx.strokeStyle = colorToCSS(color);
                 ctx.lineWidth = thickness;
@@ -68,6 +77,7 @@ export class Renderer {
         const [x, y]: Coord = pos;
         this._insertObject(
             (ctx: CanvasRenderingContext2D, opts: ClosureOptions) => {
+				if (this._isNotCorrectFloor(opts, options)) return;
                 const [offX, offY] = this._getOffset(opts, options);
                 ctx.fillStyle = colorToCSS(color);
                 ctx.beginPath();
@@ -82,6 +92,7 @@ export class Renderer {
     createPolygon(poly: Polygon, color: Color, options: ClosureConfig) {
         this._insertObject(
             (ctx: CanvasRenderingContext2D, opts: ClosureOptions) => {
+				if (this._isNotCorrectFloor(opts, options)) return;
                 const vertices: Coord[] = poly.vertices;
                 const [offX, offY] = this._getOffset(opts, options);
                 const [xBegin, yBegin] = vertices[0];
@@ -107,6 +118,7 @@ export class Renderer {
     createOutline(poly: Polygon, color: Color, options: ClosureConfig) {
         this._insertObject(
             (ctx: CanvasRenderingContext2D, opts: ClosureOptions) => {
+				if (this._isNotCorrectFloor(opts, options)) return;
                 const vertices: Coord[] = poly.vertices;
                 const [offX, offY] = this._getOffset(opts, options);
                 const [xBegin, yBegin] = vertices[0];
@@ -128,6 +140,7 @@ export class Renderer {
         const [x, y]: Coord = pos;
         this._insertObject(
             (ctx: CanvasRenderingContext2D, opts: ClosureOptions) => {
+				if (this._isNotCorrectFloor(opts, options)) return;
                 const [offX, offY] = this._getOffset(opts, options);
                 ctx.fillStyle = 'rgba(0, 0, 0, 1)';
                 ctx.fillText(text, x + offX, y + offY);
@@ -157,7 +170,6 @@ export class Renderer {
 
     backgroundColor(newColor?: Color) {
         if (newColor) this.background = newColor;
-        return this.background;
     }
 
     set offset(newOffset: Coord) {
@@ -169,4 +181,8 @@ export class Renderer {
         this.context.canvas.width = newSize[0];
         this.context.canvas.height = newSize[1];
     }
+
+	set floor(newFloor: number) {
+		this.closureOption.renderingFloor = newFloor;
+	}
 }

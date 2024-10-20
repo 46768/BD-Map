@@ -9,12 +9,12 @@ function test() {
     return [room];
 }
 function tp() {
-	return blankPath;
-};
+    return blankPath;
+}
 </script>
 
 <template>
-    <MapDisplay :gps-coord="[0, 0]" :path-data="tp()" :room-data="test()" />
+    <MapDisplay :gps-coord="[0, 0]" :current-floor="1" :path-data="tp()" :room-data="test()" />
 </template>
 
 <style></style>

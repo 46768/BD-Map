@@ -98,7 +98,7 @@ watch(
         <!--Room Floor-->
         <div class="block">
             <p class="inline-block w-1/5">Floor:</p>
-            <input class="inline-block w-4/5" type="number" v-model="floor" />
+            <input class="inline-block w-4/5" type="number" step="0.5" v-model="floor" />
         </div>
 
         <!--Polygon Color-->
