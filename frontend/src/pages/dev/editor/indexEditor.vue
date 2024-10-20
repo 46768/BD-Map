@@ -28,12 +28,19 @@ const hoveringRoom: Ref<Room> = ref(Room.blank);
 const selectingRoom: Ref<Room> = ref(Room.blank);
 const pathfindData: Ref<[number, number] | undefined> = ref();
 const pathfindHold: Ref<[number, number]> = ref([0, 0]);
+const currentFloor: Ref<number> = ref(1);
 
 // Functions
 function callRender() {
     if (display.value) {
         display.value.callRender();
     }
+}
+function refreshRenderer() {
+	csvData.value = [...csvData.value];
+	pathData.value = [...pathData.value];
+	console.log(csvData.value);
+	console.log(pathData.value);
 }
 function handleUpdate() {
     selectingRoom.value.polygon.refresh();
@@ -104,6 +111,7 @@ watch(csvInput, (newInputEl) => {
             <MapDisplay
                 ref="display"
                 :gps-coord="[0, 0]"
+                :current-floor="currentFloor"
                 :path-data="pathData"
                 :room-data="csvData"
                 :pathfinding-data="pathfindData"
@@ -125,7 +133,9 @@ watch(csvInput, (newInputEl) => {
             <button class="fixed bottom-[6rem] left-2" @click="console.log(csvData)">
                 export data
             </button>
-            <button class="fixed bottom-[8rem] left-2" @click="generatePathData">generate path</button>
+            <button class="fixed bottom-[8rem] left-2" @click="generatePathData">
+                generate path
+            </button>
             <div class="fixed bottom-[10rem] left-2">
                 <button class="inline" @click="() => (pathfindData = pathfindHold)">
                     pathfind
@@ -135,6 +145,10 @@ watch(csvInput, (newInputEl) => {
             </div>
             <button class="fixed bottom-[12rem] left-2" @click="() => (csvData = testData)">
                 use test data
+            </button>
+            <input class="fixed bottom-[14rem] left-2" type="number" v-model="currentFloor" />
+			<button class="fixed bottom-[16rem] left-2" @click="refreshRenderer">
+				refresh map
             </button>
         </div>
     </div>
