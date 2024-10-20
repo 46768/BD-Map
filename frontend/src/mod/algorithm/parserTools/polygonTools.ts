@@ -1,13 +1,9 @@
 import { Polygon } from '@/mod/data/polygon/polygon';
 import { lineToString, stringToLine } from './roomTools';
+import { validateLineSegmentCoincidentation } from '@/mod/data/com/line';
 
 import type { Coord } from '@/mod/data/com/vertex';
-
-// [slope, y-intercept]
-export type Line = [number | false, number];
-
-// [Line, lowerX, upperX]
-export type LineSegment = [Line, Coord, Coord];
+import type { Line, LineSegment } from '@/mod/data/com/line';
 
 export function normalizeZero(x: number) {
     return x === 0 ? 0 : x;
@@ -46,27 +42,6 @@ export function getPolygonLabelledEdges(polygon: Polygon): Record<string, [Coord
         prevIdx = vertIdx;
     }
     return edgeRecord;
-}
-
-export function validateLineSegmentCoincidentation(
-    [line1, lowerX1, upperX1]: LineSegment,
-    [line2, lowerX2, upperX2]: LineSegment
-): boolean {
-    if (line1[0] !== line2[0]) return false;
-    if (line1[1] !== line2[1]) return false;
-    for (const vertex1 of [lowerX1[0], upperX1[0]]) {
-        if (lowerX2[0] > vertex1 !== upperX2[0] > vertex1) return true;
-    }
-    for (const vertex2 of [lowerX2[0], upperX2[0]]) {
-        if (lowerX1[0] > vertex2 !== upperX1[0] > vertex2) return true;
-    }
-    for (const vertex1 of [lowerX1[1], upperX1[1]]) {
-        if (lowerX2[1] > vertex1 !== upperX2[1] > vertex1) return true;
-    }
-    for (const vertex2 of [lowerX2[1], upperX2[1]]) {
-        if (lowerX1[1] > vertex2 !== upperX1[1] > vertex2) return true;
-    }
-    return false;
 }
 
 export function getPolygonCommonEdge(

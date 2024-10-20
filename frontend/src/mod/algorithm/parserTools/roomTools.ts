@@ -2,7 +2,7 @@ import { Polygon } from '@/mod/data/polygon/polygon';
 import { Room } from '@/mod/data/room/room';
 import { getPolygonEdges, validatePolygonTouching } from './polygonTools';
 
-import type { Line } from './polygonTools';
+import type { Line } from '@/mod/data/com/line';
 
 export function lineToString(line: Line): string {
     return line.join(',');

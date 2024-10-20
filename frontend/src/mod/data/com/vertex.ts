@@ -9,6 +9,6 @@ export function stringToCoord(coordString: string): Coord {
     return coordString.split(',,').map(parseFloat) as Coord;
 }
 
-export function coordCmp(coord1: Coord, coord2: Coord) {
+export function isCoordEqual(coord1: Coord, coord2: Coord) {
     return coord1[0] === coord2[0] && coord1[1] === coord2[1];
 }

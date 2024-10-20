@@ -1,2 +1,2 @@
 # Parser
-- got graph generation prototype working, optimization soon
+- implemented file generator and parser from PathData and RoomData
