@@ -1,7 +1,9 @@
-import { expect, test } from 'vitest';
+import { test, expect } from 'vitest';
+
+import * as pathTools from '../pathTools';
+import * as parser from '../parser';
 import { Polygon } from '@/mod/data/polygon/polygon';
 import { Room } from '@/mod/data/room/room';
-import * as graphTools from '../graphTools';
 
 const testPolygon = new Polygon(
     [
@@ -33,8 +35,8 @@ const testPolygon3 = new Polygon(
 const testPolygon4 = new Polygon(
     [
         [25, 100],
-        [50, 100],
-        [50, 200],
+        [75, 100],
+        [75, 200],
         [25, 200],
     ],
     [70, 70, 70, 1]
@@ -42,8 +44,8 @@ const testPolygon4 = new Polygon(
 const testPolygon5 = new Polygon(
     [
         [125, 100],
-        [150, 100],
-        [150, 200],
+        [175, 100],
+        [175, 200],
         [125, 200],
     ],
     [70, 70, 70, 1]
@@ -51,8 +53,8 @@ const testPolygon5 = new Polygon(
 const testPolygon6 = new Polygon(
     [
         [225, 100],
-        [250, 100],
-        [250, 200],
+        [275, 100],
+        [275, 200],
         [225, 200],
     ],
     [70, 70, 70, 1]
@@ -75,15 +77,24 @@ const testRoom5 = new Room(7102, 1, testPolygon5, 'testRoom5ID');
 const testRoom6 = new Room(7103, 1, testPolygon6, 'testRoom6ID');
 const testRoom7 = new Room(7104, 1, testPolygon7, 'testRoom7ID');
 
-test('graph generation test', () => {
-    const graph = graphTools.generateGraph([
-        testRoom,
-        testRoom2,
-        testRoom3,
-        testRoom4,
-        testRoom5,
-        testRoom6,
-        testRoom7,
-    ]);
-    expect(true).toBe(true);
+const testData = [testRoom, testRoom2, testRoom3, testRoom4, testRoom5, testRoom6, testRoom7];
+
+test('path parser', () => {
+    const resultPath: pathTools.PathData = pathTools.generatePath(testData);
+    expect(parser.parsePathFileData(parser.generatePathFileData(resultPath))).toEqual(resultPath);
+});
+test('room parser', () => {
+    expect(parser.parseRoomFileData(parser.generateRoomFileData(testData))).toEqual(testData);
+});
+
+test('whole parser', () => {
+    const resultPath: pathTools.PathData = pathTools.generatePath(testData);
+    expect(
+        parser.parseWholeData(
+            parser.joinFileData(
+                parser.generatePathFileData(resultPath),
+                parser.generateRoomFileData(testData)
+            )
+        )
+    ).toEqual([resultPath, testData]);
 });

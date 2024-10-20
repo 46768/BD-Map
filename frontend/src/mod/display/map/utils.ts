@@ -12,7 +12,7 @@ export function generateDivider(lineGap: number) {
             [x, window.outerHeight + lineGap],
             dividerColor,
             dividerThickness,
-            { zLayer: 0, tag: "divider", repeating: lineGap },
+            { zLayer: 0, tag: 'divider', repeating: lineGap },
         ]);
     }
     for (let y = 0; y < window.outerHeight + lineGap; y += lineGap) {
@@ -21,7 +21,7 @@ export function generateDivider(lineGap: number) {
             [window.outerWidth + lineGap, y],
             dividerColor,
             dividerThickness,
-            { zLayer: 0, tag: "divider", repeating: lineGap },
+            { zLayer: 0, tag: 'divider', repeating: lineGap },
         ]);
     }
 

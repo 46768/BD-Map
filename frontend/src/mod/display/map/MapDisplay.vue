@@ -8,14 +8,14 @@ import { generatePathObjects } from './pathfinder/mod';
 
 import type { Coord } from '@/mod/data/com/vertex';
 import type { LineData } from './renderer/def';
-import type { GraphData } from '@/mod/algorithm/parserTools/graphTools';
+import type { PathData } from '@/mod/algorithm/parserTools/pathTools';
 
 // header macros
 const props = defineProps<{
     gpsCoord: Coord;
-    pathData: GraphData;
+    pathData: PathData;
     roomData: Room[];
-	pathfindingData?: [number, number];
+    pathfindingData?: [number, number];
     getOffset?: (coord: Coord) => any;
 }>();
 
@@ -46,7 +46,7 @@ watch(renderer, (newRenderer) => {
     if (newRenderer) {
         roomList.clear();
         const dividerLines = generateDivider(lineGap);
-        const [nodes, neighbors]: GraphData = props.pathData;
+        const [nodes, neighbors]: PathData = props.pathData;
         newRenderer.backgroundColor([0, 204, 102, 1]);
         for (let line of dividerLines) {
             const [start, end, color, thickness, options]: LineData = line;
@@ -56,19 +56,22 @@ watch(renderer, (newRenderer) => {
             if (!roomList.has(room.id)) {
                 newRenderer.createPolygon(room.polygon, room.polygon.color, {
                     zLayer: 2,
-					tag: "polygon",
+                    tag: 'polygon',
                 });
                 roomList.add(room.id);
             }
         }
         for (let node of nodes) {
-            newRenderer.createDot(node, 5, [255, 0, 0, 1], { zLayer: 3, tag: "node point" });
+            newRenderer.createDot(node, 5, [255, 0, 0, 1], { zLayer: 3, tag: 'node point' });
         }
         for (let idx = 0; idx < nodes.length; idx++) {
             const nodeCrd: Coord = nodes[idx];
             for (let nbrIdx of neighbors[idx]) {
                 const nbrCrd: Coord = nodes[nbrIdx];
-                newRenderer.createLine(nodeCrd, nbrCrd, [255, 0, 0, 1], 2, { zLayer: 3, tag: "nebor path" });
+                newRenderer.createLine(nodeCrd, nbrCrd, [255, 0, 0, 1], 2, {
+                    zLayer: 3,
+                    tag: 'nebor path',
+                });
             }
         }
         callRender();
@@ -78,12 +81,12 @@ watch(
     () => props.roomData,
     (newRoomData) => {
         if (!renderer.value) return;
-		renderer.value.clearTag("polygon");
+        renderer.value.clearTag('polygon');
         for (let room of newRoomData) {
             if (!roomList.has(room.id)) {
                 renderer.value.createPolygon(room.polygon, room.polygon.color, {
                     zLayer: 2,
-					tag: "polygon",
+                    tag: 'polygon',
                 });
                 roomList.add(room.id);
             }
@@ -95,39 +98,43 @@ watch(
     () => props.pathData,
     (newPathData) => {
         if (!renderer.value) return;
-		renderer.value.clearTag("node point");
-		renderer.value.clearTag("nebor path");
-        const [nodes, neighbors]: GraphData = newPathData;
+        renderer.value.clearTag('node point');
+        renderer.value.clearTag('nebor path');
+        const [nodes, neighbors]: PathData = newPathData;
         for (let node of nodes) {
-            renderer.value.createDot(node, 5, [255, 0, 0, 1], { zLayer: 3, tag: "node point" });
+            renderer.value.createDot(node, 5, [255, 0, 0, 1], { zLayer: 3, tag: 'node point' });
         }
         for (let idx = 0; idx < nodes.length; idx++) {
             const nodeCrd: Coord = nodes[idx];
             for (let nbrIdx of neighbors[idx]) {
                 const nbrCrd: Coord = nodes[nbrIdx];
-                renderer.value.createLine(nodeCrd, nbrCrd, [255, 0, 0, 1], 2, { zLayer: 3, tag: "nebor path" });
+                renderer.value.createLine(nodeCrd, nbrCrd, [255, 0, 0, 1], 2, {
+                    zLayer: 3,
+                    tag: 'nebor path',
+                });
             }
         }
         callRender();
     }
 );
 watch(
-	() => props.pathfindingData,
-	(newData) => {
-		if (!renderer.value) return;
-		renderer.value.clearTag("pathfind-obj");
-		if (!newData) return;
-		const [source, target] = newData;
-		const [lines, points] = generatePathObjects(props.pathData, source, target);
-		for (let point of points) {
-			renderer.value.createDot(...point);
-		}
-		for (let line of lines) {
-			renderer.value.createLine(...line);
-		}
-		callRender();
-	}
-, {deep: true});
+    () => props.pathfindingData,
+    (newData) => {
+        if (!renderer.value) return;
+        renderer.value.clearTag('pathfind-obj');
+        if (!newData) return;
+        const [source, target] = newData;
+        const [lines, points] = generatePathObjects(props.pathData, source, target);
+        for (let point of points) {
+            renderer.value.createDot(...point);
+        }
+        for (let line of lines) {
+            renderer.value.createLine(...line);
+        }
+        callRender();
+    },
+    { deep: true }
+);
 
 // event listeners
 function changeOffset(newOffset: Coord) {

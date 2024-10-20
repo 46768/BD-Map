@@ -1,5 +1,5 @@
-import { Polygon } from '@/mod/data/polygon/polygon'
-import { Room } from '@/mod/data/room/room'
+import { Polygon } from '@/mod/data/polygon/polygon';
+import { Room } from '@/mod/data/room/room';
 
 const testPolygon = new Polygon(
     [
@@ -74,11 +74,11 @@ const testRoom6 = new Room(7103, 1, testPolygon6, 'testRoom6ID');
 const testRoom7 = new Room(7104, 1, testPolygon7, 'testRoom7ID');
 
 export const testData = [
-	testRoom,
-	testRoom2,
-	testRoom3,
-	testRoom4,
-	testRoom5,
-	testRoom6,
-	testRoom7,
-]
+    testRoom,
+    testRoom2,
+    testRoom3,
+    testRoom4,
+    testRoom5,
+    testRoom6,
+    testRoom7,
+];

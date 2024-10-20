@@ -17,6 +17,5 @@ const source = 0;
 const target = 4;
 test('aStar test', () => {
     const path = aStar(nodes, nebors, source, target);
-    expect(true).toBe(true);
     expect(path).toEqual([0, 1, 2, 4]);
 });

@@ -1,4 +1,4 @@
-import { MinHeap } from './heap'
+import { MinHeap } from './heap';
 
 import type { Coord } from '@/mod/data/com/vertex';
 
@@ -27,9 +27,7 @@ function buildPath(path: number[], pathEnd: number) {
 }
 
 function queueCmp(left: [number, number], right: [number, number]) {
-	console.log(left);
-	console.log(right);
-	return left[1] - right[1];
+    return left[1] - right[1];
 }
 
 export function aStar(nodes: Coord[], nebors: number[][], source: number, target: number) {
@@ -41,7 +39,7 @@ export function aStar(nodes: Coord[], nebors: number[][], source: number, target
     const gCost: number[] = new Array(nodeCnt).fill(999999);
     const fCost: number[] = new Array(nodeCnt).fill(999999);
 
-	const queue: MinHeap<[number, number]> = new MinHeap<[number, number]>(queueCmp, [-1, 999999]);
+    const queue: MinHeap<[number, number]> = new MinHeap<[number, number]>(queueCmp, [-1, 999999]);
     const queueSet: Set<number> = new Set<number>();
 
     path[source] = source;
@@ -50,8 +48,7 @@ export function aStar(nodes: Coord[], nebors: number[][], source: number, target
     queue.insert([source, fCost[source]]);
 
     while (queue.getSize() > 0) {
-		const extracted: [number, number] = queue.extract();
-		console.log(extracted);
+        const extracted: [number, number] = queue.extract();
         const currentIdx: number = extracted[0];
         const currentNode: Coord = nodes[currentIdx];
         queueSet.delete(currentIdx);

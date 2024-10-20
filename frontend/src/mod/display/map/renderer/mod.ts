@@ -18,11 +18,12 @@ export class Renderer {
     }
 
     _insertObject(object: Closure, zLayer: number, tag?: string): void {
-		tag = tag ?? "untagged";
-		if (!this.objectBuffer[zLayer]) this.objectBuffer[zLayer] = {};
-        if (!Object.prototype.hasOwnProperty.call(this.objectBuffer[zLayer], tag)) this.objectBuffer[zLayer][tag] = [];
+        tag = tag ?? 'untagged';
+        if (!this.objectBuffer[zLayer]) this.objectBuffer[zLayer] = {};
+        if (!Object.prototype.hasOwnProperty.call(this.objectBuffer[zLayer], tag))
+            this.objectBuffer[zLayer][tag] = [];
         this.objectBuffer[zLayer][tag].push(object);
-		if (!this.tagRecord.get(tag)) this.tagRecord.set(tag, zLayer);
+        if (!this.tagRecord.get(tag)) this.tagRecord.set(tag, zLayer);
     }
 
     _getOffset(opts: ClosureOptions, options: ClosureConfig): Coord {
@@ -38,12 +39,12 @@ export class Renderer {
         return opts.coordinateOffset;
     }
 
-	clearTag(tag: string) {
-		const tagLayer = this.tagRecord.get(tag);
-		if (!tagLayer) return;
-		delete this.objectBuffer[tagLayer][tag]
-		this.tagRecord.delete(tag);
-	}
+    clearTag(tag: string) {
+        const tagLayer = this.tagRecord.get(tag);
+        if (!tagLayer) return;
+        delete this.objectBuffer[tagLayer][tag];
+        this.tagRecord.delete(tag);
+    }
 
     createLine(start: Coord, end: Coord, color: Color, thickness: number, options: ClosureConfig) {
         const [sx, sy]: Coord = start;
@@ -144,13 +145,13 @@ export class Renderer {
         ctx.clearRect(0, 0, sx, sy);
         ctx.fillStyle = colorToCSS(this.background);
         ctx.fillRect(0, 0, sx, sy);
-        for (let zLayer of objects) {
-			if (typeof zLayer !== "object") continue;
-			for (let objs of Object.values(zLayer)) {
-				for (let obj of objs) {
-					obj(ctx, opts);
-				}
-			}
+        for (const zLayer of objects) {
+            if (typeof zLayer !== 'object') continue;
+            for (const objs of Object.values(zLayer)) {
+                for (const obj of objs) {
+                    obj(ctx, opts);
+                }
+            }
         }
     }
 

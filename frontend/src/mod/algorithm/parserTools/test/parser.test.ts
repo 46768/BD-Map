@@ -3,7 +3,7 @@ import { Polygon } from '@/mod/data/polygon/polygon';
 import { Room } from '@/mod/data/room/room';
 import * as polygonTools from '../polygonTools';
 import * as roomTools from '../roomTools';
-import * as graphTools from '../graphTools';
+import * as graphTools from '../pathTools';
 
 import type { Line } from '@/mod/data/com/line';
 
@@ -73,6 +73,6 @@ test('room touch extraction', () => {
 });
 
 test('graph generation test', () => {
-    const graph = graphTools.generateGraph([testRoom, testRoom2, testRoom3]);
+    graphTools.generatePath([testRoom, testRoom2, testRoom3]);
     expect(true).toBe(true);
 });

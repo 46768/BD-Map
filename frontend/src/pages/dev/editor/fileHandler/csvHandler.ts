@@ -10,7 +10,7 @@ export function parseCSV(fileData: string) {
 
     const roomDataArray: Room[] = [];
 
-    for (let dataLine of nestedArrayData) {
+    for (const dataLine of nestedArrayData) {
         const id: string = dataLine[0];
         const vertices: Coord[] = [];
         for (let idx = 1; idx < dataLine.length; idx += 2) {
