@@ -1,10 +1,10 @@
 import { aStar } from '@/mod/algorithm/astar/astar';
 
-import type { GraphData } from '@/mod/algorithm/parserTools/graphTools';
+import type { PathData } from '@/mod/algorithm/parserTools/pathTools';
 import type { LineData, PointData } from '@/mod/display/map/renderer/def';
 
 export function generatePathObjects(
-    graph: GraphData,
+    graph: PathData,
     source: number,
     target: number
 ): [LineData[], PointData[]] {

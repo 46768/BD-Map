@@ -1,16 +1,20 @@
 <script setup lang="ts">
 import MapDisplay from '@/mod/display/map/MapDisplay.vue';
 import { Room } from '@/mod/data/room/room';
+import { blankPath } from '@/mod/algorithm/parserTools/pathTools';
 
 const room: Room = Room.blank;
 
 function test() {
     return [room];
 }
+function tp() {
+	return blankPath;
+};
 </script>
 
 <template>
-    <MapDisplay :gps-coord="[0, 0]" :path-data="[]" :room-data="test()" />
+    <MapDisplay :gps-coord="[0, 0]" :path-data="tp()" :room-data="test()" />
 </template>
 
 <style></style>
