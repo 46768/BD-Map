@@ -6,6 +6,7 @@ import { Polygon } from '@/mod/data/polygon/polygon';
 import { Room } from '@/mod/data/room/room';
 import { blankPath, generatePath } from '@/mod/algorithm/parserTools/pathTools';
 import { vMouseMove, vMouseClick } from '@/attrib/mouse/attrib';
+import { searchTag, searchAlias } from '@/mod/tools/search/mod';
 import MapDisplay from '@/mod/display/map/MapDisplay.vue';
 import type { MapDisplayElement } from '@/mod/display/map/def';
 import type { Coord } from '@/mod/data/com/vertex';
@@ -28,19 +29,16 @@ const hoveringRoom: Ref<Room> = ref(Room.blank);
 const selectingRoom: Ref<Room> = ref(Room.blank);
 const pathfindData: Ref<[number, number] | undefined> = ref();
 const pathfindHold: Ref<[number, number]> = ref([0, 0]);
+const searchHighlight: Ref<Room[]> = ref([]);
 const currentFloor: Ref<number> = ref(1);
+const tagBuffer: Ref<string> = ref("");
+const aliasBuffer: Ref<string> = ref("");
 
 // Functions
 function callRender() {
     if (display.value) {
         display.value.callRender();
     }
-}
-function refreshRenderer() {
-    csvData.value = [...csvData.value];
-    pathData.value = [...pathData.value];
-    console.log(csvData.value);
-    console.log(pathData.value);
 }
 function handleUpdate() {
     selectingRoom.value.polygon.refresh();
@@ -52,6 +50,9 @@ function getHoveringPolygon(hoverPoint: Coord) {
     for (let room of csvData.value) {
         room.polygon.highlighted = false;
     }
+	for (let room of searchHighlight.value) {
+		room.polygon.highlighted = true;
+	}
     selectingRoom.value.polygon.highlighted = true;
 
     hoveringRoom.value = Room.blank;
@@ -68,7 +69,36 @@ function getHoveringPolygon(hoverPoint: Coord) {
 }
 function generatePathData() {
     pathData.value = generatePath(csvData.value);
-    console.log(pathData.value);
+}
+function searchRoomTag() {
+	console.log("searching for tag:", tagBuffer.value);
+	for (let room of csvData.value) {
+		room.polygon.highlighted = false;
+	}
+	const searchRes: Room[] = searchTag(csvData.value, tagBuffer.value);
+	console.log("search result:", searchRes);
+	for (let room of searchRes) {
+		console.log("highlighting", room.id);
+		room.polygon.highlighted = true;
+		console.log("highlight status:", room.polygon.highlighted);
+	}
+	searchHighlight.value = searchRes;
+	callRender();
+}
+function searchRoomAlias() {
+	console.log("searching for alias:", aliasBuffer.value);
+	for (let room of csvData.value) {
+		room.polygon.highlighted = false;
+	}
+	const searchRes: Room[] = searchAlias(csvData.value, aliasBuffer.value);
+	console.log("search result:", searchRes);
+	for (let room of searchRes) {
+		console.log("highlighting", room.id);
+		room.polygon.highlighted = true;
+		console.log("highlight status:", room.polygon.highlighted);
+	}
+	searchHighlight.value = searchRes;
+	callRender();
 }
 
 // Event listeners
@@ -147,9 +177,18 @@ watch(csvInput, (newInputEl) => {
                 use test data
             </button>
             <input class="fixed bottom-[14rem] left-2" type="number" v-model="currentFloor" />
-            <button class="fixed bottom-[16rem] left-2" @click="refreshRenderer">
-                refresh map
-            </button>
+            <div class="fixed bottom-[16rem] left-2">
+                <button class="inline" @click="searchRoomTag">
+					search tag
+                </button>
+                <input class="inline w-[4rem]" type="text" v-model="tagBuffer" />
+            </div>
+            <div class="fixed bottom-[18rem] left-2">
+                <button class="inline" @click="searchRoomAlias">
+					search alias
+                </button>
+                <input class="inline w-[4rem]" type="text" v-model="aliasBuffer" />
+            </div>
         </div>
     </div>
 </template>

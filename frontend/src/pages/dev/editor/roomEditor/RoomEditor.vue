@@ -24,8 +24,11 @@ const floor = computed<number>({
     },
 });
 const aliases = ref<string[]>(roomSrc.alias);
+const tags = ref<string[]>(Array.from(roomSrc.tag));
 const polyVertices = ref<Coord[]>(roomSrc.polygon.vertices);
 const polyColor = ref<Color>(roomSrc.polygon.color);
+
+const tagBuffer = ref<string>("");
 
 function addAlias(alias: string) {
     roomSrc.addAlias(alias);
@@ -47,6 +50,16 @@ function removeVertex(vertexIdx: number) {
     polyVertices.value = roomSrc.polygon.vertices;
     emit('update');
 }
+function addTag() {
+	roomSrc.addTag(tagBuffer.value);
+	tags.value = Array.from(roomSrc.tag);
+	emit('update');
+}
+function removeTag(tag: string) {
+	roomSrc.removeTag(tag);
+	tags.value = Array.from(roomSrc.tag);
+	emit('update');
+}
 
 watch(
     () => roomSrc.id,
@@ -56,6 +69,7 @@ watch(
         floor.value = roomSrc.floor;
         polyVertices.value = newPoly.vertices;
         polyColor.value = newPoly.color;
+		tags.value = Array.from(roomSrc.tag);
     }
 );
 
@@ -177,6 +191,22 @@ watch(
                 </template>
             </div>
             <button class="block pr-2 pl-2" @click="addAlias('')">+</button>
+        </div>
+        <!--Room Tags-->
+        <div class="block">
+            <p class="block">Tags</p>
+            <div class="h-[8rem] overflow-y-scroll">
+                <template v-for="idx in tags.length" :key="`${idx}tags`">
+                    <div class="inline-block w-full">
+                        <button class="inline-block w-1/6" @click="removeTag(tags[idx-1])">-</button>
+						<p class="inline-block w-5/6">{{tags[idx-1]}}</p>
+                    </div>
+                </template>
+            </div>
+			<div>
+				<button class="inline-block pr-2 pl-2" @click="addTag()">+</button>
+				<input class="inline-block" type="text" v-model="tagBuffer" />
+			</div>
         </div>
     </div>
 </template>
