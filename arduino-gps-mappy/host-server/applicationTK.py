@@ -211,10 +211,8 @@ class Application:
 
     def addElement(self, name, tkWidget, master, **kwargs):
         if kwargs:
-            print("kwag")
             self.element[name] = tkWidget(master, **kwargs)
         else:
-            print("no kwag")
             self.element[name] = tkWidget(master=master)
 
     def placeElement(self, name, **kwargs):

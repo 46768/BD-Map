@@ -16,12 +16,8 @@ def serialInterface(PolygonTreeHandler):
         while running:
             serBuf = serialPort.read()
             if serBuf:
-                # print(bin(ord(serBuf)))
-                # print(serBuf)
                 gpsParser.appendBuffer(ord(serBuf))
-                # print(gpsParser.getBuffer())
                 gpsParser.parse()
-                print(gpsParser.persistentData)
     except serial.SerialException as e:
         print(f"Error: {e}")
         return

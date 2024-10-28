@@ -54,10 +54,6 @@ class Parser:
         self.parsing = True
         # Get Header and Start Signal
         byte = self.serBuffer
-        # print("parser byte:")
-        # print(byte)
-        # print("microEnd:")
-        # print(commsHeader.microEnd)
         if self.microParsing and self.microHeader == 0:
             self.microHeader = byte
         if byte == commsHeader.microSend and not self.microParsing:
@@ -66,10 +62,6 @@ class Parser:
             hostHeader = commsHeader.hostReceived
             # Data sanitization
             data = self.dataBuffer[2:-1]
-            # print("dataBuffer:")
-            # print(self.dataBuffer)
-            # print("data:")
-            # print(data)
             match self.microHeader:
                 case commsHeader.gpsNew:
                     print("Gps New")
@@ -78,12 +70,8 @@ class Parser:
                     print("gps INF")
                     gpsLatByte = 0
                     gpsLonByte = 0
-                    # print("gps INF parsing data:")
-                    # print(data)
                     gpsLatByte = bytes(data[0:4])
                     gpsLonByte = bytes(data[4:8])
-                    # print(gpsLatByte)
-                    # print(gpsLonByte)
                     dataTuple = (
                         struct.unpack("<f", gpsLatByte)[0],
                         struct.unpack("<f", gpsLonByte)[0],
@@ -92,21 +80,17 @@ class Parser:
                     self.treeview.addData("temp", ",".join(
                         map(str, dataTuple)))
                 case commsHeader.gpsCnl:
-                    print("gpscnl")
                     self.persistentData = []
                     self.treeview.clearTemp()
                 case commsHeader.gpsEnd:
-                    print("gpsEnd")
                     self.treeview.replicateFromTemp(uuid.uuid4())
                     self.treeview.clearTemp()
                 case commsHeader.ioCnct:
-                    print("ioCnct")
                     self.serialHandler.write(commsHeader.hostSend)
                     self.serialHandler.write(data)
                     self.serialHandler.write(commsHeader.hostEnd)
                 case commsHeader.ioMsg:
                     print("ioMsg")
-
                 case _:
                     print("Unknown Header")
                     hostHeader = commsHeader.hostError

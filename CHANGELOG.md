@@ -1,2 +1,3 @@
-# Pathfinding
-- multi floor pathfinding done
+# Mappy
+- making Mappy host more modular
+- rewriting Mappy's Arduino src

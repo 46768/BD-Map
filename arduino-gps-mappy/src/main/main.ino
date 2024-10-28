@@ -119,7 +119,6 @@ void setup() {
 	Serial1.begin(9600);
 }
 
-// 16 bit CPU processing loop
 // Execution order (top to bottom)
 // GPS retrival
 // UART in
