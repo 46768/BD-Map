@@ -1,13 +1,10 @@
-import applicationTK
 import GPSHandler
 
 
 class PolygonHandler:
     def __init__(
             self,
-            TreeviewHandler: applicationTK.ExtendedTreeview
     ):
-        self.treeview = TreeviewHandler
         self.gpsHandler = GPSHandler.GPSHandler()
         self.polygonData = []
         self.isFree = True

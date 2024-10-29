@@ -13,6 +13,7 @@ class CLI:
     def __init__(
         self,
         polygonData: applicationTK.ExtendedTreeview,
-        serialHandler: SerialHandler.SerialHandler
+        serialHandler: SerialHandler.SerialHandler,
+        polygonHandler
     ):
         print("hekki")
