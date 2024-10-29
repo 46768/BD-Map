@@ -5,25 +5,11 @@ import serial
 class commsHeader:
     microSend = 0b11110001
     microEnd = 0b11110010
-    microReceived = 0b11110011
-    microError = 0b11110100
 
-    hostSend = 0b10000001
-    hostEnd = 0b10000010
-    hostReceived = 0b10000011
-    hostError = 0b10000100
+    gps_Info = 0b11000001
+    gps_NA = 0b11000010
 
-    gpsInf = 0b11000010
-    gpsNew = 0b11000001
-    gpsEnd = 0b11000011
-    gpsCnl = 0b11000100
-
-    ioCnct = 0b11100001
-    ioMsg = 0b11100010
-
-    logSend = 0b11010001
-    logRqst = 0b11010010
-    logRecv = 0b11010011
+    noHeader = 0b0
 
 
 class SerialHandler:
@@ -38,5 +24,23 @@ class SerialHandler:
         self.serialPort.write(commsHeader.hostEnd)
 
     def read(self):
-        
-        print()
+        byteBuf = []
+        msgType = commsHeader.noHeader
+        haveSendHeader = False
+        haveEndHeader = False
+        while self.serialPort.inWaiting:
+            readingByte = self.serialPort.read()
+            byteBuf.append(readingByte)
+            if readingByte == commsHeader.microSend:
+                haveSendHeader = True
+            if readingByte == commsHeader.microEnd:
+                haveEndHeader = True
+                break
+
+        if not (haveSendHeader and haveEndHeader):
+            return (commsHeader.noHeader, [])
+        if len(byteBuf) > 0:
+            msgType = byteBuf.pop(0)
+            byteBuf.pop()
+
+        return (msgType, byteBuf)

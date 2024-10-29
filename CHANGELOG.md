@@ -1,2 +1,2 @@
 # Mappy
-- Mappy now is a GPS provider instead of being a standalone polygon mapper
+- host server got gps parser, serial handler, polygon parser modules

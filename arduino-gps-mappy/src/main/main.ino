@@ -10,7 +10,7 @@
 #define micro_end (char)0b11110010
 
 #define gps_info (char)0b11000001
-#define gps_nan (char)0b11000010
+#define gps_na (char)0b11000010
 
 #define double_s sizeof(double)
 
@@ -58,6 +58,6 @@ void loop() {
 	if (gps.location.isValid()) {
 		send_UART(gps_info, uart_buf);
 	} else {
-		send_UART(gps_nan);
+		send_UART(gps_na);
 	}
 }

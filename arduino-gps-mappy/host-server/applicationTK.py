@@ -45,7 +45,7 @@ class ExtendedTreeview:
                                       orient="vertical",
                                       command=self.treeview.yview,
                                       )
-        self.data: Dict[str, List[str]] = {"temp": []}
+        self.data: Dict[str, List[str]] = {}
         self.namespaceUUID = uuid.uuid4()
         self.treeData = []
 
