@@ -1,3 +1,2 @@
 # Mappy
-- making Mappy host more modular
-- rewriting Mappy's Arduino src
+- Mappy now is a GPS provider instead of being a standalone polygon mapper
