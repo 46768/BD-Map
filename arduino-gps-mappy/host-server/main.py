@@ -24,7 +24,7 @@ baudRate = 19200
 serialPort = SerialHandler(baudRate=baudRate, port=port)
 polygonHandler = PolygonHandler()
 
-app = makeApp(serialPort, polygonHandler)
+app = makeApp()
 
 running = True
 serialThread = threading.Thread(target=serialInterface, daemon=True)

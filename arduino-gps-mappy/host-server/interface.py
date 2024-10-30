@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 
 
-def makeApp(serialHandler, polygonHandler):
+def makeApp():
     def mkApp():
         # Root Structure
         app = applicationTK.Application("Mappy Host Module", "1280x640")
