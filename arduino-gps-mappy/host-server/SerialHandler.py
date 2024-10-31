@@ -1,4 +1,5 @@
 import serial
+import time
 
 
 # micro host Comms
@@ -18,29 +19,40 @@ class SerialHandler:
         self.baud = baudRate
         self.port = port
 
+        self.serialBuffer = []
+        self.serialInputTime = -1
+        self.haveSendHeader = False
+        self.haveEndHeader = False
+
     def write(self, buf):
         self.serialPort.write(commsHeader.hostSend)
         self.serialPort.write(buf)
         self.serialPort.write(commsHeader.hostEnd)
 
     def read(self):
-        byteBuf = []
         msgType = commsHeader.noHeader
-        haveSendHeader = False
-        haveEndHeader = False
+        if time.time() - self.serialInputTime > 4.9:
+            print("message timed out, discarding")
+            self.serialBuffer = []
+            return (commsHeader.noHeader, [])
         while self.serialPort.inWaiting:
             readingByte = self.serialPort.read()
-            byteBuf.append(readingByte)
+            self.serialBuf.append(readingByte)
             if readingByte == commsHeader.microSend:
-                haveSendHeader = True
+                self.haveSendHeader = True
+                self.serialInputTime = time.time()
+                self.serialBuffer = []
             if readingByte == commsHeader.microEnd:
-                haveEndHeader = True
+                self.haveEndHeader = True
                 break
 
-        if not (haveSendHeader and haveEndHeader):
-            return (commsHeader.noHeader, [])
-        if len(byteBuf) > 0:
-            msgType = byteBuf.pop(0)
+        if len(self.serialBuf) > 0 and self.haveSendHeader and self.haveEndHeader:
+            byteBuf = self.serialBuffer.copy()
+            msgType = byteBuf.pop(1)
+            byteBuf.pop(0)
             byteBuf.pop()
-
-        return (msgType, byteBuf)
+            self.haveSendHeader = False
+            self.haveEndHeader = False
+            self.serialBuffer = []
+            return (msgType, byteBuf)
+        return (commsHeader.noHeader, [])

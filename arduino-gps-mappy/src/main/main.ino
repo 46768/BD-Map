@@ -2,9 +2,6 @@
 #include "TinyGPSPlus.h"
 #include <string.h>
 
-// GPS Info
-#define gpsAvg 10
-
 //Host-Micro Protocol
 #define micro_send (char)0b11110001
 #define micro_end (char)0b11110010
@@ -13,6 +10,7 @@
 #define gps_na (char)0b11000010
 
 #define double_s sizeof(double)
+#define uint_s sizeof(unsigned int)
 
 // TinyGpsPlus
 TinyGPSPlus gps;
@@ -20,8 +18,9 @@ TinyGPSPlus gps;
 // variables
 double gps_lat;
 double gps_lng;
+unsigned int gps_upt = 0;
 
-char uart_buf[2*double_s];
+char uart_buf[(2*double_s)+uint_s];
 
 // helper functions
 
@@ -50,10 +49,12 @@ void loop() {
 	if (gps.location.isUpdated()) {
 		gps_lat = gps.location.lat();
 		gps_lng = gps.location.lng();
+		gps_upt++;
 	}
 
 	memcpy(uart_buf, &gps_lat, double_s);
-	memcpy(uart_buf+2, &gps_lng, double_s);
+	memcpy(uart_buf+double_s, &gps_lng, double_s);
+	memcpy(uart_buf+(2*doube_s), &gps_upt, uint_s);
 
 	if (gps.location.isValid()) {
 		send_UART(gps_info, uart_buf);
