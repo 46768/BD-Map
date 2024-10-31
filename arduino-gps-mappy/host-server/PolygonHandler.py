@@ -7,18 +7,22 @@ class PolygonHandler:
     ):
         self.gpsHandler = GPSHandler.GPSHandler()
         self.polygonData = []
+        self.polygonName = ""
         self.isFree = True
 
-    def new(self):
+    def new(self, name):
         self.polygonData = []
+        self.polygonName = name
         self.isFree = False
 
     def cancel(self):
         self.isFree = True
+        self.polygonName = ""
 
     def closePolygon(self):
         self.isFree = True
-        return self.polygonData
+        self.polygonName = ""
+        return (self.polygonName, self.polygonData)
 
     def addVertexFromPacket(self, packet):
         gps = self.gpsHandler
@@ -28,3 +32,6 @@ class PolygonHandler:
             return
 
         self.polygonData.append((gps.lat, gps.lng))
+
+    def addVertex(self, x, y):
+        self.polygonData.append((x, y))

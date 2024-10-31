@@ -1,2 +1,2 @@
 # Mappy
-- host server got serial time out, can handle partialy sent message, got polygon CLI partially implemented
+- polygon vertex adding now run on a different thread for non blocking runtime, working on the polygon closing

@@ -86,11 +86,6 @@ class ExtendedTreeview:
                     text=data[2]
                 )
 
-    def replicateFromTemp(self, label):
-        print(f"temp replaced into {label}")
-        self.data[str(label)] = self.data["temp"]
-        self.refreshTree()
-
     def setData(self, label, data):
         self.data[label] = data
         self.refreshTree()
@@ -100,10 +95,6 @@ class ExtendedTreeview:
             self.data[label] = []
 
         self.data[label].append(data)
-        self.refreshTree()
-
-    def clearTemp(self):
-        self.data["temp"] = []
         self.refreshTree()
 
     def getTreeview(self):
