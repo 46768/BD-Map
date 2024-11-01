@@ -3,6 +3,9 @@ import SerialHandler
 import PolygonHandler
 import time
 import threading
+import uuid
+import random
+import os
 
 
 class CLICMD:
@@ -14,9 +17,9 @@ class CLICMD:
 class CLI:
     def __init__(
         self,
-        polygonData: applicationTK.ExtendedTreeview,
-        serialHandler: SerialHandler.SerialHandler,
-        polygonHandler: PolygonHandler.PolygonHandler,
+        polygonData,
+        serialHandler,
+        polygonHandler,
         outputUpdater
     ):
         self.polyHandler = polygonHandler
@@ -29,11 +32,32 @@ class CLI:
 
     def pushOutput(self, lineText):
         self.outputBuffer.append(lineText)
-        self.updateOutput()
+        self.updateOutput(self.outputBuffer)
 
-    def command(self, name):
+    def command(name):
         def decorator(fn):
-            self.cmdRegistry[name] = fn
+            def wrapper(self, *args, **kwargs):
+                self.cmdRegistry[name] = fn
+            return wrapper
+        return decorator
+
+    @command(CLICMD.export)
+    def exporter(self, *args):
+        self.running = True
+        polygonData = self.polygonHandler.data
+        if not os.path.exists("export/"):
+            os.mkdir("export/")
+        with open("export/export.csv", "w", newline='\n') as file:
+            for label in polygonData:
+                if label == "temp" and len(polygonData[label]) != 4:
+                    continue
+                data = [label] + polygonData[label]
+                self.pushOutput(f'exporting {label}')
+                file.write(",".join(data))
+                file.write('\n')
+            file.close()
+        self.pushOutput("exported")
+        self.running = False
 
     @command(CLICMD.polygon)
     def polygonCLI(self, *args):
@@ -52,11 +76,14 @@ class CLI:
                 self.running = False
             case "close":
                 verticesCnt = len(self.polyHandler.polygonData)
-                self.polyHandler.closePolygon()
-                polyVertices = self.pushOutput(
+                polyVertices = self.polyHandler.closePolygon()
+                self.pushOutput(
                     f'closed a polygon with {verticesCnt} vertices'
                 )
-                self.polyData
+                self.polyData.setData(
+                    polyVertices[0],
+                    [f'{vert[0]},{vert[1]}' for vert in polyVertices[1]]
+                )
 
                 self.running = False
             case "scan":
@@ -90,13 +117,33 @@ class CLI:
                     self.running = False
                 threading.Thread(target=scanJob, daemon=True).start()
             case "test":
-                print()
+                for i in range(20):
+                    dataKey = str(uuid.uuid4())
+                    offX = random.randint(0, 2000)
+                    offY = random.randint(0, 2000)
+                    self.polyHandler.addData(
+                        dataKey,
+                        f"{100+random.randint(0, 200)+offX},{100+random.randint(0, 200)+offY}"
+                    )
+                    self.polyHandler.addData(
+                        dataKey,
+                        f"{100+random.randint(0, 200)+offX},{300+random.randint(0, 200)+offY}"
+                    )
+                    self.polyHandler.addData(
+                        dataKey,
+                        f"{300+random.randint(0, 200)+offX},{300+random.randint(0, 200)+offY}"
+                    )
+                    self.polyHandler.addData(
+                        dataKey,
+                        f"{300+random.randint(0, 200)+offX},{100+random.randint(0, 200)+offY}"
+                    )
             case _:
-                print()
+                self.pushOutput("unknown command")
 
     def runCmd(self, cmd, *args):
         if cmd == CLICMD.clear:
             self.outputBuffer.clear()
+            self.updateOutput(self.outputBuffer)
             return
         commandFn = self.cmdRegistry.get(cmd)
         if (commandFn is None):

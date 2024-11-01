@@ -2,10 +2,9 @@ import uuid
 import tkinter as tk
 from tkinter import scrolledtext
 from tkinter import ttk
-import random
 import sys
-import os
 from typing import List, Dict
+import CLI
 
 
 class ExtendedText:
@@ -109,70 +108,36 @@ class ExtendedCanvas:
         return self.canvas
 
 
-class commands:
-    export = "export"
-    clear = "clear"
-    test = "test"
-
-
 class CommandLine:
-    def __init__(self, master, polygonHandler: ExtendedTreeview):
+    def __init__(
+        self,
+        master,
+        polygonData: ExtendedTreeview,
+        serialHandler,
+        polygonHandler
+    ):
         self.commandFrame = tk.Frame(master)
         self.commandline = tk.Entry(self.commandFrame)
         self.commandTerminal = ExtendedText(self.commandFrame)
         self.commandline.bind("<Return>", self.runCommand)
-        self.polygonHandler = polygonHandler
+        self.polygonData = polygonData
+        self.CLI = CLI.CLI(
+            polygonData,
+            serialHandler,
+            polygonHandler,
+            self.updateContent
+        )
 
-        self.commandTerminal.insertText("[host]: ")
+        self.commandTerminal.insertText("started CLI\n")
 
     def runCommand(self, event):
         inpt = self.commandline.get()
-        self.commandTerminal.insertText(f'{inpt}\n')
+        self.CLI.runCmd(inpt)
 
-        match inpt:
-            case commands.export:
-                polygonData = self.polygonHandler.data
-                if not os.path.exists("export/"):
-                    os.mkdir("export/")
-                with open("export/export.csv", "w", newline='\n') as file:
-                    for label in polygonData:
-                        if label == "temp" and len(polygonData[label]) != 4:
-                            continue
-                        data = [label] + polygonData[label]
-                        self.commandTerminal.insertText(f'exporting {label}\n')
-                        file.write(",".join(data))
-                        file.write('\n')
-                    file.close()
-                self.commandTerminal.insertText("exported\n")
-            case commands.clear:
-                self.commandTerminal.setText("")
-            case commands.test:
-                for i in range(20):
-                    dataKey = str(uuid.uuid4())
-                    offX = random.randint(0, 2000)
-                    offY = random.randint(0, 2000)
-                    self.polygonHandler.addData(
-                        dataKey,
-                        f"{100+random.randint(0, 200)+offX},{100+random.randint(0, 200)+offY}"
-                    )
-                    self.polygonHandler.addData(
-                        dataKey,
-                        f"{100+random.randint(0, 200)+offX},{300+random.randint(0, 200)+offY}"
-                    )
-                    self.polygonHandler.addData(
-                        dataKey,
-                        f"{300+random.randint(0, 200)+offX},{300+random.randint(0, 200)+offY}"
-                    )
-                    self.polygonHandler.addData(
-                        dataKey,
-                        f"{300+random.randint(0, 200)+offX},{100+random.randint(0, 200)+offY}"
-                    )
-            case _:
-                self.commandTerminal.insertText("unknown command\n")
-
-        self.commandTerminal.insertText("[host]: ")
         self.commandline.delete("0", tk.END)
-        print(inpt)
+
+    def updateContent(self, contentArray):
+        print()
 
     def getFrame(self):
         return self.commandFrame

@@ -13,6 +13,8 @@ elif platform.system() == "Windows":
     port = 'COM3'
 
 baudRate = 19200
+serialPort
+polygonHandler
 
 
 def serialInterface():
@@ -23,7 +25,6 @@ def serialInterface():
     try:
         serialPort = SerialHandler(baudRate=baudRate, port=port)
         polygonHandler = PolygonHandler()
-        print()
     except serial.SerialException as e:
         print(f"Error: {e}")
         return
@@ -32,5 +33,5 @@ def serialInterface():
 running = True
 serialThread = threading.Thread(target=serialInterface, daemon=True)
 serialThread.start()
-app = makeApp()
+app = makeApp(serialPort, polygonHandler)
 app.run()
