@@ -1,5 +1,6 @@
 import serial
 import time
+import os
 
 
 # micro host Comms
@@ -7,13 +8,20 @@ class commsHeader:
     microSend = 0b11110001
     microEnd = 0b11110010
 
-    gps_Info = 0b11000001
-    gps_NA = 0b11000010
+    gpsInfo = 0b11000001
+    gpsNA = 0b11000010
+    gpsStart = 0b11000011
 
     noHeader = 0b0
 
 
 class SerialHandler:
+    def __new__(cls, port, *argv, **kwarg):
+        if not os.path.exists(port):
+            print(f'Port {port} isnt connected')
+            return None
+        return super().__new__(cls)
+
     def __init__(self, baudRate, port):
         self.serialPort: serial.Serial = serial.Serial(port, baudRate)
         self.baud = baudRate
@@ -31,11 +39,11 @@ class SerialHandler:
 
     def read(self):
         msgType = commsHeader.noHeader
-        if time.time() - self.serialInputTime > 4.9:
-            print("message timed out, discarding")
+        while self.serialPort.in_waiting > 0:
+            if time.time() - self.serialInputTime > 4.9:
+                print("message timed out, dropping packet")
             self.serialBuffer = []
             return (commsHeader.noHeader, [])
-        while self.serialPort.inWaiting:
             readingByte = self.serialPort.read()
             self.serialBuf.append(readingByte)
             if readingByte == commsHeader.microSend:
@@ -46,7 +54,7 @@ class SerialHandler:
                 self.haveEndHeader = True
                 break
 
-        if len(self.serialBuf) > 0 and self.haveSendHeader and self.haveEndHeader:
+        if len(self.serialBuffer) > 0 and self.haveSendHeader and self.haveEndHeader:
             byteBuf = self.serialBuffer.copy()
             msgType = byteBuf.pop(1)
             byteBuf.pop(0)

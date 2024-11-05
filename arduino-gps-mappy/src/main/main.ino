@@ -8,6 +8,7 @@
 
 #define gps_info (char)0b11000001
 #define gps_na (char)0b11000010
+#define gps_start (char)0b11000011
 
 #define double_s sizeof(double)
 #define uint_s sizeof(unsigned int)
@@ -39,6 +40,7 @@ void setup() {
 	Serial.begin(19200);
 	// GPS serial input
 	Serial1.begin(9600);
+	send_UART(gps_start);
 }
 
 void loop() {
