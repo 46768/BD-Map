@@ -16,6 +16,8 @@ class commsHeader:
 
 
 class SerialHandler:
+    noneHeader = (0, [])
+
     def __new__(cls, port, *argv, **kwarg):
         if not os.path.exists(port):
             print(f'Port {port} isnt connected')
@@ -65,3 +67,9 @@ class SerialHandler:
             self.serialBuffer = []
             return (msgType, byteBuf)
         return (commsHeader.noHeader, [])
+
+    def waitUntilHeader(self, header):
+        incommingPacket = self.noneHeader
+        headerByte = bytes([header])
+        while incommingPacket[0] != headerByte:
+            incommingPacket = self.read()

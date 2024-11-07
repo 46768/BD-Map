@@ -23,17 +23,21 @@ if not os.path.exists('./data/'):
     os.mkdir('./data/')
 polygonDataExist = os.path.exists('./data/export.csv')
 polygonPointerExist = os.path.exists('./data/head')
+
 if not polygonDataExist:
     open('./data/export.csv', 'w', newline='\n').close()
 if not polygonPointerExist:
     open('./data/head', 'w').close()
-polygonDataFile = open('./data/export.csv', 'r+', newline='\n')
-polygonPointerFile = open('./data/head', 'w+')
-polygonDataBuffer = ''.join([poly for poly in polygonDataFile]).split('\n')  # DO NOT REMOVE
-polygonDataBuffer.pop()
-polygonPointer = [ptr for ptr in polygonPointerFile]
-polygonPointer = polygonPointer[0] if len(polygonPointer) > 0 else ''
 
+polygonDataPath = './data/export.csv'
+polygonPointerPath = './data/head'
+
+polygonData = [
+    polyDat.split(';') for polyDat in open(
+        polygonDataPath
+    ).read().split('\n')
+]
+polygonPointer = open(polygonPointerPath).read()
 serialPort = serialHandler.SerialHandler(port=port, baudRate=baudRate)
 gpsParser = gps.GPSHandler()
 parser = argparse.ArgumentParser(
@@ -59,32 +63,31 @@ match args.type:
         match args.action:
             case 'new':
                 polygonID = uuid.uuid4()
-                polygonDataFile.write(str(polygonID))
-                polygonDataFile.write('\n')
-                polygonPointerFile.write(str(polygonID))
+                polygonData.append([str(polygonID)])
+                polygonPointer = str(polygonID)
                 print(f'Created new polygon: {polygonID}')
             case 'list':
-                if not polygonDataExist:
+                polygonData = open('./data/export.csv').read()
+                if not polygonDataExist or polygonData == '':
                     print("No Polygon Data")
                 else:
-                    polyCount = len(polygonDataBuffer)
-                    print(f"Total polygon: {polyCount}")
-                    for poly in polygonDataBuffer:
+                    polygonArray = polygonData.split('\n')
+                    print(f'Total polygon: {len(polygonArray)}\n')
+                    for poly in polygonArray:
                         print(poly)
+                    pass
             case 'add':
                 if serialPort is None:
                     print('Mappy not connected')
                     exit(1)
                 print('Waiting for start signal')
-                incommingPacket = (0, [])
-                while incommingPacket[0] != bytes([serialHandler.commsHeader.gpsStart]):
-                    incommingPacket = serialPort.read()
-                print('mappy automatically started, waiting for manual startup')
-                incommingPacket = (0, [])
-                while incommingPacket[0] != bytes([serialHandler.commsHeader.gpsStart]):
-                    incommingPacket = serialPort.read()
-                print(f'Recieved start signal, logging gps {gpsAvg} times')
-                print(f'adding vertex to {polygonPointer}')
+                serialPort.waitUntilHeader(serialHandler.commsHeader.gpsStart)
+                print('mappy started, waiting for manual startup')
+                serialPort.waitUntilHeader(serialHandler.commsHeader.gpsStart)
+                print(f'''
+                    Recieved start signal, logging gps {gpsAvg} times
+                    Adding vertex to {polygonPointer}
+                ''')
                 gpsCnt = 0
                 gpsLastUpt = gpsParser.upt
                 vertexCoord = [0, 0]
@@ -96,17 +99,23 @@ match args.type:
                         vertexCoord[0] += gpsParser.lat
                         vertexCoord[1] += gpsParser.lng
                         gpsLastUpt = curGpsUpt
-                        # print(f'average upt: {gpsParser.upt}, last upt: {gpsLastUpt}')
 
                         gpsCnt += 1
                 vertexCoord[0] /= gpsAvg
                 vertexCoord[1] /= gpsAvg
+                # GPS data at vertexCoord
                 print(f'recorded vertex at {vertexCoord[0]}, {vertexCoord[1]}')
 
             case 'del':
-                polygonDataFile.truncate(0)
-                polygonPointerFile.truncate(0)
+                polygonData = []
+                polygonPointer = ''
                 print('Cleared polygon data file')
 
+polygonDataFile = open(polygonDataPath, mode='w')
+polygonPointerFile = open(polygonPointerPath, mode='w')
+dataContent = '\n'.join(map((lambda p: ';'.join(p)), polygonData))
+dataContent = dataContent[1:]
+polygonDataFile.write(dataContent)
+polygonPointerFile.write(polygonPointer)
 polygonDataFile.close()
 polygonPointerFile.close()
