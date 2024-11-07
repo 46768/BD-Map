@@ -1,2 +1,5 @@
 # Mappy
-- polygon vertex adding now run on a different thread for non blocking runtime, working on the polygon closing
+- mappy cli now can add vertex to polygon
+
+# Frontend
+- changed csv parser to handle the new csv format

@@ -105,6 +105,9 @@ match args.type:
                 vertexCoord[1] /= gpsAvg
                 # GPS data at vertexCoord
                 print(f'recorded vertex at {vertexCoord[0]}, {vertexCoord[1]}')
+                for poly in polygonData:
+                    if poly[0] == polygonPointer:
+                        poly.append(f'{vertexCoord[0]},{vertexCoord[1]}')
 
             case 'del':
                 polygonData = []
