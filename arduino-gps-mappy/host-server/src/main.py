@@ -18,19 +18,19 @@ actions = {
     'polygon': ['new', 'list', 'add', 'del'],
 }
 
+polygonDataPath = os.path.abspath('./data/export.csv')
+polygonPointerPath = os.path.abspath('./data/head')
 # File handling stuff
-if not os.path.exists('./data/'):
-    os.mkdir('./data/')
-polygonDataExist = os.path.exists('./data/export.csv')
-polygonPointerExist = os.path.exists('./data/head')
+if not os.path.exists('../data/'):
+    os.mkdir('../data/')
+polygonDataExist = os.path.exists(polygonDataPath)
+polygonPointerExist = os.path.exists(polygonPointerPath)
 
 if not polygonDataExist:
-    open('./data/export.csv', 'w', newline='\n').close()
+    open(polygonDataPath, 'w', newline='\n').close()
 if not polygonPointerExist:
-    open('./data/head', 'w').close()
+    open(polygonPointerPath).close()
 
-polygonDataPath = './data/export.csv'
-polygonPointerPath = './data/head'
 
 polygonData = [
     polyDat.split(';') for polyDat in open(
@@ -71,10 +71,12 @@ match args.type:
                 if not polygonDataExist or polygonData == '':
                     print("No Polygon Data")
                 else:
-                    polygonArray = polygonData.split('\n')
-                    print(f'Total polygon: {len(polygonArray)}\n')
-                    for poly in polygonArray:
-                        print(poly)
+                    print(f'Total polygon: {len(polygonData)}\n')
+                    for poly in polygonData:
+                        if poly[0] == polygonPointer:
+                            print('>>>', poly[0])
+                        else:
+                            print(poly[0])
                     pass
             case 'add':
                 if serialPort is None:
@@ -118,6 +120,8 @@ polygonDataFile = open(polygonDataPath, mode='w')
 polygonPointerFile = open(polygonPointerPath, mode='w')
 dataContent = '\n'.join(map((lambda p: ';'.join(p)), polygonData))
 dataContent = dataContent[1:]
+print(dataContent)
+print(dataContent.split('\n'))
 polygonDataFile.write(dataContent)
 polygonPointerFile.write(polygonPointer)
 polygonDataFile.close()
