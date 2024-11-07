@@ -40,17 +40,18 @@ class SerialHandler:
     def read(self):
         msgType = commsHeader.noHeader
         while self.serialPort.in_waiting > 0:
-            if time.time() - self.serialInputTime > 4.9:
+            if time.time() - self.serialInputTime > 4.9 and self.haveSendHeader:
                 print("message timed out, dropping packet")
-            self.serialBuffer = []
-            return (commsHeader.noHeader, [])
+                self.serialBuffer = []
+                return (commsHeader.noHeader, [])
             readingByte = self.serialPort.read()
-            self.serialBuf.append(readingByte)
-            if readingByte == commsHeader.microSend:
+            # print('reading: ', readingByte)
+            self.serialBuffer.append(readingByte)
+            if readingByte == bytes([commsHeader.microSend]):
                 self.haveSendHeader = True
                 self.serialInputTime = time.time()
-                self.serialBuffer = []
-            if readingByte == commsHeader.microEnd:
+                self.serialBuffer = [readingByte]
+            if readingByte == bytes([commsHeader.microEnd]):
                 self.haveEndHeader = True
                 break
 
