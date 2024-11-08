@@ -4,6 +4,7 @@ import os
 import uuid
 import serialHandler
 import gps
+import re
 
 
 port = '/dev/ttyUSB0'  # 'dev/ttyUSB0' on linux
@@ -15,7 +16,7 @@ elif platform.system() == "Windows":
 baudRate = 19200
 gpsAvg = 10
 actions = {
-    'polygon': ['new', 'list', 'add', 'del'],
+    'polygon': ['new', 'list', 'add', 'del', 'sel'],
 }
 
 polygonDataPath = os.path.abspath('./data/export.csv')
@@ -67,8 +68,7 @@ match args.type:
                 polygonPointer = str(polygonID)
                 print(f'Created new polygon: {polygonID}')
             case 'list':
-                polygonData = open('./data/export.csv').read()
-                if not polygonDataExist or polygonData == '':
+                if not polygonDataExist or polygonData == []:
                     print("No Polygon Data")
                 else:
                     print(f'Total polygon: {len(polygonData)}\n')
@@ -115,13 +115,24 @@ match args.type:
                 polygonData = []
                 polygonPointer = ''
                 print('Cleared polygon data file')
+            case 'sel':
+                if args.polygon is None:
+                    print('Polygon to select isnt provided')
+                    exit(1)
+                found = False
+                for poly in polygonData:
+                    if re.search(args.polygon, poly[0]) is not None:
+                        print(f'found polygon {poly[0]}')
+                        polygonPointer = poly[0]
+                        found = True
+                if not found:
+                    print('Polygon not found')
 
 polygonDataFile = open(polygonDataPath, mode='w')
 polygonPointerFile = open(polygonPointerPath, mode='w')
 dataContent = '\n'.join(map((lambda p: ';'.join(p)), polygonData))
-dataContent = dataContent[1:]
-print(dataContent)
-print(dataContent.split('\n'))
+if dataContent[0] == '\n':
+    dataContent = dataContent[1:]
 polygonDataFile.write(dataContent)
 polygonPointerFile.write(polygonPointer)
 polygonDataFile.close()
