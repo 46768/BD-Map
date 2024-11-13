@@ -2,6 +2,7 @@ import platform
 import argparse
 import os
 import uuid
+import random
 import serialHandler
 import gps
 import re
@@ -16,7 +17,8 @@ elif platform.system() == "Windows":
 baudRate = 19200
 gpsAvg = 10
 actions = {
-    'polygon': ['new', 'list', 'add', 'del', 'sel'],
+    'polygon': ['new', 'list', 'del', 'sel', 'test'],
+    'vertex': ['add', 'sel'],
 }
 
 polygonDataPath = os.path.abspath('./data/export.csv')
@@ -60,24 +62,8 @@ if args.action not in actions[args.type]:
     exit(1)
 
 match args.type:
-    case 'polygon':
+    case 'vertex':
         match args.action:
-            case 'new':
-                polygonID = uuid.uuid4()
-                polygonData.append([str(polygonID)])
-                polygonPointer = str(polygonID)
-                print(f'Created new polygon: {polygonID}')
-            case 'list':
-                if not polygonDataExist or polygonData == []:
-                    print("No Polygon Data")
-                else:
-                    print(f'Total polygon: {len(polygonData)}\n')
-                    for poly in polygonData:
-                        if poly[0] == polygonPointer:
-                            print('>>>', poly[0])
-                        else:
-                            print(poly[0])
-                    pass
             case 'add':
                 if serialPort is None:
                     print('Mappy not connected')
@@ -110,7 +96,25 @@ match args.type:
                 for poly in polygonData:
                     if poly[0] == polygonPointer:
                         poly.append(f'{vertexCoord[0]},{vertexCoord[1]}')
-
+            case 'sel':
+                pass
+    case 'polygon':
+        match args.action:
+            case 'new':
+                polygonID = uuid.uuid4()
+                polygonData.append([str(polygonID)])
+                polygonPointer = str(polygonID)
+                print(f'Created new polygon: {polygonID}')
+            case 'list':
+                if not polygonDataExist or polygonData == []:
+                    print("No Polygon Data")
+                    exit(1)
+                print(f'Total polygon: {len(polygonData)}\n')
+                for poly in polygonData:
+                    if poly[0] == polygonPointer:
+                        print('>>>', poly[0])
+                    else:
+                        print(poly[0])
             case 'del':
                 polygonData = []
                 polygonPointer = ''
@@ -127,11 +131,33 @@ match args.type:
                         found = True
                 if not found:
                     print('Polygon not found')
+            case 'test':
+                for i in range(20):
+                    polygonID = uuid.uuid4()
+                    [x, y] = [
+                        random.randint(-1000, 1000),
+                        random.randint(-1000, 1000)
+                    ]
+
+                    [w, h] = [
+                        random.randint(0, 500),
+                        random.randint(0, 500)
+                    ]
+                    polygonData.append([
+                        str(polygonID),
+                        f'{x},{y}',
+                        f'{x+w},{y}',
+                        f'{x+w},{y+w}',
+                        f'{x},{y+w}',
+                    ])
+                    polygonPointer = str(polygonID)
+                    pass
+                pass
 
 polygonDataFile = open(polygonDataPath, mode='w')
 polygonPointerFile = open(polygonPointerPath, mode='w')
 dataContent = '\n'.join(map((lambda p: ';'.join(p)), polygonData))
-if dataContent[0] == '\n':
+if len(dataContent) > 0 and dataContent[0] == '\n':
     dataContent = dataContent[1:]
 polygonDataFile.write(dataContent)
 polygonPointerFile.write(polygonPointer)
