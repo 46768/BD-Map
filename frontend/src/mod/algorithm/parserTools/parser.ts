@@ -5,6 +5,28 @@ import { coordToString, stringToCoord } from '@/mod/data/com/vertex';
 import type { PathData, Nodes, Neighbors } from './pathTools';
 import type { Coord, Color } from '@/mod/data/com/vertex';
 
+export function parseMappyCSV(fileData: string) {
+    const nestedArrayData: string[][] = fileData.split('\n').map((line) => line.split(';'));
+    // Remove the last line due to trailing \n
+    nestedArrayData.pop();
+
+    const roomDataArray: Room[] = [];
+
+    for (const dataLine of nestedArrayData) {
+        const id: string = dataLine[0];
+        const vertices: Coord[] = [];
+        for (let idx = 1; idx < dataLine.length; idx++) {
+			const splitCoord = dataLine[idx].split(',')
+            vertices.push([parseFloat(splitCoord[0]), parseFloat(splitCoord[1])]);
+        }
+        const roomPolygon: Polygon = new Polygon(vertices, [70, 70, 70, 0.4]);
+        const roomData: Room = new Room(0, 1, roomPolygon, id);
+        roomDataArray.push(roomData);
+    }
+
+    return roomDataArray;
+}
+
 export function generatePathFileData([nodes, neighbors]: PathData): string {
     if (nodes.length !== neighbors.length) {
         console.error('invalid nodes and neighbors data');

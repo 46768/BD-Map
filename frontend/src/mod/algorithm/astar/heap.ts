@@ -9,9 +9,7 @@ export class MinHeap<T> {
         const data = this.data;
         let childIdx = data.push(val) - 1;
         while (true) {
-            console.log(childIdx);
             const parentIdx = Math.max((childIdx - 1) >> 1, 0);
-            console.log(parentIdx);
             const childVal: T = data[childIdx];
             const parentVal: T = data[parentIdx];
             if (this.cmpFn(childVal, parentVal) < 0) {

@@ -11,7 +11,7 @@ import type { MapDisplayElement } from '@/mod/display/map/def';
 import type { Coord } from '@/mod/data/com/vertex';
 import type { PathData } from '@/mod/algorithm/parserTools/pathTools';
 
-import { parseCSV } from './fileHandler/csvHandler';
+import { parseMappyCSV } from '@/mod/algorithm/parserTools/parser';
 import { testData } from './testData';
 import RoomEditor from './roomEditor/RoomEditor.vue';
 
@@ -79,7 +79,7 @@ fileReader.addEventListener('load', () => {
     }
     const fileData: string = fileReader.result;
 
-    csvData.value = parseCSV(fileData);
+    csvData.value = parseMappyCSV(fileData);
     callRender();
 });
 
