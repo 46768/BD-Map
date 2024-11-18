@@ -32,7 +32,7 @@ polygonPointerExist = os.path.exists(polygonPointerPath)
 if not polygonDataExist:
     open(polygonDataPath, 'w', newline='\n').close()
 if not polygonPointerExist:
-    open(polygonPointerPath).close()
+    open(polygonPointerPath, 'w').close()
 
 
 polygonData = [

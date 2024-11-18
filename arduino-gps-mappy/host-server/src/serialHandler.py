@@ -65,6 +65,7 @@ class SerialHandler:
             self.haveSendHeader = False
             self.haveEndHeader = False
             self.serialBuffer = []
+            print(f"reading: {(msgType, byteBuf)}")
             return (msgType, byteBuf)
         return (commsHeader.noHeader, [])
 

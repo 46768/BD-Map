@@ -68,6 +68,7 @@ void loop() {
 	memcpy(uart_buf+(2*double_s), &gps_upt, uint_s);
 
 	if (have_gps) {
+		send_UART(gps_info, uart_buf, sizeof(uart_buf));
 		if (gps.location.isValid()) {
 			send_UART(gps_info, uart_buf, sizeof(uart_buf));
 		} else if (prev_gps_uart != gps_uart && gps_uart == false) {
