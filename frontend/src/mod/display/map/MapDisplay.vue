@@ -31,41 +31,6 @@ function callRender() {
     if (!renderer.value) return;
     renderer.value.render();
 }
-function updateRooms(newRoomData: Room[]) {
-    if (!renderer.value) return;
-    renderer.value.clearTag('polygon');
-    for (let room of newRoomData) {
-        if (!roomList.has(room.id)) {
-            renderer.value.createPolygon(room.polygon, room.polygon.color, {
-                zLayer: 2,
-                tag: 'polygon',
-                floor: room.floor,
-            });
-            roomList.add(room.id);
-        }
-    }
-    callRender();
-}
-function updatePath(newPathData: PathData) {
-    if (!renderer.value) return;
-    renderer.value.clearTag('node point');
-    renderer.value.clearTag('nebor path');
-    const [nodes, neighbors]: PathData = newPathData;
-    for (let node of nodes) {
-        renderer.value.createDot(node, 5, [255, 0, 0, 1], { zLayer: 3, tag: 'node point' });
-    }
-    for (let idx = 0; idx < nodes.length; idx++) {
-        const nodeCrd: Coord = nodes[idx];
-        for (let nbrIdx of neighbors[idx]) {
-            const nbrCrd: Coord = nodes[nbrIdx];
-            renderer.value.createLine(nodeCrd, nbrCrd, [255, 0, 0, 1], 2, {
-                zLayer: 3,
-                tag: 'nebor path',
-            });
-        }
-    }
-    callRender();
-}
 
 // watchers
 watch(canvasRef, (newCanvas) => {
@@ -179,6 +144,8 @@ watch(() => props.currentFloor, (newFloor) => {
 		callRender();
 	}
 })
+
+
 
 // event listeners
 function changeOffset(newOffset: Coord) {

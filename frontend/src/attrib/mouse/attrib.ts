@@ -14,6 +14,9 @@ export const vMouseDrag: Directive = {
     mounted(el, binding) {
         let x: number = 0;
         let y: number = 0;
+		if (typeof binding.value === 'function') {
+			[x, y] = binding.value();
+		}
 
         function onMouseDown() {
             el.addEventListener('mousemove', onMouseMove);

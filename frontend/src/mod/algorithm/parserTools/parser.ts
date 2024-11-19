@@ -1,14 +1,14 @@
 import { Polygon } from '@/mod/data/polygon/polygon';
 import { Room } from '@/mod/data/room/room';
 import { coordToString, stringToCoord } from '@/mod/data/com/vertex';
+import { latitudeToKm, longitudeToKm, meterToPixel } from '@/utils/distance';
 
 import type { PathData, Nodes, Neighbors } from './pathTools';
 import type { Coord, Color } from '@/mod/data/com/vertex';
 
 export function parseMappyCSV(fileData: string) {
+	console.log("stated parsing")
     const nestedArrayData: string[][] = fileData.split('\n').map((line) => line.split(';'));
-    // Remove the last line due to trailing \n
-    nestedArrayData.pop();
 
     const roomDataArray: Room[] = [];
 
@@ -17,11 +17,22 @@ export function parseMappyCSV(fileData: string) {
         const vertices: Coord[] = [];
         for (let idx = 1; idx < dataLine.length; idx++) {
 			const splitCoord = dataLine[idx].split(',')
-            vertices.push([parseFloat(splitCoord[0]), parseFloat(splitCoord[1])]);
+			const latKm = latitudeToKm(parseFloat(splitCoord[0]))
+			const lngKm = longitudeToKm(
+				parseFloat(splitCoord[1]),
+				parseFloat(splitCoord[0])
+			)
+			const latM = latKm * 1000;
+			const lngM = lngKm * 1000;
+			const latP = meterToPixel(latM)
+			const lngP = meterToPixel(lngM)
+			console.log(`Lat: ${latP}, Lng: ${lngP}`)
+            vertices.push([latP, lngP]);
         }
         const roomPolygon: Polygon = new Polygon(vertices, [70, 70, 70, 0.4]);
         const roomData: Room = new Room(0, 1, roomPolygon, id);
         roomDataArray.push(roomData);
+		console.log(roomData)
     }
 
     return roomDataArray;
