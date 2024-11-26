@@ -19,6 +19,28 @@ const router = createRouter({
             name: 'dev/editor',
             component: () => import('@/pages/dev/editor/indexEditor.vue'),
         },
+        {
+            path: '/docs',
+            name: 'docs',
+            component: () => import('@/pages/docs/indexDocs.vue'),
+        },
+
+        {
+            path: '/docs/mapjs',
+            name: 'docs/mapjs',
+            component: () => import('@/pages/docs/mapJS.vue'),
+        },
+
+        {
+            path: '/docs/room',
+            name: 'docs/room',
+            component: () => import('@/pages/docs/rooms.vue'),
+        },
+        {
+            path: '/docs/polygon',
+            name: 'docs/polygon',
+            component: () => import('@/pages/docs/polygon.vue'),
+        },
     ],
 });
 
