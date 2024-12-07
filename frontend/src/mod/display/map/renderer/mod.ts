@@ -8,6 +8,7 @@ export class Renderer {
     public tagRecord: Map<string, number> = new Map<string, number>();
     public background: Color = [255, 255, 255, 1];
     public closureOption: ClosureOptions = {
+		globalOffset: [0, 0],
         coordinateOffset: [0, 0],
         canvasSize: [window.innerWidth, window.innerHeight],
         renderingFloor: 1,
@@ -29,15 +30,15 @@ export class Renderer {
 
     _getOffset(opts: ClosureOptions, options: ClosureConfig): Coord {
         if (options.static) {
-            return [0, 0];
+            return opts.globalOffset;
         }
         if (options.repeating) {
             return [
-                opts.coordinateOffset[0] % options.repeating,
-                opts.coordinateOffset[1] % options.repeating,
+                (opts.coordinateOffset[0] + opts.globalOffset[0]) % options.repeating,
+                (opts.coordinateOffset[1] + opts.globalOffset[1]) % options.repeating,
             ];
         }
-        return opts.coordinateOffset;
+        return opts.coordinateOffset.map((val, idx) => val+opts.globalOffset[idx]) as Coord;
     }
 	_isNotCorrectFloor(opts: ClosureOptions, options: ClosureConfig) {
 		if (options.floor) {
@@ -184,5 +185,9 @@ export class Renderer {
 
 	set floor(newFloor: number) {
 		this.closureOption.renderingFloor = newFloor;
+	}
+
+	set globalOffset(newOffset: Coord) {
+		this.closureOption.globalOffset = newOffset;
 	}
 }

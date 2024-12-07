@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
-import { Renderer } from './renderer/mod';
+import { Renderer } from 'mapjs';
 import { Room } from '@/mod/data/room/room';
 import { vMouseDrag } from '@/attrib/mouse/attrib';
 import { generateDivider } from './utils';
@@ -16,6 +16,7 @@ const props = defineProps<{
     currentFloor: number;
     pathData: PathData;
     roomData: Room[];
+	globalOffset: [number, number];
     pathfindingData?: [number, number];
     getOffset?: (coord: Coord) => any;
 }>();
@@ -45,6 +46,7 @@ watch(canvasRef, (newCanvas) => {
 
 watch(renderer, (newRenderer) => {
     if (newRenderer) {
+		newRenderer.globalOffset = props.globalOffset
         roomList.clear();
         const dividerLines = generateDivider(lineGap);
         const [nodes, neighbors]: PathData = props.pathData;
@@ -53,6 +55,7 @@ watch(renderer, (newRenderer) => {
             const [start, end, color, thickness, options]: LineData = line;
             newRenderer.createLine(start, end, color, thickness, options);
         }
+
         for (let room of props.roomData) {
             if (!roomList.has(room.id)) {
                 newRenderer.createPolygon(room.polygon, room.polygon.color, {
@@ -63,9 +66,11 @@ watch(renderer, (newRenderer) => {
                 roomList.add(room.id);
             }
         }
+
         for (let node of nodes) {
             newRenderer.createDot(node, 5, [255, 0, 0, 1], { zLayer: 3, tag: 'node point' });
         }
+
         for (let idx = 0; idx < nodes.length; idx++) {
             const nodeCrd: Coord = nodes[idx];
             for (let nbrIdx of neighbors[idx]) {
@@ -97,7 +102,7 @@ watch(
         callRender();
     }
 );
-watch(
+/*watch(
     () => props.pathData,
     (newPathData) => {
         if (!renderer.value) return;
@@ -119,7 +124,7 @@ watch(
         }
         callRender();
     }
-);
+);*/
 watch(
     () => props.pathfindingData,
     (newData) => {

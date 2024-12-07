@@ -5,12 +5,15 @@ import { latitudeToKm, longitudeToKm, meterToPixel } from '@/utils/distance';
 
 import type { PathData, Nodes, Neighbors } from './pathTools';
 import type { Coord, Color } from '@/mod/data/com/vertex';
+import type { GPSMetadata } from './def'
 
-export function parseMappyCSV(fileData: string) {
+export function parseMappyCSV(fileData: string): GPSMetadata {
 	console.log("stated parsing")
     const nestedArrayData: string[][] = fileData.split('\n').map((line) => line.split(';'));
 
     const roomDataArray: Room[] = [];
+	let latMin: number = Infinity;
+	let lngMin: number = Infinity;
 
     for (const dataLine of nestedArrayData) {
         const id: string = dataLine[0];
@@ -26,8 +29,12 @@ export function parseMappyCSV(fileData: string) {
 			const lngM = lngKm * 1000;
 			const latP = meterToPixel(latM)
 			const lngP = meterToPixel(lngM)
+			if (latP < latMin) {
+				latMin = latP
+				lngMin = lngP
+			}
 			console.log(`Lat: ${latP}, Lng: ${lngP}`)
-            vertices.push([latP, lngP]);
+            vertices.push([lngP, latP]);
         }
         const roomPolygon: Polygon = new Polygon(vertices, [70, 70, 70, 0.4]);
         const roomData: Room = new Room(0, 1, roomPolygon, id);
@@ -35,7 +42,20 @@ export function parseMappyCSV(fileData: string) {
 		console.log(roomData)
     }
 
-    return roomDataArray;
+	for (let room of roomDataArray) {
+		const poly: Polygon = room.polygon
+		const newVert: Coord[] = poly.vertices.map(
+			coord => [
+				coord[0]-lngMin, coord[1]-latMin
+			] as Coord
+		)
+		poly.updateVertices(newVert)
+	}
+
+    return {
+		gpsOffset: [latMin, lngMin],
+		roomData: roomDataArray
+	};
 }
 
 export function generatePathFileData([nodes, neighbors]: PathData): string {

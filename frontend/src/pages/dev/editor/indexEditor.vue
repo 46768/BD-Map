@@ -24,6 +24,7 @@ const fileReader: FileReader = new FileReader();
 const csvData: Ref<Room[]> = ref([]);
 const pathData: Ref<PathData> = ref(blankPath);
 const canvasOffset: Ref<Coord> = ref([0, 0]);
+const globalOffset: Ref<Coord> = ref([0, 0]);
 const hoveringRoom: Ref<Room> = ref(Room.blank);
 const selectingRoom: Ref<Room> = ref(Room.blank);
 const pathfindData: Ref<[number, number] | undefined> = ref();
@@ -79,7 +80,7 @@ fileReader.addEventListener('load', () => {
     }
     const fileData: string = fileReader.result;
 
-    csvData.value = parseMappyCSV(fileData);
+    csvData.value = parseMappyCSV(fileData).roomData;
     callRender();
 });
 
@@ -116,6 +117,7 @@ watch(csvInput, (newInputEl) => {
                 :room-data="csvData"
                 :pathfinding-data="pathfindData"
                 :get-offset="(offset) => (canvasOffset = offset)"
+				:global-offset="globalOffset"
             />
         </div>
 
@@ -150,6 +152,13 @@ watch(csvInput, (newInputEl) => {
 			<button class="fixed bottom-[16rem] left-2" @click="refreshRenderer">
 				refresh map
             </button>
+            <div class="fixed bottom-[18rem] left-2">
+                <p class="inline">
+                    offset
+                </p>
+                <input class="inline w-[4rem]" type="number" v-model="globalOffset[0]" />
+                <input class="inline w-[4rem]" type="number" v-model="globalOffset[1]" />
+            </div>
         </div>
     </div>
 </template>

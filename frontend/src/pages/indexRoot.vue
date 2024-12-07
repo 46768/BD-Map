@@ -14,7 +14,12 @@ function tp() {
 </script>
 
 <template>
-    <MapDisplay :gps-coord="[0, 0]" :current-floor="1" :path-data="tp()" :room-data="test()" />
+    <MapDisplay 
+	:gps-coord="[0, 0]" 
+	:current-floor="1" 
+	:path-data="tp()" 
+	:room-data="test()" 
+	:global-offset="[0, 0]"/>
 </template>
 
 <style></style>

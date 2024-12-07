@@ -1,6 +1,7 @@
 import type { Coord, Color } from '@/mod/data/com/vertex';
 
 export interface ClosureOptions {
+	globalOffset: Coord;
     coordinateOffset: Coord;
     canvasSize: Coord;
     renderingFloor: number;
