@@ -162,7 +162,9 @@ watch(
         renderer.value.clearTag('pathfind-obj');
         if (!newData) return;
         const [source, target] = newData;
+		const start = performance.now();
         const [lines, points] = generatePathObjects(props.pathData, source, target);
+		console.log(`pathfind from ${source} to ${target}: ${performance.now()-start}`);
         for (let point of points) {
             renderer.value.createDot(...point);
         }

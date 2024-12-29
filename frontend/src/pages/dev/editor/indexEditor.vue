@@ -66,6 +66,9 @@ function getHoveringPolygon(hoverPoint: Coord) {
     }
     callRender();
 }
+function testAStar() {
+
+}
 function generatePathData() {
     pathData.value = generatePath(csvData.value);
     console.log(pathData.value);
